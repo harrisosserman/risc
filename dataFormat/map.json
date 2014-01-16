@@ -10,8 +10,6 @@
                 }
             ]
         }
-
-
-    ]
-
+    ],
+    "additionalTroops": 5  <-- NOTE, THIS IS OPTIONAL AND IS ONLY PASSED ON INITIALIZATION
 }
