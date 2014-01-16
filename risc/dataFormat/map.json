@@ -1,0 +1,17 @@
+{
+    "_id": "asdfasfdadf",
+    "numPlayers": 5,
+    "turns": [
+        {
+            "territories": [
+                {
+                    "owner": 2,
+                    "troops": 5
+                }
+            ]
+        }
+
+
+    ]
+
+}

@@ -1,11 +1,12 @@
 initialization.waitingPlayers
 {
   _gameID: “asdfasdfief”
-  started: false
-  players:
-  {
-    name: “name1”,
-    name: “name2”,
-    name: “name3”,
-  }
+  players: [ {
+	name: “name1”, 
+	ready: true
+	},
+	{
+	name: “name2”,
+	ready: false
+	}
 }
