@@ -127,3 +127,369 @@ Sending app actor 14 source files
 2014-01-16 23:06:47,662 - [DEBUG] - from application in ForkJoinPool-3-worker-9 
 Sending app actor 14 source files
 
+2014-01-17 13:31:28,296 - [DEBUG] - from application in ForkJoinPool-3-worker-15 
+Sending app actor 14 source files
+
+2014-01-17 13:42:20,766 - [DEBUG] - from application in ForkJoinPool-3-worker-11 
+Sending app actor 14 source files
+
+2014-01-17 13:47:02,199 - [DEBUG] - from application in ForkJoinPool-3-worker-5 
+Sending app actor 14 source files
+
+2014-01-17 13:47:47,452 - [DEBUG] - from application in ForkJoinPool-3-worker-5 
+Sending app actor 14 source files
+
+2014-01-17 13:49:34,544 - [DEBUG] - from application in ForkJoinPool-3-worker-5 
+Sending app actor 14 source files
+
+2014-01-17 13:51:11,460 - [DEBUG] - from application in ForkJoinPool-3-worker-13 
+Sending app actor 14 source files
+
+2014-01-17 13:53:08,531 - [DEBUG] - from application in ForkJoinPool-3-worker-7 
+Sending app actor 14 source files
+
+2014-01-17 14:00:48,095 - [DEBUG] - from application in ForkJoinPool-3-worker-13 
+Sending app actor 14 source files
+
+2014-01-17 14:02:18,567 - [DEBUG] - from application in ForkJoinPool-3-worker-15 
+Sending app actor 14 source files
+
+2014-01-17 14:06:50,885 - [DEBUG] - from application in ForkJoinPool-3-worker-1 
+Sending app actor 14 source files
+
+2014-01-17 14:11:37,382 - [INFO] - from application in Thread-6 
+onStop received closing down the app
+
+2014-01-17 14:11:37,382 - [WARN] - from application in Thread-6 
+AppManager onApplicationStop is disabled pending some refactoring so it works with FakeApplication in tests
+
+2014-01-17 14:11:54,618 - [INFO] - from play in main 
+Application started (Prod)
+
+2014-01-17 14:11:54,712 - [INFO] - from play in main 
+Listening for HTTP on /127.0.0.1:8888
+
+2014-01-17 14:11:57,684 - [INFO] - from application in default-akka.actor.default-dispatcher-4 
+WebSocket streams created
+
+2014-01-17 14:11:57,767 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/Downloads-1.(null), found: audio/mpeg
+
+2014-01-17 14:11:57,775 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-02-26T14-30-50, found: application/octet-stream
+
+2014-01-17 14:11:57,779 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-02-26T14-31-53, found: application/octet-stream
+
+2014-01-17 14:11:57,784 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-02-27T21-19-00, found: application/octet-stream
+
+2014-01-17 14:11:57,789 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-02T15-21-11, found: application/octet-stream
+
+2014-01-17 14:11:57,792 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-02T15-21-20, found: application/octet-stream
+
+2014-01-17 14:11:57,797 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-05T06-00-42, found: application/octet-stream
+
+2014-01-17 14:11:57,801 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-08T02-44-39, found: application/octet-stream
+
+2014-01-17 14:11:57,806 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-09T03-32-35, found: application/octet-stream
+
+2014-01-17 14:11:57,810 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-12T19-04-55, found: application/octet-stream
+
+2014-01-17 14:11:57,813 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-13T21-20-10, found: application/octet-stream
+
+2014-01-17 14:11:57,817 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-15T01-07-49, found: application/octet-stream
+
+2014-01-17 14:11:57,820 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-17T19-43-32, found: application/octet-stream
+
+2014-01-17 14:11:57,824 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-18T16-27-06, found: application/octet-stream
+
+2014-01-17 14:11:57,827 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-19T13-43-06, found: application/octet-stream
+
+2014-01-17 14:11:57,830 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-20T00-26-10, found: application/octet-stream
+
+2014-01-17 14:11:57,833 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-20T04-39-26, found: application/octet-stream
+
+2014-01-17 14:11:57,839 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+Checking mime type for /Users/osserman/mongo.log.2013-03-21T13-47-57, found: application/octet-stream
+
+2014-01-17 14:12:04,381 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+Loading app for /app html page
+
+2014-01-17 14:12:04,387 - [DEBUG] - from application in play-akka.actor.default-dispatcher-4 
+loaded for html page: App(risc@1})
+
+2014-01-17 14:12:04,760 - [DEBUG] - from application in New I/O worker #10 
+Connect request for app id: risc
+
+2014-01-17 14:12:04,768 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+app looks shiny and new! App(risc@1})
+
+2014-01-17 14:12:04,768 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+Computing connection streams for app ID risc
+
+2014-01-17 14:12:04,770 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+Loaded app for connection: App(risc@1})
+
+2014-01-17 14:12:04,774 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+CreateWebSocket resulted in (snap.WebSocketActor$ActorIteratee@1e8e2a09,play.api.libs.iteratee.Concurrent$$anon$10@769c48b)
+
+2014-01-17 14:12:04,774 - [DEBUG] - from application in play-akka.actor.default-dispatcher-3 
+WebSocket streams created
+
+2014-01-17 14:12:05,242 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator, found: application/x-shellscript
+
+2014-01-17 14:12:05,244 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator-launch-1.0.10.jar, found: application/zip
+
+2014-01-17 14:12:05,246 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/LICENSE, found: application/octet-stream
+
+2014-01-17 14:12:13,033 - [DEBUG] - from application in ForkJoinPool-3-worker-13 
+Sending app actor 14 source files
+
+2014-01-17 14:12:14,625 - [DEBUG] - from application in ForkJoinPool-3-worker-13 
+Sending app actor 14 source files
+
+2014-01-17 14:15:38,528 - [DEBUG] - from application in ForkJoinPool-3-worker-13 
+Sending app actor 14 source files
+
+2014-01-17 14:15:47,573 - [DEBUG] - from application in ForkJoinPool-3-worker-7 
+Sending app actor 14 source files
+
+2014-01-17 14:17:05,248 - [DEBUG] - from application in play-akka.actor.default-dispatcher-16 
+Loading app for /app html page
+
+2014-01-17 14:17:05,248 - [DEBUG] - from application in play-akka.actor.default-dispatcher-16 
+loaded for html page: App(risc@1})
+
+2014-01-17 14:17:05,799 - [DEBUG] - from application in New I/O worker #14 
+Connect request for app id: risc
+
+2014-01-17 14:17:05,800 - [DEBUG] - from application in play-akka.actor.default-dispatcher-18 
+browser tab already connected to App(risc@1}), disconnecting it
+
+2014-01-17 14:17:05,802 - [DEBUG] - from application in default-akka.actor.default-dispatcher-7 
+Will retry in 300 milliseconds (failure was java.lang.Exception: retry after killing app actor)
+
+2014-01-17 14:17:06,109 - [DEBUG] - from application in play-akka.actor.default-dispatcher-6 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator, found: application/x-shellscript
+
+2014-01-17 14:17:06,110 - [DEBUG] - from application in play-akka.actor.default-dispatcher-6 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator-launch-1.0.10.jar, found: application/zip
+
+2014-01-17 14:17:06,112 - [DEBUG] - from application in play-akka.actor.default-dispatcher-6 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/LICENSE, found: application/octet-stream
+
+2014-01-17 14:17:06,123 - [DEBUG] - from application in default-akka.actor.default-dispatcher-15 
+Retrying now...
+
+2014-01-17 14:17:06,366 - [DEBUG] - from application in default-akka.actor.default-dispatcher-7 
+Will retry in 300 milliseconds (failure was java.lang.Exception: actor Actor[akka://default/temp/$a] has terminated)
+
+2014-01-17 14:17:06,684 - [DEBUG] - from application in default-akka.actor.default-dispatcher-7 
+Retrying now...
+
+2014-01-17 14:17:06,686 - [DEBUG] - from application in play-akka.actor.default-dispatcher-17 
+app looks shiny and new! App(risc@2})
+
+2014-01-17 14:17:06,686 - [DEBUG] - from application in play-akka.actor.default-dispatcher-17 
+Computing connection streams for app ID risc
+
+2014-01-17 14:17:06,686 - [DEBUG] - from application in play-akka.actor.default-dispatcher-17 
+Loaded app for connection: App(risc@2})
+
+2014-01-17 14:17:06,687 - [DEBUG] - from application in play-akka.actor.default-dispatcher-17 
+CreateWebSocket resulted in (snap.WebSocketActor$ActorIteratee@31df588a,play.api.libs.iteratee.Concurrent$$anon$10@3e2de59a)
+
+2014-01-17 14:17:06,687 - [DEBUG] - from application in play-akka.actor.default-dispatcher-17 
+WebSocket streams created
+
+2014-01-17 14:17:15,670 - [DEBUG] - from application in ForkJoinPool-3-worker-7 
+Sending app actor 14 source files
+
+2014-01-17 14:17:17,412 - [DEBUG] - from application in ForkJoinPool-3-worker-1 
+Sending app actor 14 source files
+
+2014-01-17 14:32:56,732 - [DEBUG] - from application in ForkJoinPool-3-worker-15 
+Sending app actor 14 source files
+
+2014-01-17 16:30:39,751 - [DEBUG] - from application in play-akka.actor.default-dispatcher-24 
+Loading app for /app html page
+
+2014-01-17 16:30:39,752 - [DEBUG] - from application in play-akka.actor.default-dispatcher-24 
+loaded for html page: App(risc@2})
+
+2014-01-17 16:30:40,164 - [DEBUG] - from application in New I/O worker #7 
+Connect request for app id: risc
+
+2014-01-17 16:30:40,165 - [DEBUG] - from application in play-akka.actor.default-dispatcher-28 
+browser tab already connected to App(risc@2}), disconnecting it
+
+2014-01-17 16:30:40,166 - [DEBUG] - from application in default-akka.actor.default-dispatcher-15 
+Will retry in 300 milliseconds (failure was java.lang.Exception: retry after killing app actor)
+
+2014-01-17 16:30:40,483 - [DEBUG] - from application in default-akka.actor.default-dispatcher-2 
+Retrying now...
+
+2014-01-17 16:30:40,651 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator, found: application/x-shellscript
+
+2014-01-17 16:30:40,653 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator-launch-1.0.10.jar, found: application/zip
+
+2014-01-17 16:30:40,655 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/LICENSE, found: application/octet-stream
+
+2014-01-17 16:30:40,686 - [DEBUG] - from application in default-akka.actor.default-dispatcher-7 
+Will retry in 300 milliseconds (failure was java.lang.Exception: actor Actor[akka://default/temp/$b] has terminated)
+
+2014-01-17 16:30:41,003 - [DEBUG] - from application in default-akka.actor.default-dispatcher-7 
+Retrying now...
+
+2014-01-17 16:30:41,006 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+app looks shiny and new! App(risc@5})
+
+2014-01-17 16:30:41,007 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+Computing connection streams for app ID risc
+
+2014-01-17 16:30:41,007 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+Loaded app for connection: App(risc@5})
+
+2014-01-17 16:30:41,009 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+CreateWebSocket resulted in (snap.WebSocketActor$ActorIteratee@1713abe4,play.api.libs.iteratee.Concurrent$$anon$10@c7a1192)
+
+2014-01-17 16:30:41,009 - [DEBUG] - from application in play-akka.actor.default-dispatcher-30 
+WebSocket streams created
+
+2014-01-17 16:30:50,530 - [DEBUG] - from application in ForkJoinPool-3-worker-3 
+Sending app actor 14 source files
+
+2014-01-17 16:32:10,213 - [INFO] - from application in Thread-6 
+onStop received closing down the app
+
+2014-01-17 16:32:10,213 - [WARN] - from application in Thread-6 
+AppManager onApplicationStop is disabled pending some refactoring so it works with FakeApplication in tests
+
+2014-01-17 16:32:16,241 - [INFO] - from play in main 
+Application started (Prod)
+
+2014-01-17 16:32:16,362 - [INFO] - from play in main 
+Listening for HTTP on /127.0.0.1:8888
+
+2014-01-17 16:32:19,977 - [INFO] - from application in default-akka.actor.default-dispatcher-2 
+WebSocket streams created
+
+2014-01-17 16:32:20,043 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/Downloads-1.(null), found: audio/mpeg
+
+2014-01-17 16:32:20,049 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-02-26T14-30-50, found: application/octet-stream
+
+2014-01-17 16:32:20,055 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-02-26T14-31-53, found: application/octet-stream
+
+2014-01-17 16:32:20,060 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-02-27T21-19-00, found: application/octet-stream
+
+2014-01-17 16:32:20,065 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-02T15-21-11, found: application/octet-stream
+
+2014-01-17 16:32:20,069 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-02T15-21-20, found: application/octet-stream
+
+2014-01-17 16:32:20,073 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-05T06-00-42, found: application/octet-stream
+
+2014-01-17 16:32:20,076 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-08T02-44-39, found: application/octet-stream
+
+2014-01-17 16:32:20,079 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-09T03-32-35, found: application/octet-stream
+
+2014-01-17 16:32:20,083 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-12T19-04-55, found: application/octet-stream
+
+2014-01-17 16:32:20,087 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-13T21-20-10, found: application/octet-stream
+
+2014-01-17 16:32:20,091 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-15T01-07-49, found: application/octet-stream
+
+2014-01-17 16:32:20,095 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-17T19-43-32, found: application/octet-stream
+
+2014-01-17 16:32:20,099 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-18T16-27-06, found: application/octet-stream
+
+2014-01-17 16:32:20,103 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-19T13-43-06, found: application/octet-stream
+
+2014-01-17 16:32:20,106 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-20T00-26-10, found: application/octet-stream
+
+2014-01-17 16:32:20,109 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-20T04-39-26, found: application/octet-stream
+
+2014-01-17 16:32:20,114 - [DEBUG] - from application in play-akka.actor.default-dispatcher-9 
+Checking mime type for /Users/osserman/mongo.log.2013-03-21T13-47-57, found: application/octet-stream
+
+2014-01-17 16:32:27,408 - [DEBUG] - from application in play-akka.actor.default-dispatcher-7 
+Loading app for /app html page
+
+2014-01-17 16:32:27,416 - [DEBUG] - from application in play-akka.actor.default-dispatcher-5 
+loaded for html page: App(risc@1})
+
+2014-01-17 16:32:27,764 - [DEBUG] - from application in New I/O worker #10 
+Connect request for app id: risc
+
+2014-01-17 16:32:27,771 - [DEBUG] - from application in play-akka.actor.default-dispatcher-6 
+app looks shiny and new! App(risc@1})
+
+2014-01-17 16:32:27,771 - [DEBUG] - from application in play-akka.actor.default-dispatcher-6 
+Computing connection streams for app ID risc
+
+2014-01-17 16:32:27,773 - [DEBUG] - from application in play-akka.actor.default-dispatcher-6 
+Loaded app for connection: App(risc@1})
+
+2014-01-17 16:32:27,778 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+CreateWebSocket resulted in (snap.WebSocketActor$ActorIteratee@183ee521,play.api.libs.iteratee.Concurrent$$anon$10@4934e5f6)
+
+2014-01-17 16:32:27,778 - [DEBUG] - from application in play-akka.actor.default-dispatcher-2 
+WebSocket streams created
+
+2014-01-17 16:32:28,070 - [DEBUG] - from application in play-akka.actor.default-dispatcher-8 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator, found: application/x-shellscript
+
+2014-01-17 16:32:28,072 - [DEBUG] - from application in play-akka.actor.default-dispatcher-8 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/activator-launch-1.0.10.jar, found: application/zip
+
+2014-01-17 16:32:28,075 - [DEBUG] - from application in play-akka.actor.default-dispatcher-8 
+Checking mime type for /Users/osserman/Documents/Spring Senior Year/ECE 496/risc/risc/LICENSE, found: application/octet-stream
+
+2014-01-17 16:32:36,853 - [DEBUG] - from application in ForkJoinPool-3-worker-13 
+Sending app actor 14 source files
+
+2014-01-17 16:32:44,685 - [DEBUG] - from application in ForkJoinPool-3-worker-15 
+Sending app actor 14 source files
+
+2014-01-17 16:40:34,043 - [DEBUG] - from application in ForkJoinPool-3-worker-11 
+Sending app actor 14 source files
+
+2014-01-17 17:10:41,377 - [DEBUG] - from application in ForkJoinPool-3-worker-15 
+Sending app actor 14 source files
+
