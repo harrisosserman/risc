@@ -5,9 +5,10 @@
 <head>
     <title>@title</title>
     <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")'>
-    <link rel='stylesheet' href='@routes.Assets.at("javascript/libraries/knockout.js"))'>
-    <link rel='stylesheet' href='@routes.Assets.at("javascript/libraries/bootstrap.js"))'>
-    <link rel='stylesheet' href='@routes.Assets.at("stylesheets/index.css")'>
+    <script type='text/javascript' href='@routes.Assets.at("javascript/knockout.js"))'></script>
+    <script type='text/javascript' href='@routes.Assets.at("javascript/bootstrap.js"))'></script>
+
+    <link rel="stylesheet" href='@routes.Assets.at("stylesheets/bootstrap.css")'>
     <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
     <script type="text/javascript" src="@routes.MessageController.javascriptRoutes"></script>
 </head>
@@ -20,7 +21,19 @@
         </div>
     </div>
     <div class="container">
-        @content
+        <div class="modal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Play Risc!</h4>
+              </div>
+              <div class="modal-body">
+                <input type="text" name="playerName" placeholder="Player Name" />
+                <input type="submit" name="start" value="Play!" />
+              </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     </div>
 </body>
 </html>
