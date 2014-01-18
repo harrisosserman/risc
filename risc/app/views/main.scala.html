@@ -5,6 +5,7 @@
     <head>
         <title>Risc</title>
         <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")'>
+        <link rel="stylesheet" href='@routes.Assets.at("stylesheets/shame.css")'>
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")'>
         <script type="text/javascript" src="@routes.MessageController.javascriptRoutes"></script>
     </head>
@@ -24,7 +25,7 @@
                     <h4 class="modal-title">Play Risc!</h4>
                   </div>
                   <div class="modal-body">
-                    <div data-bind="visible: displayGameStart">
+                    <div data-bind="visible: displayGameStart" class="form-inline">
                         <input type="text" data-bind="value: playerName" placeholder="Player Name"></input>
                         <button data-bind="click: enterGame">Play</button>
                     </div>
