@@ -9,31 +9,43 @@
         <script type="text/javascript" src="@routes.MessageController.javascriptRoutes"></script>
     </head>
     <body>
-        <div class="navbar navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container-fluid">
-                    <a class="brand" href="/">Risc</a>
+        <div class="container">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <h5 style="text-align: center; color: white">Risc</h3>
                 </div>
             </div>
         </div>
         <div class="container">
-            <div class="modal">
+            <div class="modal" data-bind="visible: displayModal">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h4 class="modal-title">Play Risc!</h4>
                   </div>
-                  <div class="modal-body" data-bind="visible: displayGameStart">
-                    <input type="text" data-bind="value: playerName" placeholder="Player Name" />
-                    <input type="submit" value="Play!" data-bind="click: enterGame" />
+                  <div class="modal-body">
+                    <div data-bind="visible: displayGameStart">
+                        <input type="text" data-bind="value: playerName" placeholder="Player Name"></input>
+                        <button data-bind="click: enterGame">Play</button>
+                    </div>
+                    <div data-bind="visible: displayGameWaitingRoom">
+                        <label type="text" data-bind="text: playerName"></label>
+                        <button data-bind="click: startGame">I'm ready</button>
+                    </div>
                   </div>
-                  <div class="modal-body" data-bind="visible: displayGameWaitingRoom">
-                    <label type="text" data-bind="text: playerName" />
-                    <input type="submit" value="I'm ready!" />
-                  </div>
-                </div><!-- /.modal-content -->
-              </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                </div>
+              </div>
+            </div>
+
+            <div data-bind="visible: displayMap">
+                <div class="row-fluid">
+                    <table class="table table-bordered" id="map">
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/knockout.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/bootstrap.js")'></script>
