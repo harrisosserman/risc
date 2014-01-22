@@ -1,0 +1,9 @@
+package models;
+
+public class API {
+
+    public static result createGame() {
+        //fill in with game creation logic
+        return ok("GAME CREATED");
+    }
+}
