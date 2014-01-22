@@ -28,16 +28,17 @@
             self.displayMap(true);
         };
         self.pollGameWaitingRoom = function(gameId) {
-            while(true) {
-                $.ajax('/game/' + gameId, {
-                    method: 'GET'
-                }).done(function() {
-                    break;
-                }).fail(function(result) {
-                    //add each element from result into observable array
-                });
-                $.delay(5000);  //wait 5 seconds before polling again
-            }
+            return;
+            // while(true) {
+            //     $.ajax('/game/' + gameId, {
+            //         method: 'GET'
+            //     }).done(function() {
+            //         break;
+            //     }).fail(function(result) {
+            //         //add each element from result into observable array
+            //     });
+            //     $.delay(5000);  //wait 5 seconds before polling again
+            // }
         };
     }
     ko.applyBindings(new viewModel());

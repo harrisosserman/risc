@@ -4,9 +4,9 @@
 <html>
     <head>
         <title>Risc</title>
-        <link rel='shortcut icon' type='image/png' href='@controllers.Assets.at("/public","images/favicon.png")'>
-        <link rel="stylesheet" href='@controllers.Assets.at("/public","stylesheets/shame.css")'>
-        <link rel="stylesheet" href='@controllers.Assets.at("/public","stylesheets/libraries/bootstrap.css")'>
+        <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")' />
+        <link rel="stylesheet" href='@routes.Assets.at("stylesheets/shame.css")' />
+        <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")' />
     </head>
     <body>
         <div class="container">
@@ -47,9 +47,8 @@
                 </div>
             </div>
         </div>
-        <script type='text/javascript' src='@controllers.Assets.at("/public","javascript/libraries/knockout.js")'></script>
-        <script type='text/javascript' src='@controllers.Assets.at("/public","javascript/libraries/bootstrap.js")'></script>
-        <script type='text/javascript' src='@controllers.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
-        <script type='text/javascript' src='@controllers.Assets.at("/public","javascript/index.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/knockout.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/bootstrap.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/index.js")'></script>
     </body>
 </html>
