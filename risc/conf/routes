@@ -7,6 +7,8 @@ POST    /game                       controllers.API.createGame()
 
 #   API calls that Harris made for testing the front end
 POST    /test/game                  controllers.TestAPI.createTestGame()
+POST    /test/game/:id/start        controllers.TestAPI.startTestGame(id: Long)
+GET     /test/game/:id              controllers.TestAPI.getTestGame(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /public/*file               controllers.Assets.at(path="/public", file)

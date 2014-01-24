@@ -29,9 +29,20 @@
                         <button data-bind="click: enterGame">Play</button>
                     </div>
                     <div data-bind="visible: displayGameWaitingRoom">
-                        <div data-bind="foreach: playerList">
-                            <label type="text" data-bind="text: $data"></label>
-                        </div>
+                        <h3>Players in the game are:</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td><strong>Player Name</strong></td>
+                                    <td><strong>Is Ready?</strong></td>
+                            </thead>
+                            <tbody data-bind="foreach: playerList">
+                                <tr>
+                                    <td data-bind="text: name"></td>
+                                    <td data-bind="text: ready"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <button data-bind="click: startGame">I'm ready</button>
                     </div>
                   </div>
@@ -41,8 +52,8 @@
 
             <div data-bind="visible: displayMap">
                 <div class="row-fluid">
-                    <table class="table table-bordered" id="map">
-                        <tbody>
+                    <table class="table table-bordered">
+                        <tbody id="map">
 
                         </tbody>
                     </table>
