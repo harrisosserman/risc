@@ -38,7 +38,10 @@
                             </thead>
                             <tbody data-bind="foreach: playerList">
                                 <tr>
-                                    <td data-bind="text: name"></td>
+                                    <td>
+                                        <span data-bind="text: ($index() + 1)"></span>:
+                                        <span data-bind="text: name"></span>
+                                    </td>
                                     <td data-bind="text: ready"></td>
                                 </tr>
                             </tbody>
@@ -54,9 +57,16 @@
                 <div class="row-fluid">
                     <table class="table table-bordered">
                         <tbody id="map">
-
+                            <!-- The table cells are created with JavaScript in the index.js file -->
                         </tbody>
                     </table>
+                </div>
+                <div class="row-fluid">
+                    <div class = "well well-sm">
+                        <div data-bind="foreach: playerList">
+                            <p>Player <span data-bind="text: ($index() + 1)"></span>: <span data-bind="text: name"></span></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
