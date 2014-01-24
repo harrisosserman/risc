@@ -5,6 +5,9 @@
 GET     /                           controllers.MainController.index()
 POST    /game                       controllers.API.createGame()
 
+#   API calls that Harris made for testing the front end
+POST    /test/game                  controllers.TestAPI.createTestGame()
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /public/*file               controllers.Assets.at(path="/public", file)
 GET     /webjars/*file              controllers.WebJarAssets.at(file)

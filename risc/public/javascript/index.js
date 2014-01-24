@@ -7,21 +7,28 @@
         self.displayModal = ko.observable(true);
         self.displayMap = ko.observable(false);
         self.playerList = ko.observableArray([]);
+        self.gameId = -1;
         self.enterGame = function() {
-            self.displayGameWaitingRoom(true);
-            self.displayGameStart(false);
-            // var data = {
-            //     "name": self.playerName
-            // };
-            // $.ajax('/game/', {
-            //             method: 'POST',
-            //             data: data
-            //         }).done(function(result) {
-            //             self.displayGameWaitingRoom(true);
-            //             self.displayGameStart(false);
-            //             // get names
-            //         });
-            pollGameWaitingRoom(12345);      //pass in game id
+            // self.displayGameWaitingRoom(true);
+            // self.displayGameStart(false);
+            var data = {
+                "name": self.playerName
+            };
+            $.ajax('/test/game', {
+                        method: 'POST',
+                        data: data
+                    }).done(function(result) {
+                        self.displayGameWaitingRoom(true);
+                        self.displayGameStart(false);
+                        var players = $.parseJSON(result);
+                        self.gameId = players.gameId;
+                        for(var k=0; k<players.players.length; k++) {
+                            self.playerList.push(players.players[k].name);
+                            console.log(players.players[k].name);
+                        }
+                        // get names
+                    });
+            // pollGameWaitingRoom(12345);      //pass in game id
         };
         self.startGame = function() {
             self.displayModal(false);
