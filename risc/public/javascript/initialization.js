@@ -1,5 +1,5 @@
-(function() {
-    function viewModel() {
+(function(ko, Board) {
+    function initializationViewModel() {
         var self = this;
         self.playerName = ko.observable();
         self.playerNumber = -1;
@@ -50,6 +50,7 @@
                     if(allPlayersReady === true) {
                         self.displayModal(false);
                         self.displayMap(true);
+                        new Board(self);
                     } else {
                         setTimeout(self.pollGameWaitingRoom, 1000); //wait 5 seconds before polling again
                     }
@@ -78,8 +79,8 @@
                     });
         };
     }
-    ko.applyBindings(new viewModel());
-})();
+    ko.applyBindings(new initializationViewModel());
+})(window.ko, window.Board);
 
 (function() {
     //function to build map out of table

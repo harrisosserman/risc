@@ -48,6 +48,37 @@ public class TestAPI extends Controller {
     }
 
     public static Result getTestMap(Long id) {
-        return ok();
+        JSONObject result = new JSONObject();
+        result.put("gameID", "3938383");
+        result.put("numPlayers", 3);
+        JSONArray map = new JSONArray();
+        map.put(new JSONObject().put("owner", 1).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 3).put("troops", 5));
+        map.put(new JSONObject().put("owner", 3).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 1).put("troops", 5));
+        map.put(new JSONObject().put("owner", 1).put("troops", 2));
+        map.put(new JSONObject().put("owner", 2).put("troops", 2));
+        map.put(new JSONObject().put("owner", 3).put("troops", 2));
+        map.put(new JSONObject().put("owner", 3).put("troops", 2));
+        map.put(new JSONObject().put("owner", 2).put("troops", 2));
+        map.put(new JSONObject().put("owner", 1).put("troops", 2));
+        map.put(new JSONObject().put("owner", 1).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 3).put("troops", 5));
+        map.put(new JSONObject().put("owner", 3).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 1).put("troops", 5));
+        map.put(new JSONObject().put("owner", 1).put("troops", 2));
+        map.put(new JSONObject().put("owner", 2).put("troops", 2));
+        map.put(new JSONObject().put("owner", 3).put("troops", 2));
+        map.put(new JSONObject().put("owner", 3).put("troops", 2));
+        map.put(new JSONObject().put("owner", 2).put("troops", 2));
+        map.put(new JSONObject().put("owner", 1).put("troops", 2));
+        map.put(new JSONObject().put("owner", 1).put("troops", 10));
+        result.put("map", map);
+        //DEAL WITH ADDITIONAL TROOPS LATER
+        return ok(result.toString());
     }
 }
