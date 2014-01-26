@@ -8,7 +8,7 @@
         self.displayModal = ko.observable(true);
         self.displayMap = ko.observable(false);
         self.playerList = ko.observableArray([]);
-        self.gameId = -1;
+        self.gameID = -1;
         self.enterGame = function() {
             // self.displayGameWaitingRoom(true);
             // self.displayGameStart(false);
@@ -22,7 +22,7 @@
                         self.displayGameWaitingRoom(true);
                         self.displayGameStart(false);
                         var players = $.parseJSON(result);
-                        self.gameId = players.gameId;
+                        self.gameID = players.gameID;
                         for(var k=0; k<players.players.length; k++) {
                             if(self.playerName() === players.players[k].name) playerNumber = k;
                             self.playerList.push({
@@ -33,7 +33,7 @@
                     });
         };
         self.startGame = function() {
-            $.ajax('/test/game/' + self.gameId + '/start', {
+            $.ajax('/test/game/' + self.gameID + '/start', {
                 method: 'POST',
                 data: {
                     'name': self.playerName(),
@@ -56,7 +56,7 @@
                 });
         };
         self.loadWaitingPlayers = function(deferredObject) {
-            $.ajax('/test/game/' + self.gameId, {
+            $.ajax('/test/game/' + self.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
