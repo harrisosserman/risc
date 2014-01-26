@@ -2,6 +2,9 @@ table > tbody > td{
     width: 10px;
     height: 80px;
 }
+.player0 {
+    background-color: white;
+}
 .player1 {
     background-color: #AF81C9;
 }
@@ -16,4 +19,7 @@ table > tbody > td{
 }
 .player5 {
     background-color: #445569;
+}
+.territoryHover {
+    background-color: #FFFFE0;
 }

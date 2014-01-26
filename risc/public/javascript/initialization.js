@@ -8,11 +8,9 @@
         self.displayModal = ko.observable(true);
         self.displayMap = ko.observable(false);
         self.playerList = ko.observableArray([]);
-        // self.colorList = ko.observableArray(['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue']);
+        self.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         self.gameID = -1;
         self.enterGame = function() {
-            // self.displayGameWaitingRoom(true);
-            // self.displayGameStart(false);
             var data = {
                 "name": self.playerName()
             };
@@ -25,7 +23,9 @@
                         var players = $.parseJSON(result);
                         self.gameID = players.gameID;
                         for(var k=0; k<players.players.length; k++) {
-                            if(self.playerName() === players.players[k].name) playerNumber = k;
+                            if(self.playerName() === players.players[k].name) {
+                                self.playerNumber = k + 1;
+                            }
                             self.playerList.push({
                                 'name': players.players[k].name,
                                 'ready': players.players[k].ready});
@@ -53,7 +53,7 @@
                         self.displayMap(true);
                         new Board(self);
                     } else {
-                        setTimeout(self.pollGameWaitingRoom, 1000); //wait 5 seconds before polling again
+                        setTimeout(self.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                     }
                 });
         };
@@ -79,6 +79,9 @@
                         }
                     });
         };
+        self.playerColor = ko.computed(function(index) {
+            return self.colorList[index];
+        }, self);
     }
     ko.applyBindings(new initializationViewModel());
 })(window.ko, window.Board);

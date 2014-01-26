@@ -4,13 +4,23 @@
         var self = context;
         self.territoryInfo = {};
         self.getMap = function() {
+            $(".displayPlayerColor").each(function(index) {
+                $(this).append(self.colorList[index]);
+            });
             $.ajax('/test/game/' + self.gameID + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         self.territoryInfo = $.parseJSON(result);
                         $("#map td").each(function(index) {
-                            // $(this).attr("data-bind", "css: {playerList()[" + index + "]}");
                             $(this).addClass("player" + self.territoryInfo.map[index].owner);
+                            if(self.territoryInfo.map[index].owner === self.playerNumber) {
+                                $(this).hover(function() {
+                                    $(this).addClass("territoryHover");
+                                }, function() {
+                                    $(this).removeClass("territoryHover");
+                                });
+                            }
+
                             $(this).append("<p>troops: " + self.territoryInfo.map[index].troops + "</p>");
                         });
                 });
