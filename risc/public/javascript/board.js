@@ -11,6 +11,7 @@
                         $("#map td").each(function(index) {
                             // $(this).attr("data-bind", "css: {playerList()[" + index + "]}");
                             $(this).addClass("player" + self.territoryInfo.map[index].owner);
+                            $(this).append("<p>troops: " + self.territoryInfo.map[index].troops + "</p>");
                         });
                 });
         };

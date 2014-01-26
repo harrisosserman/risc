@@ -8,6 +8,7 @@
         self.displayModal = ko.observable(true);
         self.displayMap = ko.observable(false);
         self.playerList = ko.observableArray([]);
+        // self.colorList = ko.observableArray(['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue']);
         self.gameID = -1;
         self.enterGame = function() {
             // self.displayGameWaitingRoom(true);
