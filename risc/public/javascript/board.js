@@ -22,8 +22,8 @@
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
-                                    $(this).toggleClass("territoryClick");
                                     self.highlightMap($(this).attr('territoryNumber'));
+                                    $(this).toggleClass("territoryClick");
                                 });
                             }
                             $(this).append("<p>troops: " + self.territoryInfo.map[index].troops + "</p>");
@@ -34,11 +34,11 @@
         self.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
             var map = $("#map td");
-            // if($(map[index]).hasClass('territoryClick') || $(map[index]).hasClass('territoryAttack') || $(map[index]).hasClass('territoryMoveTroops')) {
-            //     //user wants to attack, move troops, or de-highlight
-            //     self.userMapAction(index, map);
-            //     return;
-            // }
+            if($(map[index]).hasClass('territoryClick') || $(map[index]).hasClass('territoryAttack') || $(map[index]).hasClass('territoryMoveTroops')) {
+                //user wants to attack, move troops, or de-highlight
+                self.userMapAction(index, map);
+                return;
+            }
             self.removeAllPreviousAdjacencies();
             var adjacentTerritories = self.findValidAdjacencies(index);
             for(var k=0; k<adjacentTerritories.length; k++) {
@@ -50,11 +50,8 @@
             }
         };
         self.removeAllPreviousAdjacencies = function() {
-            console.log('calling remove all previous adjacencies');
             $("#map td").each(function(){
-                console.log('iterating...');
                 if($(this).hasClass('territoryClick') || $(this).hasClass('territoryAttack') || $(this).hasClass('territoryMoveTroops')) {
-                    console.log($(this));
                     $(this).removeClass('territoryClick territoryAttack territoryMoveTroops');
                 }
             });
@@ -71,8 +68,9 @@
         self.userMapAction = function(index, map) {
             if($(map[index]).hasClass('territoryClick')) {
                 self.removeAllPreviousAdjacencies(map);
+                $(map[index]).addClass('territoryClick');   //need to add territoryClick class again because it will be toggled off in the click function
             } else if($(map[index]).hasClass('territoryMoveTroops')) {
-                self.moveTroops(destination, map);
+                self.moveTroops(index, map);
             } else {
                 //user wants to attack
             }
