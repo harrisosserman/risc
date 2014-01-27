@@ -8,6 +8,9 @@ public class Player {
 
 	public Player(String name){
 		this.myName = name;
-		System.out.println("created player with name:" + myName);
+	}
+
+	public String getName(){
+		return myName;
 	}
 }

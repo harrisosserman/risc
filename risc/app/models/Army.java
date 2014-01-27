@@ -13,7 +13,6 @@ public class Army{
 			Troop t = new Troop();
 			myTroops.add(t);
 		}
-		System.out.println("created an army");
 	}
 
 	public Army branch(int totalStrength){
