@@ -14,6 +14,7 @@
                         $("#map td").each(function(index) {
                             $(this).attr("owner", self.territoryInfo.map[index].owner);
                             $(this).attr("territoryNumber", index + 1);
+                            $(this).attr("troops", self.territoryInfo.map[index].troops);
                             $(this).addClass("player" + self.territoryInfo.map[index].owner);
                             if(self.territoryInfo.map[index].owner === self.playerNumber) {
                                 $(this).hover(function() {
@@ -26,7 +27,7 @@
                                     $(this).toggleClass("territoryClick");
                                 });
                             }
-                            $(this).append("<p>troops: " + self.territoryInfo.map[index].troops + "</p>");
+                            $(this).append("<p >troops: <span>" + self.territoryInfo.map[index].troops + "</span></p>");
                         });
                 });
         };
@@ -57,6 +58,7 @@
             });
         };
         self.findValidAdjacencies = function(index) {
+            //NEED TO IMPROVE THIS FUNCTION.  FINDS SOME ADDJACENCIES THAT ARE NOT ACTUALLY ADJACENT
             var adjacentTerritories = [index + 1, index - 1, index - 5, index + 5, index + 6, index - 6, index + 4, index - 4];
             for(var k=0; k<adjacentTerritories.length; k++) {
                 if(adjacentTerritories[k] < 0 || adjacentTerritories[k] > 24) {
@@ -76,7 +78,27 @@
             }
         };
         self.moveTroops = function(destination, map) {
-            console.log('moving troops to destination ' + destination);
+            var origin = self.findOrigin(destination, map);
+            var originTroops = $(map[origin]).attr('troops');
+            var destinationTroops = $(map[destination]).attr('troops');
+            if(originTroops > 0) {
+                originTroops--;
+                destinationTroops++;
+                $(map[origin]).attr('troops', originTroops);
+                $(map[destination]).attr('troops', destinationTroops);
+                $(map[origin]).children('p').children('span').html(originTroops);
+                $(map[destination]).children('p').children('span').html(destinationTroops);
+            }
+        };
+        self.findOrigin = function(destination, map) {
+            var originTerritory = -1;
+            $(map).each(function(){
+                if($(this).hasClass('territoryClick')) {
+                    originTerritory = $(this).attr('territoryNumber') - 1;
+                    return false;
+                }
+            });
+            return originTerritory;
         };
     }
     window.Board = boardViewModel;
