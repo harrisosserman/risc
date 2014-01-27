@@ -25,7 +25,7 @@ public class API extends Controller {
         game.addPlayer(playerName);
 
         JSONObject result = new JSONObject();
-        result.put(GAME_ID, game.getGameId());
+        result.put(GAME_ID, game.getGameID());
         result.put(PLAYER_ID, game.getPlayerCount());
         return ok(result.toString());
     }
