@@ -11,7 +11,8 @@
                 method: 'GET',
                     }).done(function(result) {
                         self.territoryInfo = $.parseJSON(result);
-                        $("#map td").each(function(index) {
+                        var map = $("#map td");
+                        $(map).each(function(index) {
                             $(this).attr("owner", self.territoryInfo.map[index].owner);
                             $(this).attr("territoryNumber", index + 1);
                             $(this).attr("troops", self.territoryInfo.map[index].troops);
@@ -25,6 +26,11 @@
                                 $(this).click(function() {
                                     self.highlightMap($(this).attr('territoryNumber'));
                                     $(this).toggleClass("territoryClick");
+                                });
+                            } else {
+                                $(this).click(function() {
+                                    //click handler for clicking on enemy territory
+                                    self.userMapAction(index, map);
                                 });
                             }
                             $(this).append("<p >troops: <span>" + self.territoryInfo.map[index].troops + "</span></p>");
@@ -68,13 +74,14 @@
             return adjacentTerritories;
         };
         self.userMapAction = function(index, map) {
+            console.log('user map action called');
             if($(map[index]).hasClass('territoryClick')) {
                 self.removeAllPreviousAdjacencies(map);
                 $(map[index]).addClass('territoryClick');   //need to add territoryClick class again because it will be toggled off in the click function
             } else if($(map[index]).hasClass('territoryMoveTroops')) {
                 self.moveTroops(index, map);
-            } else {
-                //user wants to attack
+            } else if($(map[index]).hasClass('territoryAttack')){
+                self.attack(index, map);
             }
         };
         self.moveTroops = function(destination, map) {
@@ -90,7 +97,18 @@
                 $(map[destination]).children('p').children('span').html(destinationTroops);
             }
         };
+        self.attack = function(destination, map) {
+            var origin = self.findOrigin(destination, map);
+            var originTroops = $(map[origin]).attr('troops');
+            var troopsAttacking = originTroops + 1;
+            console.log('troops attacking is ' + troopsAttacking);
+            while(troopsAttacking > originTroops) {
+                console.log('prompt');
+                troopsAttacking = prompt("How many troops would you like to attack with?  You have " + originTroops + " available");
+            }
+        };
         self.findOrigin = function(destination, map) {
+            //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
             var originTerritory = -1;
             $(map).each(function(){
                 if($(this).hasClass('territoryClick')) {
