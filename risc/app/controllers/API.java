@@ -13,7 +13,7 @@ import play.mvc.BodyParser;
 public class API extends Controller {
 
     private static final String NAME = "name";
-    private static final String GAME_ID = "gameId";
+    private static final String GAME_ID = "gameID";
     private static final String PLAYER_ID = "playerId";
 
     @BodyParser.Of(BodyParser.Json.class)

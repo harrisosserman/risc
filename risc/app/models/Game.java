@@ -7,12 +7,12 @@ public class Game {
 	private static final String DEFAULT_GAME_ID = "12345";
 	private static final int NUM_TERRITORIES = 50;
 
-	private String myGameId;
+	private String myGameID;
 	private ArrayList<Player> myPlayers;
 	private Territory[] myTerritories;
 
 	public Game(){
-		this.myGameId = DEFAULT_GAME_ID;
+		this.myGameID = DEFAULT_GAME_ID;
 		this.myPlayers = new ArrayList<Player>();
 	}
 
@@ -22,7 +22,7 @@ public class Game {
 	}
 
 	public void start(){
-		System.out.println("Should start game: " + this.myGameId);
+		System.out.println("Should start game: " + this.myGameID);
 		assert (myPlayers.size() > 1);
 
 		myTerritories = divyCountries();
@@ -49,8 +49,8 @@ public class Game {
 		return territories;
 	}
 
-	public String getGameId(){
-		return this.myGameId;
+	public String getGameID(){
+		return this.myGameID;
 	}
 
 	public int getPlayerCount(){
