@@ -5,6 +5,9 @@
 GET     /                           controllers.MainController.index()
 POST    /game                       controllers.API.createGame()
 GET		/game/:id					controllers.API.getWaitingPlayers(id: String)
+POST 	/game/:id 					controllers.API.commitTurn(id: String)
+POST	/game/:id/start				controllers.API.startGame(id: String)
+GET 	/game/:id/map 				controllers.API.getMap(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /public/*file               controllers.Assets.at(path="/public", file)
