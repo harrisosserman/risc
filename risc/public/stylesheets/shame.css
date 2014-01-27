@@ -23,3 +23,14 @@ table > tbody > td{
 .territoryHover {
     background-color: #FFFFE0;
 }
+.territoryClick {
+    background-color: #3366BB;
+}
+.territoryAttack {
+    background-color: #af111c;
+    opacity: .5;
+}
+.territoryMoveTroops {
+    background-color: #4D5D53;
+    opacity: .5;
+}
