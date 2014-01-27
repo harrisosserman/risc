@@ -7,15 +7,16 @@ public class Game {
 	private static final String DEFAULT_GAME_ID = "12345";
 
 	private String myGameId;
-	private ArrayList<String> players;
+	private ArrayList<Player> players;
 
 	public Game(){
 		this.myGameId = DEFAULT_GAME_ID;
-		this.players = new ArrayList<String>();
+		this.players = new ArrayList<Player>();
 	}
 
 	public void addPlayer(String name){
-		players.add(name);
+		Player p = new Player(name);
+		players.add(p);
 		System.out.println("add player with name: " + name);
 	}
 
