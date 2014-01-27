@@ -20,4 +20,8 @@ public class API extends Controller {
 
         return ok("GAME IS CREATED");
     }
+
+    public static Result getWaitingPlayers(String id) {
+    	return ok("will return a JSON of waiting players for game_id:" + id);
+    }
 }
