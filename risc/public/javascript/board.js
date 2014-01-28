@@ -103,11 +103,14 @@
             var origin = self.findOrigin(destination, map);
             var originTroops = self.troops[origin];
             var troopsAttacking = originTroops + 1;
-            console.log('troops attacking is ' + troopsAttacking);
             while(troopsAttacking > originTroops) {
-                console.log('prompt');
                 troopsAttacking = prompt("How many troops would you like to attack with?  You have " + originTroops + " available");
             }
+            var attackArrowPosition = self.calculateArrowPosition($(self.territoryDOMElements[origin]).position(), $(self.territoryDOMElements[destination]).position());
+            // var mapAppendArrow = $('#map').append("<span class='attackArrow glyphicon " + attackArrowPosition.class + "' style='top: " + attackArrowPosition.top + "px; left: " + attackArrowPosition.left + "px'>HELLO</span>");
+            var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
+            var appendImageUrl = "-128.png";
+            var mapAppendArrow = $("<img class='attackArrow' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
         };
         self.findOrigin = function(destination, map) {
             //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
@@ -119,6 +122,58 @@
                 }
             });
             return originTerritory;
+        };
+        self.calculateArrowPosition = function(origin, destination) {
+            var upDownArrowPadding = 60;
+            var leftRightArrowPadding = 80;
+            var heightOfTile = 97;
+            var widthOfTile = 188;
+            var result = {
+                top: origin.top,
+                left: origin.left,
+                urlDirection: ' '
+            };
+            if(origin.top > destination.top && origin.left === destination.left) {
+                //ARROW UP
+                result.top = result.top - upDownArrowPadding;
+                result.left = result.left + (widthOfTile / 4);
+                result.urlDirection = 'up';
+            }
+            if(origin.top < destination.top && origin.left === destination.left) {
+                //ARROW DOWN
+                result.top = result.top  + heightOfTile - upDownArrowPadding;
+                result.left = result.left + (widthOfTile / 4);
+                result.urlDirection = 'down';
+            }
+            if(origin.top > destination.top && origin.left > destination.left) {
+                //ARROW UP AND LEFT
+                console.log('arrow up and left');
+            }
+            if(origin.top < destination.top && origin.left < destination.left) {
+                //ARROW DOWN AND RIGHT
+                console.log('arrow down and right');
+            }
+            if(origin.top > destination.top && origin.left < destination.left) {
+                //ARROW UP AND RIGHT
+                console.log('arrow up and right');
+            }
+            if(origin.top < destination.top && origin.left > destination.left) {
+                //ARROW DOWN AND LEFT
+                console.log('arrow down and left');
+            }
+            if(origin.top === destination.top && origin.left > destination.left) {
+                //ARROW LEFT
+                result.top = result.top  + heightOfTile/12;
+                result.left = result.left -  leftRightArrowPadding;
+                result.urlDirection = 'left';
+            }
+            if(origin.top === destination.top && origin.left < destination.left) {
+                //ARROW RIGHT
+                result.top = result.top  + heightOfTile/12;
+                result.left = result.left +  widthOfTile - leftRightArrowPadding;
+                result.urlDirection = 'right';
+            }
+            return result;
         };
     }
     window.Board = boardViewModel;
