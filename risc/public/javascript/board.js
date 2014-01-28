@@ -6,6 +6,7 @@
         self.territoryOwner = [];
         self.territoryDOMElements = [];
         self.troops = [];
+        self.attackingTroops = [];
         self.getMap = function() {
             $(".displayPlayerColor").each(function(index) {
                 $(this).append(self.colorList[index]);
@@ -93,11 +94,13 @@
             if(originTroops > 0) {
                 originTroops--;
                 destinationTroops++;
-                self.troops[origin] = originTroops;
-                self.troops[destination] = destinationTroops;
-                $(map[origin]).children('p').children('span').html(originTroops);
-                $(map[destination]).children('p').children('span').html(destinationTroops);
+                self.updateTroopsOnTerritory(origin, originTroops, map);
+                self.updateTroopsOnTerritory(destination, destinationTroops, map);
             }
+        };
+        self.updateTroopsOnTerritory = function(index, troops, map) {
+            self.troops[index] = troops;
+            $(map[index]).children('p').children('span').html(troops);
         };
         self.attack = function(destination, map) {
             var origin = self.findOrigin(destination, map);
@@ -112,7 +115,8 @@
             var appendImageUrl = "-128.png";
             $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
             $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
-
+            // self.attackingTroops[origin][attackArrowPosition.urlDirection] = troopsAttacking;
+            self.updateTroopsOnTerritory(origin, self.troops[origin] - troopsAttacking, map);
         };
         self.findOrigin = function(destination, map) {
             //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
