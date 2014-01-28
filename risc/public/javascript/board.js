@@ -147,19 +147,27 @@
             }
             if(origin.top > destination.top && origin.left > destination.left) {
                 //ARROW UP AND LEFT
-                console.log('arrow up and left');
+                result.top = result.top - upDownArrowPadding;
+                result.left = result.left -  leftRightArrowPadding;
+                result.urlDirection = 'up_left';
             }
             if(origin.top < destination.top && origin.left < destination.left) {
                 //ARROW DOWN AND RIGHT
-                console.log('arrow down and right');
+                result.top = result.top  + heightOfTile - upDownArrowPadding;
+                result.left = result.left +  widthOfTile - leftRightArrowPadding;
+                result.urlDirection = 'down_right';
             }
             if(origin.top > destination.top && origin.left < destination.left) {
                 //ARROW UP AND RIGHT
-                console.log('arrow up and right');
+                result.top = result.top - upDownArrowPadding;
+                result.left = result.left +  widthOfTile - leftRightArrowPadding;
+                result.urlDirection = 'up_right';
             }
             if(origin.top < destination.top && origin.left > destination.left) {
                 //ARROW DOWN AND LEFT
-                console.log('arrow down and left');
+                result.top = result.top  + heightOfTile - upDownArrowPadding;
+                result.left = result.left -  leftRightArrowPadding;
+                result.urlDirection = 'down_left';
             }
             if(origin.top === destination.top && origin.left > destination.left) {
                 //ARROW LEFT
