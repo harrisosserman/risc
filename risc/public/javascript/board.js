@@ -17,6 +17,48 @@
                         self.territoryInfo = $.parseJSON(result);
                         var map = $("#map td");
                         $(map).each(function(index) {
+                            self.attackingTroops.push({
+                                'up': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'down': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'left': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'right': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'up_left': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'up_right': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'down_left': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'down_right': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                }
+                            });
                             self.territoryOwner.push(self.territoryInfo.map[index].owner);
                             self.troops.push(self.territoryInfo.map[index].troops);
                             self.territoryDOMElements.push($(this));
@@ -110,13 +152,27 @@
                 troopsAttacking = prompt("How many troops would you like to attack with?  You have " + originTroops + " available");
             }
             var attackArrowPosition = self.calculateArrowPosition($(self.territoryDOMElements[origin]).position(), $(self.territoryDOMElements[destination]).position());
-            // var mapAppendArrow = $('#map').append("<span class='attackArrow glyphicon " + attackArrowPosition.class + "' style='top: " + attackArrowPosition.top + "px; left: " + attackArrowPosition.left + "px'>HELLO</span>");
             var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
             var appendImageUrl = "-128.png";
-            $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
-            $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
-            // self.attackingTroops[origin][attackArrowPosition.urlDirection] = troopsAttacking;
-            self.updateTroopsOnTerritory(origin, self.troops[origin] - troopsAttacking, map);
+            var arrowDOM, attackTextDOM;
+            if(troopsAttacking > 0) {
+                arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
+                attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
+            }
+            var troopsPreviouslyAttacking = self.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM);
+            self.updateTroopsOnTerritory(origin, self.troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map);
+        };
+        self.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM) {
+            var result = self.attackingTroops[origin][direction];
+            var troopsPreviouslyAttacking = result.troops;
+            if(result.troops !== 0) {
+                $(self.attackingTroops[origin][direction].arrowDOM).remove();
+                $(self.attackingTroops[origin][direction].textDOM).remove();
+            }
+            self.attackingTroops[origin][direction].arrowDOM = arrowDOM;
+            self.attackingTroops[origin][direction].textDOM = textDOM;
+            self.attackingTroops[origin][direction].troops = troopsAttacking;
+            return troopsPreviouslyAttacking;
         };
         self.findOrigin = function(destination, map) {
             //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
