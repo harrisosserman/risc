@@ -22,7 +22,7 @@ public class MongoConnection {
         //NOTE: WHEN WE PUT MONGO ON AWS, WE WILL NEED TO EDIT THIS CONSTRUCTOR
     }
     public DB getDB(String database) {
-        return mongoClient.getDB("initialization");
+        return mongoClient.getDB(database);
     }
     public void closeConnection() {
         mongoClient.close();
