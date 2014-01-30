@@ -9,12 +9,20 @@ import libraries.JSONLibrary.JSONArray;
 import models.Game;
 import play.mvc.Http.RequestBody;
 import play.mvc.BodyParser;
+import libraries.MongoConnection;
+import com.mongodb.*;
+import java.net.UnknownHostException;
 
 public class API extends Controller {
 
     private static final String NAME = "name";
     private static final String GAME_ID = "gameID";
     private static final String PLAYER_ID = "playerId";
+
+    public static MongoConnection initDB() throws UnknownHostException{
+        MongoConnection mongoConnection = new MongoConnection();
+        return mongoConnection;
+    }
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createGame() {
@@ -30,7 +38,13 @@ public class API extends Controller {
         return ok(result.toString());
     }
 
-    public static Result getWaitingPlayers(String id) {
+    public static Result getWaitingPlayers(String id) throws UnknownHostException{
+        MongoConnection connection = initDB();
+        DBObject obj = new BasicDBObject();
+        obj.put( "harris", "osserman" );
+        DBCollection coll = connection.getDB("initialization").getCollection("waitingPlayers");
+        coll.insert(obj);
+        connection.closeConnection();
     	return ok("will return a JSON of waiting players for game_id:" + id);
     }
 

@@ -6,6 +6,7 @@
         self.territoryOwner = [];
         self.territoryDOMElements = [];
         self.troops = [];
+        self.attackingTroops = [];
         self.getMap = function() {
             $(".displayPlayerColor").each(function(index) {
                 $(this).append(self.colorList[index]);
@@ -16,6 +17,48 @@
                         self.territoryInfo = $.parseJSON(result);
                         var map = $("#map td");
                         $(map).each(function(index) {
+                            self.attackingTroops.push({
+                                'up': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'down': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'left': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'right': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'up_left': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'up_right': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'down_left': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                },
+                                'down_right': {
+                                    'troops': 0,
+                                    'arrowDOM': ' ',
+                                    'textDOM': ' '
+                                }
+                            });
                             self.territoryOwner.push(self.territoryInfo.map[index].owner);
                             self.troops.push(self.territoryInfo.map[index].troops);
                             self.territoryDOMElements.push($(this));
@@ -93,21 +136,43 @@
             if(originTroops > 0) {
                 originTroops--;
                 destinationTroops++;
-                self.troops[origin] = originTroops;
-                self.troops[destination] = destinationTroops;
-                $(map[origin]).children('p').children('span').html(originTroops);
-                $(map[destination]).children('p').children('span').html(destinationTroops);
+                self.updateTroopsOnTerritory(origin, originTroops, map);
+                self.updateTroopsOnTerritory(destination, destinationTroops, map);
             }
+        };
+        self.updateTroopsOnTerritory = function(index, troops, map) {
+            self.troops[index] = troops;
+            $(map[index]).children('p').children('span').html(troops);
         };
         self.attack = function(destination, map) {
             var origin = self.findOrigin(destination, map);
             var originTroops = self.troops[origin];
             var troopsAttacking = originTroops + 1;
-            console.log('troops attacking is ' + troopsAttacking);
             while(troopsAttacking > originTroops) {
-                console.log('prompt');
                 troopsAttacking = prompt("How many troops would you like to attack with?  You have " + originTroops + " available");
             }
+            var attackArrowPosition = self.calculateArrowPosition($(self.territoryDOMElements[origin]).position(), $(self.territoryDOMElements[destination]).position());
+            var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
+            var appendImageUrl = "-128.png";
+            var arrowDOM, attackTextDOM;
+            if(troopsAttacking > 0) {
+                arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
+                attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
+            }
+            var troopsPreviouslyAttacking = self.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM);
+            self.updateTroopsOnTerritory(origin, self.troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map);
+        };
+        self.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM) {
+            var result = self.attackingTroops[origin][direction];
+            var troopsPreviouslyAttacking = result.troops;
+            if(result.troops !== 0) {
+                $(self.attackingTroops[origin][direction].arrowDOM).remove();
+                $(self.attackingTroops[origin][direction].textDOM).remove();
+            }
+            self.attackingTroops[origin][direction].arrowDOM = arrowDOM;
+            self.attackingTroops[origin][direction].textDOM = textDOM;
+            self.attackingTroops[origin][direction].troops = troopsAttacking;
+            return troopsPreviouslyAttacking;
         };
         self.findOrigin = function(destination, map) {
             //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
@@ -119,6 +184,84 @@
                 }
             });
             return originTerritory;
+        };
+        self.calculateArrowPosition = function(origin, destination) {
+            var upDownArrowPadding = 60;
+            var leftRightArrowPadding = 80;
+            var heightOfTile = 97;
+            var widthOfTile = 188;
+            var result = {
+                top: origin.top,
+                left: origin.left,
+                urlDirection: ' ',
+                textTop: origin.top,
+                textLeft: origin.left
+            };
+            if(origin.top > destination.top && origin.left === destination.left) {
+                //ARROW UP
+                result.top = result.top - upDownArrowPadding;
+                result.left = result.left + (widthOfTile / 4);
+                result.urlDirection = 'up';
+                result.textTop = result.top + upDownArrowPadding;
+                result.textLeft = result.left + widthOfTile/3;
+            }
+            if(origin.top < destination.top && origin.left === destination.left) {
+                //ARROW DOWN
+                result.top = result.top  + heightOfTile - upDownArrowPadding;
+                result.left = result.left + (widthOfTile / 4);
+                result.urlDirection = 'down';
+                result.textTop = result.top + heightOfTile/4;
+                result.textLeft = result.left + widthOfTile/4;
+            }
+            if(origin.top > destination.top && origin.left > destination.left) {
+                //ARROW UP AND LEFT
+                result.top = result.top - upDownArrowPadding;
+                result.left = result.left -  leftRightArrowPadding;
+                result.urlDirection = 'up_left';
+                result.textTop = result.top + upDownArrowPadding;
+                result.textLeft = result.left + leftRightArrowPadding;
+            }
+            if(origin.top < destination.top && origin.left < destination.left) {
+                //ARROW DOWN AND RIGHT
+                result.top = result.top  + heightOfTile - upDownArrowPadding;
+                result.left = result.left +  widthOfTile - leftRightArrowPadding;
+                result.urlDirection = 'down_right';
+                result.textTop = result.top + heightOfTile/4;
+                result.textLeft = result.left + widthOfTile/3;
+            }
+            if(origin.top > destination.top && origin.left < destination.left) {
+                //ARROW UP AND RIGHT
+                result.top = result.top - upDownArrowPadding;
+                result.left = result.left +  widthOfTile - leftRightArrowPadding;
+                result.urlDirection = 'up_right';
+                result.textTop = result.top + upDownArrowPadding;
+                result.textLeft = result.left + widthOfTile/3;
+            }
+            if(origin.top < destination.top && origin.left > destination.left) {
+                //ARROW DOWN AND LEFT
+                result.top = result.top  + heightOfTile - upDownArrowPadding;
+                result.left = result.left -  leftRightArrowPadding;
+                result.urlDirection = 'down_left';
+                result.textTop = result.top + heightOfTile/4;
+                result.textLeft = result.left + leftRightArrowPadding;
+            }
+            if(origin.top === destination.top && origin.left > destination.left) {
+                //ARROW LEFT
+                result.top = result.top  + heightOfTile/12;
+                result.left = result.left -  leftRightArrowPadding;
+                result.textTop = result.top  + heightOfTile/3;
+                result.textLeft = result.left + leftRightArrowPadding;
+                result.urlDirection = 'left';
+            }
+            if(origin.top === destination.top && origin.left < destination.left) {
+                //ARROW RIGHT
+                result.top = result.top  + heightOfTile/12;
+                result.left = result.left +  widthOfTile - leftRightArrowPadding;
+                result.textTop = result.top  + heightOfTile/3;
+                result.textLeft = result.left + widthOfTile/3;
+                result.urlDirection = 'right';
+            }
+            return result;
         };
     }
     window.Board = boardViewModel;

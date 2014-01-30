@@ -34,3 +34,6 @@ table > tbody > td{
     background-color: #4D5D53;
     opacity: .5;
 }
+.attackComponent {
+    position: absolute;
+}
