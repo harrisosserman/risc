@@ -25,16 +25,20 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result createGame() {
+    public static Result createGame() throws UnknownHostException{
         RequestBody body = request().body();
         String playerName = body.asJson().get(NAME).toString();
 
         Game game = new Game();
-        game.addPlayer(playerName);
+        if (game.getWaitingPlayerCount() >= 5) {
+            return badRequest("The maximum number of players are already playing. Please try again later");
+        }
+        game.addWaitingPlayer(playerName);
+        game.getWaitingPlayerCount();
 
         JSONObject result = new JSONObject();
         result.put(GAME_ID, game.getGameID());
-        result.put(PLAYER_ID, game.getPlayerCount());
+        result.put(PLAYER_ID, game.getWaitingPlayerCount());
         return ok(result.toString());
     }
 
