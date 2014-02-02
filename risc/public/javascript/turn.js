@@ -26,6 +26,31 @@
             return result;
         };
 
+        self.pollForNextTurn = function(pollingNextTurnDOM) {
+            var deferred = $.Deferred();
+            var result = self.loadGameMap(deferred);
+            deferred.done(function() {
+                    $(pollingNextTurnDOM).remove();
+                    // self.destroyAndRebuildMap();
+                }).fail(function() {
+                    //all players have not yet finished their turns
+                    setTimeout(function() {
+                        self.pollForNextTurn(pollingNextTurnDOM);
+                    }, 1000); //wait 1 second before polling again
+                });
+        };
+
+        self.loadGameMap = function(deferred) {
+            $.ajax('/test/game/' + gameID + '/polling', {
+                method: 'GET',
+            }).done(function(result) {
+                var gameMap = $.parseJSON(result);
+                deferred.resolve();
+            }).fail(function() {
+                deferred.reject();
+            });
+        };
+
         self.constructComittedTurn = function() {
             var returnData = {};
             returnData['_id'] = gameID;
@@ -50,7 +75,9 @@
                     }
                 ]
             }).done(function() {
-
+                self.displayMap(false);
+                var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
+                self.pollForNextTurn(pollingNextTurnDOM);
             }).fail(function() {
 
             });

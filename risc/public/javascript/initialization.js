@@ -41,7 +41,11 @@
         self.startGame = function() {
             $.ajax('/test/game/' + self.gameID + '/start', {
                 method: 'POST',
-                contentType: "application/json",
+                settings: [
+                            {
+                                contentType: "application/json"
+                            }
+                        ],
                 data: {
                     'name': self.playerName(),
                     'playerNumber': self.playerNumber
