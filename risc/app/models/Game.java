@@ -3,6 +3,7 @@ package models;
 import java.util.*;
 import libraries.MongoConnection;
 import com.mongodb.*;
+import com.mongodb.util.JSON;
 import java.net.UnknownHostException;
 
 public class Game {
@@ -15,6 +16,7 @@ public class Game {
     private static final String COUNT = "count";
     private static final String READY = "ready";
     private static final String PLAYERS = "players";
+    private static final String GAME_ID = "gameID";
 
 	private String myGameID;
 	private ArrayList<Player> myPlayers;
@@ -35,14 +37,16 @@ public class Game {
         DB initialization = connection.getDB(INITIALIZATION_DB);
         DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
         if (!initialization.collectionExists(WAITING_PLAYERS_COLLECTION)) {
+        	BasicDBObject doc = new BasicDBObject();
+
             BasicDBObject firstPlayer = new BasicDBObject(NAME, playerName).append(READY, false);
             ArrayList<BasicDBObject> playersList = new ArrayList<BasicDBObject>();
             playersList.add(firstPlayer);
-            BasicDBObject players = new BasicDBObject(PLAYERS, playersList);
-            waitingPlayers.insert(players);
+            doc.append(PLAYERS, playersList);
+            doc.append(COUNT, 1);
+            doc.append(GAME_ID, DEFAULT_GAME_ID);
 
-            BasicDBObject playerCount = new BasicDBObject(COUNT, 1);
-            waitingPlayers.insert(playerCount);
+            waitingPlayers.insert(doc);
         }else{
             BasicDBObject joiningPlayer = new BasicDBObject(PLAYERS, new BasicDBObject(NAME, playerName).append(READY, false));
             DBObject updateQuery = new BasicDBObject("$push", joiningPlayer);
@@ -55,6 +59,20 @@ public class Game {
         }
 
         connection.closeConnection();
+	}
+
+	public String getWaitingPlayersJson(String gameID) throws UnknownHostException{
+		MongoConnection connection = new MongoConnection();
+        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
+        DBCursor playersList = waitingPlayers.find(query);
+
+        String json = JSON.serialize(playersList);
+        String trimmedJson = json.substring(1, json.length() - 1);	//need to remove '[' and ']' which converts it from BSON to JSON
+
+        connection.closeConnection();
+        return trimmedJson;
 	}
 
 	public void start(){
@@ -105,6 +123,7 @@ public class Game {
         }
 
         int count = (int)cursor.next().get(COUNT);
+        connection.closeConnection();
 		return count;
 	}
 
