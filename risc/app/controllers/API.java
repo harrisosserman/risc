@@ -12,12 +12,14 @@ import play.mvc.BodyParser;
 import libraries.MongoConnection;
 import com.mongodb.*;
 import java.net.UnknownHostException;
+import models.Turn;
 
 public class API extends Controller {
 
     private static final String NAME = "name";
     private static final String GAME_ID = "gameID";
     private static final String PLAYER_ID = "playerId";
+    private static final int TURN = 1;
 
     public static MongoConnection initDB() throws UnknownHostException{
         MongoConnection mongoConnection = new MongoConnection();
@@ -54,8 +56,13 @@ public class API extends Controller {
     public static Result getMap(String id) {
         return ok("will return map for game:" + id);
     }
+    
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result commitTurn(String id) throws UnknownHostException {
+        RequestBody body = request().body();
+        Turn turn = new Turn();
 
-    public static Result commitTurn(String id) {
-        return ok("Turn commited for game:" + id);
+        String json = turn.createTurn(body);
+        return ok("Turn commited for game:" + json);
     }
 }
