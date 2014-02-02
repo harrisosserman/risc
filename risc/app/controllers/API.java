@@ -59,8 +59,10 @@ public class API extends Controller {
         return ok();
     }
 
-    public static Result getMap(String id) {
-        return ok("will return map for game:" + id);
+    public static Result getMap(String id) throws UnknownHostException{
+        Game game = new Game();
+        String mapJson = game.getMapJson(id);
+        return ok(mapJson);
     }
 
     public static Result commitTurn(String id) {
