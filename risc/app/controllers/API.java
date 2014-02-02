@@ -56,7 +56,7 @@ public class API extends Controller {
 
         Game game = new Game();
         game.start(id, startingPlayerNumber, startingPlayerName);
-        return ok("will start game:" + id);
+        return ok();
     }
 
     public static Result getMap(String id) {
