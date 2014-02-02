@@ -10,6 +10,7 @@ import models.Game;
 
 public class TestAPI extends Controller {
     public static int testCounterInGetTestGame = 0;
+    public static int testCounterInGetTestMap = 0;
     public static String isHarrisReady = "false";
     public static Result createTestGame() {
         JSONObject result = new JSONObject();
@@ -80,5 +81,17 @@ public class TestAPI extends Controller {
         result.put("map", map);
         //DEAL WITH ADDITIONAL TROOPS LATER
         return ok(result.toString());
+    }
+
+    public static Result commitTestTurn(Long id) {
+        return ok();
+    }
+
+    public static Result getTestMapPolling(Long id) {
+        testCounterInGetTestMap++;
+        if(testCounterInGetTestMap > 10) {
+            return getTestMap(id);
+        }
+        return status(400, "map not ready");
     }
 }

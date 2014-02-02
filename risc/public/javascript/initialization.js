@@ -1,4 +1,4 @@
-(function(ko, Board) {
+(function(ko, Board, Turn) {
     function initializationViewModel() {
         var self = this;
         self.playerName = ko.observable();
@@ -16,7 +16,12 @@
             };
             $.ajax('/test/game', {
                         method: 'POST',
-                        data: data
+                        data: data,
+                        settings: [
+                            {
+                                contentType: "application/json"
+                            }
+                        ]
                     }).done(function(result) {
                         self.displayGameWaitingRoom(true);
                         self.displayGameStart(false);
@@ -36,6 +41,11 @@
         self.startGame = function() {
             $.ajax('/test/game/' + self.gameID + '/start', {
                 method: 'POST',
+                settings: [
+                            {
+                                contentType: "application/json"
+                            }
+                        ],
                 data: {
                     'name': self.playerName(),
                     'playerNumber': self.playerNumber
@@ -79,12 +89,15 @@
                         }
                     });
         };
+        self.submitTurnClick = function() {
+            new Turn(self);
+        };
         self.playerColor = ko.computed(function(index) {
             return self.colorList[index];
         }, self);
     }
     ko.applyBindings(new initializationViewModel());
-})(window.ko, window.Board);
+})(window.ko, window.Board, window.Turn);
 
 (function() {
     //function to build map out of table
