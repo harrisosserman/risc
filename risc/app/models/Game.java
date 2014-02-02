@@ -63,11 +63,8 @@ public class Game {
 
 	public String getWaitingPlayersJson(String gameID) throws UnknownHostException{
 		MongoConnection connection = new MongoConnection();
-        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
 
-        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
-        DBCursor playersList = waitingPlayers.find(query);
-
+		DBCursor playersList = getPlayersList(connection, gameID);
         String json = JSON.serialize(playersList);
         String trimmedJson = json.substring(1, json.length() - 1);	//need to remove '[' and ']' which converts it from BSON to JSON
 
@@ -75,11 +72,44 @@ public class Game {
         return trimmedJson;
 	}
 
-	public void start(){
-		System.out.println("Should start game: " + this.myGameID);
-		assert (myPlayers.size() > 1);
+	public void start(String gameID, int startingPlayerNumber, String startingPlayerName) throws UnknownHostException{
+		//update initialization.waitingPlayers to show that someone is ready
+		MongoConnection connection = new MongoConnection();
 
-		myTerritories = divyCountries();
+		markWaitingPlayerReady(connection, gameID, startingPlayerNumber, startingPlayerName);
+
+		//divy territories
+		// System.out.println("Should start game: " + this.myGameID);
+		// myTerritories = divyCountries();
+
+		//update game.map
+
+		connection.closeConnection();
+	}
+
+	private void markWaitingPlayerReady(MongoConnection connection, String gameID, int playerNumber, String playerName) throws UnknownHostException{
+		System.out.println("mark player " + playerName + " ready in game " + gameID);
+		DBCursor playersListCursor = getPlayersList(connection, gameID);
+		DBObject playersList = playersListCursor.next();
+
+		ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(PLAYERS);
+		int playerIndex = playerNumber - 1;	// - 1 because 1-indexed instead of 0-indexed
+		BasicDBObject startingPlayer = players.get(playerIndex);
+
+		BasicDBObject newDocument = new BasicDBObject("$set", playersList);
+		String readyPath = "players." + playerIndex + ".ready";
+		newDocument.append("$set", new BasicDBObject().append(readyPath, true));
+
+		DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+		waitingPlayers.update(new BasicDBObject(), newDocument);
+	}
+
+	private DBCursor getPlayersList(MongoConnection connection, String gameID){
+        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
+        DBCursor playersList = waitingPlayers.find(query);
+        return playersList;
 	}
 
 	private Territory[] divyCountries(){

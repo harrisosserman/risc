@@ -18,6 +18,7 @@ public class API extends Controller {
     private static final String NAME = "name";
     private static final String GAME_ID = "gameID";
     private static final String PLAYER_ID = "playerId";
+    private static final String PLAYER_NUMBER = "playerNumber";
 
     public static MongoConnection initDB() throws UnknownHostException{
         MongoConnection mongoConnection = new MongoConnection();
@@ -47,7 +48,14 @@ public class API extends Controller {
     	return ok(json);
     }
 
-    public static Result startGame(String id) {
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result startGame(String id) throws UnknownHostException{
+        RequestBody body = request().body();
+        int startingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
+        String startingPlayerName = body.asJson().get(NAME).toString();
+
+        Game game = new Game();
+        game.start(id, startingPlayerNumber, startingPlayerName);
         return ok("will start game:" + id);
     }
 
