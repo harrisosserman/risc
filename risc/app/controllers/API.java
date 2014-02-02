@@ -42,13 +42,6 @@ public class API extends Controller {
     }
 
     public static Result getWaitingPlayers(String id) throws UnknownHostException{
-        MongoConnection connection = initDB();
-        DBObject obj = new BasicDBObject();
-        obj.put( "harris", "osserman" );
-        DBCollection coll = connection.getDB("initialization").getCollection("waitingPlayers");
-        coll.insert(obj);
-        connection.closeConnection();
-
         Game game = new Game();
         String json = game.getWaitingPlayersJson(id);
     	return ok(json);
