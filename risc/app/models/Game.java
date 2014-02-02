@@ -122,9 +122,9 @@ public class Game {
         	return 0;
         }
 
-        int count = (int)cursor.next().get(COUNT);
-        connection.closeConnection();
-		return count;
+    //    int count = (int)cursor.next().get(COUNT);
+      //  connection.closeConnection();
+		return 0;
 	}
 
 	public ArrayList<Territory> territoriesOwnedByPlayer(Player p){
