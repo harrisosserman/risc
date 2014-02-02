@@ -31,7 +31,7 @@
             var result = self.loadGameMap(deferred);
             deferred.done(function() {
                     $(pollingNextTurnDOM).remove();
-                    // self.destroyAndRebuildMap();
+                    self.destroyAndRebuildMap();
                 }).fail(function() {
                     //all players have not yet finished their turns
                     setTimeout(function() {
@@ -76,6 +76,9 @@
                 ]
             }).done(function() {
                 self.displayMap(false);
+                $('.attackComponent').each(function() {
+                    $(this).remove();   //remove all arrows and attack numbers
+                });
                 var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
                 self.pollForNextTurn(pollingNextTurnDOM);
             }).fail(function() {

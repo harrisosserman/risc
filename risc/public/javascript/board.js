@@ -87,7 +87,7 @@
                                     self.userMapAction(index, map);
                                 });
                             }
-                            $(this).append("<p >troops: <span>" + self.territoryInfo.map[index].troops + "</span></p>");
+                            $(this).append("<p class='troopTotals'>troops: <span>" + self.territoryInfo.map[index].troops + "</span></p>");
                         });
                 });
         };
@@ -271,6 +271,22 @@
                 result.urlDirection = 'right';
             }
             return result;
+        };
+        self.destroyAndRebuildMap = function() {
+            self.displayMap(true);
+            self.territoryInfo = {};
+            self.territoryOwner = [];
+            self.territoryDOMElements = [];
+            self.troops = [];
+            self.attackingTroops = [];
+            $('.troopTotals').each(function() {
+                $(this).remove();
+            });
+            $(".displayPlayerColor").each(function(index) {
+                $(this).empty();
+            });
+            self.removeAllPreviousAdjacencies($('#map'));
+            self.getMap();
         };
     }
     window.Board = boardViewModel;
