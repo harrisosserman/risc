@@ -34,7 +34,6 @@ public class API extends Controller {
             return badRequest("The maximum number of players are already playing. Please try again later");
         }
         game.addWaitingPlayer(playerName);
-        game.getWaitingPlayerCount();
 
         JSONObject result = new JSONObject();
         result.put(GAME_ID, game.getGameID());
@@ -49,7 +48,10 @@ public class API extends Controller {
         DBCollection coll = connection.getDB("initialization").getCollection("waitingPlayers");
         coll.insert(obj);
         connection.closeConnection();
-    	return ok("will return a JSON of waiting players for game_id:" + id);
+
+        Game game = new Game();
+        String json = game.getWaitingPlayersJson(id);
+    	return ok(json);
     }
 
     public static Result startGame(String id) {
