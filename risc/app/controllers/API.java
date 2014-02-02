@@ -49,7 +49,7 @@ public class API extends Controller {
         DBCollection coll = connection.getDB("initialization").getCollection("waitingPlayers");
         coll.insert(obj);
         connection.closeConnection();
-    	return ok("will return a JSON of waiting players for game_id:" + id);
+        return ok("will return a JSON of waiting players for game_id:" + id);
     }
 
     public static Result startGame(String id) {

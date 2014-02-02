@@ -1,5 +1,5 @@
 // This code inside of the boardViewModel function is only loaded once the game is fully initialized
-(function() {
+(function(ko) {
     function boardViewModel(context) {
         var self = context;
         self.territoryInfo = {};
@@ -21,42 +21,50 @@
                                 'up': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'down': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'left': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'right': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'up_left': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'up_right': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'down_left': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 },
                                 'down_right': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
-                                    'textDOM': ' '
+                                    'textDOM': ' ',
+                                    'destination': -1
                                 }
                             });
                             self.territoryOwner.push(self.territoryInfo.map[index].owner);
@@ -159,12 +167,13 @@
                 arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
                 attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
             }
-            var troopsPreviouslyAttacking = self.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM);
+            var troopsPreviouslyAttacking = self.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM, destination);
             self.updateTroopsOnTerritory(origin, self.troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map);
         };
-        self.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM) {
+        self.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM, destination) {
             var result = self.attackingTroops[origin][direction];
             var troopsPreviouslyAttacking = result.troops;
+            self.attackingTroops[origin][direction]["destination"] = destination;
             if(result.troops !== 0) {
                 $(self.attackingTroops[origin][direction].arrowDOM).remove();
                 $(self.attackingTroops[origin][direction].textDOM).remove();

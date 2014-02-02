@@ -81,4 +81,8 @@ public class TestAPI extends Controller {
         //DEAL WITH ADDITIONAL TROOPS LATER
         return ok(result.toString());
     }
+
+    public static Result commitTestTurn(Long id) {
+        return ok();
+    }
 }
