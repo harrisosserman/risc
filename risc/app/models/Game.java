@@ -169,6 +169,21 @@ public class Game {
 		return owners;
 	}
 
+	public String getMapJson(String gameID) throws UnknownHostException{
+		MongoConnection connection = new MongoConnection();
+        DBCollection waitingPlayers = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
+        DBCursor mapCursor = waitingPlayers.find(query);
+
+        String json = JSON.serialize(mapCursor);
+        String trimmedJson = json.substring(1, json.length() - 1);	//need to remove '[' and ']' which converts it from BSON to JSON
+
+        connection.closeConnection();
+        
+        return trimmedJson;
+	}
+
 	public String getGameID(){
 		return this.myGameID;
 	}
