@@ -1,23 +1,25 @@
 // This code inside of the boardViewModel function is only loaded once the game is fully initialized
 (function(ko) {
-    function boardViewModel(context) {
-        var self = context;
-        self.territoryInfo = {};
-        self.territoryOwner = [];
-        self.territoryDOMElements = [];
-        self.troops = [];
-        self.attackingTroops = [];
-        self.getMap = function() {
+    function boardViewModel(context, globals) {
+        var initialization = context;
+        var globalObjects = globals;
+        var board = this;
+        board.territoryInfo = {};
+        board.territoryOwner = [];
+        board.territoryDOMElements = [];
+        board.troops = [];
+        board.attackingTroops = [];
+        globalObjects.getMap = function() {
             $(".displayPlayerColor").each(function(index) {
-                $(this).append(self.colorList[index]);
+                $(this).append(initialization.colorList[index]);
             });
-            $.ajax('/test/game/' + self.gameID + '/map', {
+            $.ajax('/test/game/' + initialization.gameID + '/map', {
                 method: 'GET',
                     }).done(function(result) {
-                        self.territoryInfo = $.parseJSON(result);
+                        board.territoryInfo = $.parseJSON(result);
                         var map = $("#map td");
                         $(map).each(function(index) {
-                            self.attackingTroops.push({
+                            board.attackingTroops.push({
                                 'up': {
                                     'troops': 0,
                                     'arrowDOM': ' ',
@@ -67,57 +69,57 @@
                                     'destination': -1
                                 }
                             });
-                            self.territoryOwner.push(self.territoryInfo.map[index].owner);
-                            self.troops.push(self.territoryInfo.map[index].troops);
-                            self.territoryDOMElements.push($(this));
-                            $(this).addClass("player" + self.territoryInfo.map[index].owner);
-                            if(self.territoryInfo.map[index].owner === self.playerNumber) {
+                            board.territoryOwner.push(board.territoryInfo.map[index].owner);
+                            board.troops.push(board.territoryInfo.map[index].troops);
+                            board.territoryDOMElements.push($(this));
+                            $(this).addClass("player" + board.territoryInfo.map[index].owner);
+                            if(board.territoryInfo.map[index].owner === initialization.playerNumber) {
                                 $(this).hover(function() {
                                     $(this).addClass("territoryHover");
                                 }, function() {
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
-                                    self.highlightMap(index + 1);
+                                    board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
                                 });
                             } else {
                                 $(this).click(function() {
                                     //click handler for clicking on enemy territory
-                                    self.userMapAction(index, map);
+                                    board.userMapAction(index, map);
                                 });
                             }
-                            $(this).append("<p class='troopTotals'>troops: <span>" + self.territoryInfo.map[index].troops + "</span></p>");
+                            $(this).append("<p class='troopTotals'>troops: <span>" + board.territoryInfo.map[index].troops + "</span></p>");
                         });
                 });
         };
-        self.getMap();
-        self.highlightMap = function(territoryNumber) {
+        globalObjects.getMap();
+        board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
-            var map = self.territoryDOMElements;
+            var map = board.territoryDOMElements;
             if($(map[index]).hasClass('territoryClick') || $(map[index]).hasClass('territoryAttack') || $(map[index]).hasClass('territoryMoveTroops')) {
                 //user wants to attack, move troops, or de-highlight
-                self.userMapAction(index, self.territoryDOMElements);
+                board.userMapAction(index, board.territoryDOMElements);
                 return;
             }
-            self.removeAllPreviousAdjacencies();
-            var adjacentTerritories = self.findValidAdjacencies(index);
+            board.removeAllPreviousAdjacencies();
+            var adjacentTerritories = board.findValidAdjacencies(index);
             for(var k=0; k<adjacentTerritories.length; k++) {
-                if(self.territoryOwner[adjacentTerritories[k]] != self.playerNumber) {
+                if(board.territoryOwner[adjacentTerritories[k]] != initialization.playerNumber) {
                     $(map[adjacentTerritories[k]]).addClass('territoryAttack');
                 } else {
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
                 }
             }
         };
-        self.removeAllPreviousAdjacencies = function() {
+        board.removeAllPreviousAdjacencies = function() {
             $("#map td").each(function(){
                 if($(this).hasClass('territoryClick') || $(this).hasClass('territoryAttack') || $(this).hasClass('territoryMoveTroops')) {
                     $(this).removeClass('territoryClick territoryAttack territoryMoveTroops');
                 }
             });
         };
-        self.findValidAdjacencies = function(index) {
+        board.findValidAdjacencies = function(index) {
             //NEED TO IMPROVE THIS FUNCTION.  FINDS SOME ADDJACENCIES THAT ARE NOT ACTUALLY ADJACENT
             var adjacentTerritories = [index + 1, index - 1, index - 5, index + 5, index + 6, index - 6, index + 4, index - 4];
             for(var k=0; k<adjacentTerritories.length; k++) {
@@ -127,39 +129,39 @@
             }
             return adjacentTerritories;
         };
-        self.userMapAction = function(index, map) {
+        board.userMapAction = function(index, map) {
             if($(map[index]).hasClass('territoryClick')) {
-                self.removeAllPreviousAdjacencies(map);
+                board.removeAllPreviousAdjacencies(map);
                 $(map[index]).addClass('territoryClick');   //need to add territoryClick class again because it will be toggled off in the click function
             } else if($(map[index]).hasClass('territoryMoveTroops')) {
-                self.moveTroops(index, map);
+                board.moveTroops(index, map);
             } else if($(map[index]).hasClass('territoryAttack')){
-                self.attack(index, map);
+                board.attack(index, map);
             }
         };
-        self.moveTroops = function(destination, map) {
-            var origin = self.findOrigin(destination, map);
-            var originTroops = self.troops[origin];
-            var destinationTroops = self.troops[destination];
+        board.moveTroops = function(destination, map) {
+            var origin = board.findOrigin(destination, map);
+            var originTroops = board.troops[origin];
+            var destinationTroops = board.troops[destination];
             if(originTroops > 0) {
                 originTroops--;
                 destinationTroops++;
-                self.updateTroopsOnTerritory(origin, originTroops, map);
-                self.updateTroopsOnTerritory(destination, destinationTroops, map);
+                board.updateTroopsOnTerritory(origin, originTroops, map);
+                board.updateTroopsOnTerritory(destination, destinationTroops, map);
             }
         };
-        self.updateTroopsOnTerritory = function(index, troops, map) {
-            self.troops[index] = troops;
+        board.updateTroopsOnTerritory = function(index, troops, map) {
+            board.troops[index] = troops;
             $(map[index]).children('p').children('span').html(troops);
         };
-        self.attack = function(destination, map) {
-            var origin = self.findOrigin(destination, map);
-            var originTroops = self.troops[origin];
+        board.attack = function(destination, map) {
+            var origin = board.findOrigin(destination, map);
+            var originTroops = board.troops[origin];
             var troopsAttacking = originTroops + 1;
             while(troopsAttacking > originTroops) {
                 troopsAttacking = prompt("How many troops would you like to attack with?  You have " + originTroops + " available");
             }
-            var attackArrowPosition = self.calculateArrowPosition($(self.territoryDOMElements[origin]).position(), $(self.territoryDOMElements[destination]).position());
+            var attackArrowPosition = board.calculateArrowPosition($(board.territoryDOMElements[origin]).position(), $(board.territoryDOMElements[destination]).position());
             var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
             var appendImageUrl = "-128.png";
             var arrowDOM, attackTextDOM;
@@ -167,23 +169,23 @@
                 arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
                 attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
             }
-            var troopsPreviouslyAttacking = self.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM, destination);
-            self.updateTroopsOnTerritory(origin, self.troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map);
+            var troopsPreviouslyAttacking = board.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM, destination);
+            board.updateTroopsOnTerritory(origin, board.troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map);
         };
-        self.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM, destination) {
-            var result = self.attackingTroops[origin][direction];
+        board.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM, destination) {
+            var result = board.attackingTroops[origin][direction];
             var troopsPreviouslyAttacking = result.troops;
-            self.attackingTroops[origin][direction]["destination"] = destination;
+            board.attackingTroops[origin][direction]["destination"] = destination;
             if(result.troops !== 0) {
-                $(self.attackingTroops[origin][direction].arrowDOM).remove();
-                $(self.attackingTroops[origin][direction].textDOM).remove();
+                $(board.attackingTroops[origin][direction].arrowDOM).remove();
+                $(board.attackingTroops[origin][direction].textDOM).remove();
             }
-            self.attackingTroops[origin][direction].arrowDOM = arrowDOM;
-            self.attackingTroops[origin][direction].textDOM = textDOM;
-            self.attackingTroops[origin][direction].troops = troopsAttacking;
+            board.attackingTroops[origin][direction].arrowDOM = arrowDOM;
+            board.attackingTroops[origin][direction].textDOM = textDOM;
+            board.attackingTroops[origin][direction].troops = troopsAttacking;
             return troopsPreviouslyAttacking;
         };
-        self.findOrigin = function(destination, map) {
+        board.findOrigin = function(destination, map) {
             //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
             var originTerritory = -1;
             $(map).each(function(index){
@@ -194,7 +196,7 @@
             });
             return originTerritory;
         };
-        self.calculateArrowPosition = function(origin, destination) {
+        board.calculateArrowPosition = function(origin, destination) {
             var upDownArrowPadding = 60;
             var leftRightArrowPadding = 80;
             var heightOfTile = 97;
@@ -272,21 +274,21 @@
             }
             return result;
         };
-        self.destroyAndRebuildMap = function() {
-            self.displayMap(true);
-            self.territoryInfo = {};
-            self.territoryOwner = [];
-            self.territoryDOMElements = [];
-            self.troops = [];
-            self.attackingTroops = [];
+        globalObjects.destroyAndRebuildMap = function() {
+            initialization.displayMap(true);
+            board.territoryInfo = {};
+            board.territoryOwner = [];
+            board.territoryDOMElements = [];
+            board.troops = [];
+            board.attackingTroops = [];
             $('.troopTotals').each(function() {
                 $(this).remove();
             });
             $(".displayPlayerColor").each(function(index) {
                 $(this).empty();
             });
-            self.removeAllPreviousAdjacencies($('#map'));
-            self.getMap();
+            board.removeAllPreviousAdjacencies($('#map'));
+            globalObjects.getMap();
         };
     }
     window.Board = boardViewModel;

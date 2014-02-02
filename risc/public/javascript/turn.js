@@ -1,7 +1,9 @@
-// This code inside of the boardViewModel function is only loaded once a player clicks the 'submit turn' button
+// This code inside of the turnViewModel function is only loaded once a player clicks the 'submit turn' button
 (function() {
-    function turnViewModel(context) {
-        var self = context;
+    function turnViewModel(context, globals) {
+        var initialization = context;
+        var globalObjects = globals;
+        var turn = this;
         var territoryOwner = self.territoryOwner;
         var troops = self.troops;
         var attackingTroops = self.attackingTroops;

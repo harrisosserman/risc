@@ -1,18 +1,19 @@
 (function(ko, Board, Turn) {
     function initializationViewModel() {
-        var self = this;
-        self.playerName = ko.observable();
-        self.playerNumber = -1;
-        self.displayGameWaitingRoom = ko.observable(false);
-        self.displayGameStart = ko.observable(true);
-        self.displayModal = ko.observable(true);
-        self.displayMap = ko.observable(false);
-        self.playerList = ko.observableArray([]);
-        self.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
-        self.gameID = -1;
-        self.enterGame = function() {
+        var initialization = this;
+        var globalObjects = {};
+        initialization.playerName = ko.observable();
+        initialization.playerNumber = -1;
+        initialization.displayGameWaitingRoom = ko.observable(false);
+        initialization.displayGameStart = ko.observable(true);
+        initialization.displayModal = ko.observable(true);
+        initialization.displayMap = ko.observable(false);
+        initialization.playerList = ko.observableArray([]);
+        initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
+        initialization.gameID = -1;
+        initialization.enterGame = function() {
             var data = {
-                "name": self.playerName()
+                "name": initialization.playerName()
             };
             $.ajax('/test/game', {
                         method: 'POST',
@@ -23,23 +24,23 @@
                             }
                         ]
                     }).done(function(result) {
-                        self.displayGameWaitingRoom(true);
-                        self.displayGameStart(false);
+                        initialization.displayGameWaitingRoom(true);
+                        initialization.displayGameStart(false);
                         var players = $.parseJSON(result);
-                        self.gameID = players.gameID;
+                        initialization.gameID = players.gameID;
                         for(var k=0; k<players.players.length; k++) {
-                            if(self.playerName() === players.players[k].name) {
-                                self.playerNumber = k + 1;
+                            if(initialization.playerName() === players.players[k].name) {
+                                initialization.playerNumber = k + 1;
                             }
-                            self.playerList.push({
+                            initialization.playerList.push({
                                 'name': players.players[k].name,
                                 'ready': players.players[k].ready});
                         }
-                        self.pollGameWaitingRoom();
+                        initialization.pollGameWaitingRoom();
                     });
         };
-        self.startGame = function() {
-            $.ajax('/test/game/' + self.gameID + '/start', {
+        initialization.startGame = function() {
+            $.ajax('/test/game/' + initialization.gameID + '/start', {
                 method: 'POST',
                 settings: [
                             {
@@ -47,37 +48,37 @@
                             }
                         ],
                 data: {
-                    'name': self.playerName(),
-                    'playerNumber': self.playerNumber
+                    'name': initialization.playerName(),
+                    'playerNumber': initialization.playerNumber
                 }
             }).done(function() {
-                self.loadWaitingPlayers($.Deferred());
+                initialization.loadWaitingPlayers($.Deferred());
             });
         };
-        self.pollGameWaitingRoom = function() {
+        initialization.pollGameWaitingRoom = function() {
                 var deferred = $.Deferred();
-                var result = self.loadWaitingPlayers(deferred);
+                var result = initialization.loadWaitingPlayers(deferred);
                 deferred.done(function(allPlayersReady) {
                     if(allPlayersReady === true) {
-                        self.displayModal(false);
-                        self.displayMap(true);
-                        new Board(self);
+                        initialization.displayModal(false);
+                        initialization.displayMap(true);
+                        new Board(initialization, globalObjects);
                     } else {
-                        setTimeout(self.pollGameWaitingRoom, 1000); //wait 1 second before polling again
+                        setTimeout(initialization.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                     }
                 });
         };
-        self.loadWaitingPlayers = function(deferredObject) {
-            $.ajax('/test/game/' + self.gameID, {
+        initialization.loadWaitingPlayers = function(deferredObject) {
+            $.ajax('/test/game/' + initialization.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
-                        self.playerList.removeAll();
+                        initialization.playerList.removeAll();
                         var allPlayersReady = true;
                         var k=0;
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === 'false') allPlayersReady = false;
-                            self.playerList.push({
+                            initialization.playerList.push({
                                 'name': players.players[k].name,
                                 'ready': players.players[k].ready});
                         }
@@ -89,12 +90,12 @@
                         }
                     });
         };
-        self.submitTurnClick = function() {
-            new Turn(self);
+        initialization.submitTurnClick = function() {
+            new Turn(initialization, globalObjects);
         };
-        self.playerColor = ko.computed(function(index) {
-            return self.colorList[index];
-        }, self);
+        initialization.playerColor = ko.computed(function(index) {
+            return initialization.colorList[index];
+        }, initialization);
     }
     ko.applyBindings(new initializationViewModel());
 })(window.ko, window.Board, window.Turn);
