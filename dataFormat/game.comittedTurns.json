@@ -1,8 +1,8 @@
 {
     "_id": "asdfsdfdafdsa",
     "player": 2,
-    "turn": {
-        "territories": {
+    "territories": [
+        {
             "1": {
                 "troops": 5,
                 "attacking": [
@@ -17,7 +17,7 @@
                 ]
             }
         }
-    }
+    ]
 }
 
 NOTE: There will be n documents in the committedTurns collection per game, where n is the number of players in the game
