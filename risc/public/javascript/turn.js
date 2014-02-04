@@ -1,17 +1,16 @@
 // This code inside of the turnViewModel function is only loaded once a player clicks the 'submit turn' button
 (function() {
-    function turnViewModel(context, globals) {
-        var initialization = context;
-        var globalObjects = globals;
-        var turn = this;
-        var territoryOwner = self.territoryOwner;
-        var troops = self.troops;
-        var attackingTroops = self.attackingTroops;
-        var gameID = self.gameID;
-        var playerNumber = self.playerNumber;
+    function turnViewModel(globals) {
+        var globalFunctions = globals;
+        var turn = {};
+        var territoryOwner = globalFunctions.getTerritoryOwner();
+        var troops = globalFunctions.getTroops();
+        var attackingTroops = globalFunctions.getAttackingTroops();
+        var gameID = globalFunctions.getGameID();
+        var playerNumber = globalFunctions.getPlayerNumber();
         var troopDirections = ['up', 'down', 'left', 'right', 'up_left', 'up_right', 'down_left', 'down_right'];
 
-        self.constructAttackingTroops = function(index) {
+        turn.constructAttackingTroops = function(index) {
             var attack = attackingTroops[index];
             var result = [];
             for(var k=0; k<troopDirections.length; k++) {
@@ -28,21 +27,21 @@
             return result;
         };
 
-        self.pollForNextTurn = function(pollingNextTurnDOM) {
+        turn.pollForNextTurn = function(pollingNextTurnDOM) {
             var deferred = $.Deferred();
-            var result = self.loadGameMap(deferred);
+            var result = turn.loadGameMap(deferred);
             deferred.done(function() {
                     $(pollingNextTurnDOM).remove();
-                    self.destroyAndRebuildMap();
+                    globalFunctions.destroyAndRebuildMap();
                 }).fail(function() {
                     //all players have not yet finished their turns
                     setTimeout(function() {
-                        self.pollForNextTurn(pollingNextTurnDOM);
+                        turn.pollForNextTurn(pollingNextTurnDOM);
                     }, 1000); //wait 1 second before polling again
                 });
         };
 
-        self.loadGameMap = function(deferred) {
+        turn.loadGameMap = function(deferred) {
             $.ajax('/test/game/' + gameID + '/polling', {
                 method: 'GET',
             }).done(function(result) {
@@ -53,14 +52,14 @@
             });
         };
 
-        self.constructComittedTurn = function() {
+        turn.constructComittedTurn = function() {
             var returnData = {};
             returnData['_id'] = gameID;
             returnData['player'] = playerNumber;
             var territories = [];
             for(var k=0; k<territoryOwner.length; k++) {
                 var territoryInfo = {};
-                var attacking = self.constructAttackingTroops(k);
+                var attacking = turn.constructAttackingTroops(k);
                 territoryInfo = {
                     "troops": troops[k],
                     "attacking": attacking
@@ -77,17 +76,17 @@
                     }
                 ]
             }).done(function() {
-                self.displayMap(false);
+                globalFunctions.setDisplayMap(false);
                 $('.attackComponent').each(function() {
                     $(this).remove();   //remove all arrows and attack numbers
                 });
                 var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
-                self.pollForNextTurn(pollingNextTurnDOM);
+                turn.pollForNextTurn(pollingNextTurnDOM);
             }).fail(function() {
-
+                //FILL THIS IN FOR WHEN TURN VALIDATION FAILS
             });
         };
-        self.constructComittedTurn();
+        turn.constructComittedTurn();
     }
     window.Turn = turnViewModel;
 })();

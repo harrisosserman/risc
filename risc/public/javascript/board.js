@@ -1,19 +1,30 @@
 // This code inside of the boardViewModel function is only loaded once the game is fully initialized
 (function(ko) {
-    function boardViewModel(context, globals) {
-        var initialization = context;
-        var globalObjects = globals;
-        var board = this;
+    function boardViewModel(globals) {
+        var globalFunctions = globals;
+        var board = {};
         board.territoryInfo = {};
         board.territoryOwner = [];
         board.territoryDOMElements = [];
         board.troops = [];
         board.attackingTroops = [];
-        globalObjects.getMap = function() {
+        var colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
+        /*          GLOBAL FUNCTIONS                        */
+        globalFunctions.getTerritoryOwner = function() {
+            return board.territoryOwner;
+        };
+        globalFunctions.getTroops = function() {
+            return board.troops;
+        };
+        globalFunctions.getAttackingTroops = function() {
+            return board.attackingTroops;
+        };
+        /*          END GLOBAL FUNCTIONS                    */
+        globalFunctions.getMap = function() {
             $(".displayPlayerColor").each(function(index) {
-                $(this).append(initialization.colorList[index]);
+                $(this).append(colorList[index]);
             });
-            $.ajax('/test/game/' + initialization.gameID + '/map', {
+            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         board.territoryInfo = $.parseJSON(result);
@@ -73,7 +84,7 @@
                             board.troops.push(board.territoryInfo.map[index].troops);
                             board.territoryDOMElements.push($(this));
                             $(this).addClass("player" + board.territoryInfo.map[index].owner);
-                            if(board.territoryInfo.map[index].owner === initialization.playerNumber) {
+                            if(board.territoryInfo.map[index].owner === globalFunctions.getPlayerNumber()) {
                                 $(this).hover(function() {
                                     $(this).addClass("territoryHover");
                                 }, function() {
@@ -93,7 +104,7 @@
                         });
                 });
         };
-        globalObjects.getMap();
+        globalFunctions.getMap();
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
             var map = board.territoryDOMElements;
@@ -105,7 +116,7 @@
             board.removeAllPreviousAdjacencies();
             var adjacentTerritories = board.findValidAdjacencies(index);
             for(var k=0; k<adjacentTerritories.length; k++) {
-                if(board.territoryOwner[adjacentTerritories[k]] != initialization.playerNumber) {
+                if(board.territoryOwner[adjacentTerritories[k]] != globalFunctions.getPlayerNumber()) {
                     $(map[adjacentTerritories[k]]).addClass('territoryAttack');
                 } else {
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
@@ -274,8 +285,8 @@
             }
             return result;
         };
-        globalObjects.destroyAndRebuildMap = function() {
-            initialization.displayMap(true);
+        globalFunctions.destroyAndRebuildMap = function() {
+            globalFunctions.setDisplayMap(true);
             board.territoryInfo = {};
             board.territoryOwner = [];
             board.territoryDOMElements = [];
@@ -288,7 +299,7 @@
                 $(this).empty();
             });
             board.removeAllPreviousAdjacencies($('#map'));
-            globalObjects.getMap();
+            globalFunctions.getMap();
         };
     }
     window.Board = boardViewModel;

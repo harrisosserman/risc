@@ -1,7 +1,7 @@
 (function(ko, Board, Turn) {
     function initializationViewModel() {
         var initialization = this;
-        var globalObjects = {};
+        var globalFunctions = {};
         initialization.playerName = ko.observable();
         initialization.playerNumber = -1;
         initialization.displayGameWaitingRoom = ko.observable(false);
@@ -9,8 +9,18 @@
         initialization.displayModal = ko.observable(true);
         initialization.displayMap = ko.observable(false);
         initialization.playerList = ko.observableArray([]);
-        initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         initialization.gameID = -1;
+        /*          GLOBAL FUNCTIONS                        */
+        globalFunctions.setDisplayMap = function(input) {
+            initialization.displayMap(input);
+        };
+        globalFunctions.getGameID = function() {
+            return initialization.gameID;
+        };
+        globalFunctions.getPlayerNumber = function() {
+            return initialization.playerNumber;
+        };
+        /*          END GLOBAL FUNCTIONS                    */
         initialization.enterGame = function() {
             var data = {
                 "name": initialization.playerName()
@@ -62,7 +72,7 @@
                     if(allPlayersReady === true) {
                         initialization.displayModal(false);
                         initialization.displayMap(true);
-                        new Board(initialization, globalObjects);
+                        new Board(globalFunctions);
                     } else {
                         setTimeout(initialization.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                     }
@@ -91,11 +101,9 @@
                     });
         };
         initialization.submitTurnClick = function() {
-            new Turn(initialization, globalObjects);
+            new Turn(globalFunctions);
         };
-        initialization.playerColor = ko.computed(function(index) {
-            return initialization.colorList[index];
-        }, initialization);
+
     }
     ko.applyBindings(new initializationViewModel());
 })(window.ko, window.Board, window.Turn);
