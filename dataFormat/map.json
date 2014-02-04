@@ -1,15 +1,19 @@
 {
-    "_id": "asdfasfdadf",
+    "gameID": "asdfasfdadf",
     "numPlayers": 5,
-    "turns": [
-        {
-            "territories": [
+    "territories": [
                 {
                     "owner": 2,
                     "troops": 5
                 }
-            ]
-        }
     ],
-    "additionalTroops": 5  <-- NOTE, THIS IS OPTIONAL AND IS ONLY PASSED ON INITIALIZATION
+    "additionalTroops": [   <-- NOTE, THIS IS USED AT GAME START, AT THE END OF A ROUND, ETC FOR NEW TROOPS
+        {
+            "owner": 3,
+            "troops": 5
+        },
+        {
+            "owner": 1,
+            "troops": 4
+        }
 }

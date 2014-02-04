@@ -18,7 +18,6 @@ public class Territory{
 	public int getPosition(){
 		return myPosition;
 	}
-
 	public int getOwner(){
 		return myOwner;
 	}
@@ -34,6 +33,4 @@ public class Territory{
 	public void setDefendingArmy(int troops){
 		myTroops = troops;
 	}
-
-
 }

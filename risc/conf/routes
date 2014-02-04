@@ -4,6 +4,18 @@
 
 GET     /                           controllers.MainController.index()
 POST    /game                       controllers.API.createGame()
+GET		/game/:id					controllers.API.getWaitingPlayers(id: String)
+POST 	/game/:id 					controllers.API.commitTurn(id: String)
+POST	/game/:id/start				controllers.API.startGame(id: String)
+GET 	/game/:id/map 				controllers.API.getMap(id: String)
+
+#   API calls that Harris made for testing the front end
+POST    /test/game                  controllers.TestAPI.createTestGame()
+POST    /test/game/:id/start        controllers.TestAPI.startTestGame(id: Long)
+GET     /test/game/:id              controllers.TestAPI.getTestGame(id: Long)
+GET     /test/game/:id/map          controllers.TestAPI.getTestMap(id: Long)
+POST    /test/game/:id              controllers.TestAPI.commitTestTurn(id: Long)
+GET     /test/game/:id/polling      controllers.TestAPI.getTestMapPolling(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /public/*file               controllers.Assets.at(path="/public", file)

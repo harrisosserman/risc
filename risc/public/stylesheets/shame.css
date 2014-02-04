@@ -2,3 +2,43 @@ table > tbody > td{
     width: 10px;
     height: 80px;
 }
+.player0 {
+    background-color: white;
+}
+.player1 {
+    background-color: #AF81C9;
+}
+.player2 {
+    background-color: #F89A7E;
+}
+.player3 {
+    background-color: #F2CA85;
+}
+.player4 {
+    background-color: #54D1F1;
+}
+.player5 {
+    background-color: #445569;
+}
+.territoryHover {
+    background-color: #FFFFE0;
+}
+.territoryClick {
+    background-color: #3366BB;
+}
+.territoryAttack {
+    background-color: #af111c;
+    opacity: .5;
+}
+.territoryMoveTroops {
+    background-color: #4D5D53;
+    opacity: .5;
+}
+.attackComponent {
+    position: absolute;
+}
+.centerAlign {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
