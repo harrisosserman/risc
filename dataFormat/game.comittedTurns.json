@@ -3,7 +3,7 @@
     "player": 2,
     "turn": {
         "territories": {
-            "1": {
+                "position": 1,
                 "troops": 5,
                 "attacking": [
                     {
@@ -15,7 +15,7 @@
                         "troops": 1
                     }
                 ]
-            }
+            
         }
     }
 }
