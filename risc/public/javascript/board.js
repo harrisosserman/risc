@@ -8,7 +8,8 @@
         board.territoryDOMElements = [];
         board.troops = [];
         board.attackingTroops = [];
-        var colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
+        board.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
+        board.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.getTerritoryOwner = function() {
             return board.territoryOwner;
@@ -22,7 +23,7 @@
         /*          END GLOBAL FUNCTIONS                    */
         globalFunctions.getMap = function() {
             $(".displayPlayerColor").each(function(index) {
-                $(this).append(colorList[index]);
+                $(this).append(board.colorList[index]);
             });
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
@@ -131,12 +132,16 @@
             });
         };
         board.findValidAdjacencies = function(index) {
-            //NEED TO IMPROVE THIS FUNCTION.  FINDS SOME ADDJACENCIES THAT ARE NOT ACTUALLY ADJACENT
-            var adjacentTerritories = [index + 1, index - 1, index - 5, index + 5, index + 6, index - 6, index + 4, index - 4];
-            for(var k=0; k<adjacentTerritories.length; k++) {
-                if(adjacentTerritories[k] < 0 || adjacentTerritories[k] > 24) {
-                    adjacentTerritories.splice(k, 1);   //remove elements that are outside the bounds of the map
+            var xPos = Math.floor(index / 5);
+            var yPos = index % 5;
+            var adjacentTerritories = [];
+            var adjacentTerritoriesX = [xPos + 1, xPos - 1, xPos, xPos, xPos + 1, xPos + 1, xPos -1, xPos - 1];
+            var adjacentTerritoriesY = [yPos, yPos, yPos + 1, yPos - 1, yPos + 1, yPos - 1, yPos + 1, yPos - 1];
+            for(var k=0; k<adjacentTerritoriesX.length; k++) {
+                if(adjacentTerritoriesX[k] < 0 || adjacentTerritoriesX[k] > 4 || adjacentTerritoriesY[k] < 0 || adjacentTerritoriesY[k] > 4) {
+                    continue;
                 }
+                adjacentTerritories.push(board.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]]);
             }
             return adjacentTerritories;
         };
