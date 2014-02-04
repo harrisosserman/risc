@@ -156,7 +156,7 @@
             }
         };
         board.moveTroops = function(destination, map) {
-            var origin = board.findOrigin(destination, map);
+            var origin = board.findOrigin(destination);
             var originTroops = board.troops[origin];
             var destinationTroops = board.troops[destination];
             if(originTroops > 0) {
@@ -171,7 +171,7 @@
             $(map[index]).children('p').children('span').html(troops);
         };
         board.attack = function(destination, map) {
-            var origin = board.findOrigin(destination, map);
+            var origin = board.findOrigin(destination);
             var originTroops = board.troops[origin];
             var troopsAttacking = originTroops + 1;
             while(troopsAttacking > originTroops) {
@@ -201,16 +201,14 @@
             board.attackingTroops[origin][direction].troops = troopsAttacking;
             return troopsPreviouslyAttacking;
         };
-        board.findOrigin = function(destination, map) {
-            //UPDATE FIND ORIGIN SO THAT IT USES ADJACENT TERRITORIES TO FIND ORIGIN
-            var originTerritory = -1;
-            $(map).each(function(index){
-                if($(this).hasClass('territoryClick')) {
-                    originTerritory = index;
-                    return false;
+        board.findOrigin = function(destination) {
+            var adjacencies = board.findValidAdjacencies(destination);
+            for(var k=0; k<adjacencies.length; k++) {
+                if($(board.territoryDOMElements[adjacencies[k]]).hasClass('territoryClick')) {
+                    return adjacencies[k];
                 }
-            });
-            return originTerritory;
+            }
+            return -1;
         };
         board.calculateArrowPosition = function(origin, destination) {
             var upDownArrowPadding = 60;
@@ -302,6 +300,9 @@
             });
             $(".displayPlayerColor").each(function(index) {
                 $(this).empty();
+            });
+            $("#map td").each(function() {
+                $(this).off('click');
             });
             board.removeAllPreviousAdjacencies($('#map'));
             globalFunctions.getMap();

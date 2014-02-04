@@ -61,10 +61,11 @@
                 var territoryInfo = {};
                 var attacking = turn.constructAttackingTroops(k);
                 territoryInfo = {
+                    "position": k,
                     "troops": troops[k],
                     "attacking": attacking
                 };
-                territories[k.toString()] = territoryInfo;
+                territories.push(territoryInfo);
             }
             returnData['territories'] = territories;
             $.ajax('/test/game/' + gameID, {

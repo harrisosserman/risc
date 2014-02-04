@@ -3,19 +3,18 @@
     "player": 2,
     "territories": [
         {
-            "1": {
-                "troops": 5,
-                "attacking": [
-                    {
-                        "territory": 2,
-                        "troops": 2
-                    },
-                    {
-                        "territory": 5,
-                        "troops": 1
-                    }
-                ]
-            }
+            "position" :1,
+            "troops": 5,
+            "attacking": [
+                {
+                    "territory": 2,
+                    "troops": 2
+                },
+                {
+                    "territory": 5,
+                    "troops": 1
+                }
+            ]
         }
     ]
 }
