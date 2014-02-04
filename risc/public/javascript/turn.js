@@ -30,8 +30,20 @@
         turn.pollForNextTurn = function(pollingNextTurnDOM) {
             var deferred = $.Deferred();
             var result = turn.loadGameMap(deferred);
-            deferred.done(function() {
+            deferred.done(function(data) {
                     $(pollingNextTurnDOM).remove();
+                    var gameMap = data.map;
+                    var owner = gameMap[0].owner;
+                    for(var k=0; k<gameMap.length; k++) {
+                        if(gameMap[k].owner !== owner) {
+                            break;
+                        }
+                        if(k === 24) {
+                            alert("Player " + owner + " wins!!!");
+                            location.reload(true);
+                            break;
+                        }
+                    }
                     globalFunctions.destroyAndRebuildMap();
                 }).fail(function() {
                     //all players have not yet finished their turns
@@ -46,7 +58,7 @@
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
-                deferred.resolve();
+                deferred.resolve(gameMap);
             }).fail(function() {
                 deferred.reject();
             });

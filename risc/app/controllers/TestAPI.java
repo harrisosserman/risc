@@ -87,9 +87,48 @@ public class TestAPI extends Controller {
         return ok();
     }
 
+    public static Result playerWinsMap() {
+        JSONObject result = new JSONObject();
+        result.put("gameID", "3938383");
+        result.put("numPlayers", 3);
+        JSONArray map = new JSONArray();
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+        map.put(new JSONObject().put("owner", 2).put("troops", 5));
+
+        result.put("map", map);
+        //DEAL WITH ADDITIONAL TROOPS LATER
+        return ok(result.toString());
+    }
+
     public static Result getTestMapPolling(Long id) {
         testCounterInGetTestMap++;
         if(testCounterInGetTestMap > 10) {
+            return playerWinsMap();
+        }
+        if(testCounterInGetTestMap == 10) {
             return getTestMap(id);
         }
         return status(400, "map not ready");
