@@ -1,42 +1,36 @@
 package models;
 
 import java.util.*;
+import models.Troop;
 
 public class Territory{
 
-	private Player myOwner;
-	private Army myDefendingArmy;
+	private int myOwner;
+	private int myTroops;
 	private int myPosition;
 
-	public Territory(int position, Player owner){
+	public Territory(int position, int owner, int troops){
 		myPosition = position;
 		myOwner = owner;
-		myDefendingArmy = new Army(0);
+		myTroops = troops;
 	}
 
 	public int getPosition(){
 		return myPosition;
 	}
-
-	public Player getOwner(){
+	public int getOwner(){
 		return myOwner;
 	}
 
-	public void setOwner(Player owner){
+	public void setOwner(int owner){
 		myOwner = owner;
 	}
 
-	public Army getDefendingArmy(){
-		return myDefendingArmy;
+	public int getDefendingArmy(){
+		return myTroops;
 	}
 
-	public void setDefendingArmy(Army army){
-		myDefendingArmy = army;
-	}
-
-	public String toString(){
-		return "Pos:" + myPosition + 
-			" Def str:" + myDefendingArmy.getTotalStrength() + 
-			" Owner:" + myOwner.getName();
+	public void setDefendingArmy(int troops){
+		myTroops = troops;
 	}
 }
