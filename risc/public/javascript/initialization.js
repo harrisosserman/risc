@@ -10,6 +10,7 @@
         initialization.displayMap = ko.observable(false);
         initialization.playerList = ko.observableArray([]);
         initialization.gameID = -1;
+        initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.setDisplayMap = function(input) {
             initialization.displayMap(input);
@@ -38,16 +39,24 @@
                         initialization.displayGameStart(false);
                         var players = $.parseJSON(result);
                         initialization.gameID = players.gameID;
+                        initialization.createPlayerList(players.players);
                         for(var k=0; k<players.players.length; k++) {
                             if(initialization.playerName() === players.players[k].name) {
                                 initialization.playerNumber = k + 1;
                             }
-                            initialization.playerList.push({
-                                'name': players.players[k].name,
-                                'ready': players.players[k].ready});
                         }
                         initialization.pollGameWaitingRoom();
                     });
+        };
+        initialization.createPlayerList = function(data) {
+            for(var k = 0; k<data.length; k++) {
+                initialization.playerList.push({
+                    'name': data[k].name,
+                    'ready': data[k].ready,
+                    'color': initialization.colorList[k],
+                    'additionalTroops': 0
+                });
+            }
         };
         initialization.startGame = function() {
             $.ajax('/test/game/' + initialization.gameID + '/start', {
@@ -86,11 +95,9 @@
                         initialization.playerList.removeAll();
                         var allPlayersReady = true;
                         var k=0;
+                        initialization.createPlayerList(players.players);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === 'false') allPlayersReady = false;
-                            initialization.playerList.push({
-                                'name': players.players[k].name,
-                                'ready': players.players[k].ready});
                         }
                         if(allPlayersReady === true && k > 1) {
                             //Can start the game if everyone is ready and there are at least 2 players

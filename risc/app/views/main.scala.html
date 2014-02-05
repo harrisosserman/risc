@@ -71,6 +71,7 @@
                                 <tr>
                                     <th>Player</th>
                                     <th>Color</th>
+                                    <th>Additional Troops</th>
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach: playerList">
@@ -78,7 +79,8 @@
                                     <td>
                                         <span data-bind="text: ($index() + 1)"></span>: <span data-bind="text: name"></span>
                                     </td>
-                                    <td class="displayPlayerColor"></td>
+                                    <td data-bind="text: color"></td>
+                                    <td data-bind="text: additionalTroops"></td>
                                 </tr>
                             </tbody>
                         </table>

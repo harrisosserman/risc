@@ -9,7 +9,7 @@
         board.troops = [];
         board.attackingTroops = [];
         board.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
-        board.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
+        board.additionalTroops = [];
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.getTerritoryOwner = function() {
             return board.territoryOwner;
@@ -22,9 +22,9 @@
         };
         /*          END GLOBAL FUNCTIONS                    */
         globalFunctions.getMap = function() {
-            $(".displayPlayerColor").each(function(index) {
-                $(this).append(board.colorList[index]);
-            });
+            // $(".displayPlayerColor").each(function(index) {
+            //     $(this).append(board.colorList[index]);
+            // });
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
@@ -298,9 +298,9 @@
             $('.troopTotals').each(function() {
                 $(this).remove();
             });
-            $(".displayPlayerColor").each(function(index) {
-                $(this).empty();
-            });
+            // $(".displayPlayerColor").each(function(index) {
+            //     $(this).empty();
+            // });
             $("#map td").each(function() {
                 $(this).off('click');
             });
