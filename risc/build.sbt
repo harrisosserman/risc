@@ -13,7 +13,9 @@ libraryDependencies ++= Seq(
   javaCore,  // The core Java API
   // WebJars pull in client-side web libraries
   "org.webjars" %% "webjars-play" % "2.2.0",
-  "org.webjars" % "bootstrap" % "2.3.1"
+  "org.webjars" % "bootstrap" % "2.3.1",
+  "org.codehaus.jackson" % "jackson-core-asl" % "1.8.9",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.2.2"
   // Add your own project dependencies in the form:
   // "group" % "artifact" % "version"
 )

@@ -7,22 +7,15 @@ import com.mongodb.util.JSON;
 import java.net.UnknownHostException;
 import models.Territory;
 import models.Troop;
+import models.Attacker;
 
 public class State{
-
-	private static final String DEFAULT_GAME_ID = "12345";
-	private static final int NUM_TERRITORIES = 50;
-	private static final String INITIALIZATION_DB = "initialization";
-    private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
-    private static final String NAME = "name";
-    private static final String COUNT = "count";
-    private static final String READY = "ready";
-    private static final String PLAYERS = "players";
-    private static final String GAME_ID = "gameID";
-
+ 
+	private int	turn; 
 	private String myGameID;
-	private ArrayList<Player> myPlayers;
 	private Territory[] myTerritories;
+	private ArrayList<Attacker> attackers;
+
 
 public State(){
 

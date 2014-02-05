@@ -62,7 +62,7 @@ public class API extends Controller {
         RequestBody body = request().body();
         Turn turn = new Turn();
 
-        String json = turn.createTurn(body);
+        int json = turn.createTurn(body);
         return ok("Turn commited for game:" + json);
     }
 }
