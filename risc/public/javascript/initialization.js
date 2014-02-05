@@ -9,6 +9,10 @@
         initialization.displayModal = ko.observable(true);
         initialization.displayMap = ko.observable(false);
         initialization.playerList = ko.observableArray([]);
+        initialization.playerList.name = ko.observable();
+        initialization.playerList.ready = ko.observable();
+        initialization.playerList.color = ko.observable();
+        initialization.playerList.additionalTroops = ko.observable();
         initialization.gameID = -1;
         initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         /*          GLOBAL FUNCTIONS                        */
@@ -20,6 +24,17 @@
         };
         globalFunctions.getPlayerNumber = function() {
             return initialization.playerNumber;
+        };
+        globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
+            var playerObject = initialization.playerList()[playerNumber - 1];
+            var newPlayerObject = {
+                "name": playerObject.name,
+                "ready": playerObject.ready,
+                "color": playerObject.color,
+                "additionalTroops": additionalTroops
+            };
+            initialization.playerList.remove(playerObject);
+            initialization.playerList.splice(playerNumber - 1, 0, newPlayerObject);
         };
         /*          END GLOBAL FUNCTIONS                    */
         initialization.enterGame = function() {

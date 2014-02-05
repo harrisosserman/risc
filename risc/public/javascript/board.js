@@ -22,13 +22,14 @@
         };
         /*          END GLOBAL FUNCTIONS                    */
         globalFunctions.getMap = function() {
-            // $(".displayPlayerColor").each(function(index) {
-            //     $(this).append(board.colorList[index]);
-            // });
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         board.territoryInfo = $.parseJSON(result);
+                        for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
+                            globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
+                                board.territoryInfo.additionalTroops[m].troops);
+                        }
                         var map = $("#map td");
                         $(map).each(function(index) {
                             board.attackingTroops.push({
@@ -81,11 +82,11 @@
                                     'destination': -1
                                 }
                             });
-                            board.territoryOwner.push(board.territoryInfo.map[index].owner);
-                            board.troops.push(board.territoryInfo.map[index].troops);
+                            board.territoryOwner.push(board.territoryInfo.territories[index].owner);
+                            board.troops.push(board.territoryInfo.territories[index].troops);
                             board.territoryDOMElements.push($(this));
-                            $(this).addClass("player" + board.territoryInfo.map[index].owner);
-                            if(board.territoryInfo.map[index].owner === globalFunctions.getPlayerNumber()) {
+                            $(this).addClass("player" + board.territoryInfo.territories[index].owner);
+                            if(board.territoryInfo.territories[index].owner === globalFunctions.getPlayerNumber()) {
                                 $(this).hover(function() {
                                     $(this).addClass("territoryHover");
                                 }, function() {
@@ -101,7 +102,7 @@
                                     board.userMapAction(index, map);
                                 });
                             }
-                            $(this).append("<p class='troopTotals'>troops: <span>" + board.territoryInfo.map[index].troops + "</span></p>");
+                            $(this).append("<p class='troopTotals'>troops: <span>" + board.territoryInfo.territories[index].troops + "</span></p>");
                         });
                 });
         };
@@ -298,9 +299,6 @@
             $('.troopTotals').each(function() {
                 $(this).remove();
             });
-            // $(".displayPlayerColor").each(function(index) {
-            //     $(this).empty();
-            // });
             $("#map td").each(function() {
                 $(this).off('click');
             });

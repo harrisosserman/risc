@@ -78,8 +78,12 @@ public class TestAPI extends Controller {
         map.put(new JSONObject().put("owner", 2).put("troops", 2));
         map.put(new JSONObject().put("owner", 1).put("troops", 2));
         map.put(new JSONObject().put("owner", 1).put("troops", 10));
-        result.put("map", map);
-        //DEAL WITH ADDITIONAL TROOPS LATER
+        result.put("territories", map);
+        JSONArray additionalTroops = new JSONArray();
+        additionalTroops.put(new JSONObject().put("owner", 1).put("troops", 1));
+        additionalTroops.put(new JSONObject().put("owner", 2).put("troops", 2));
+        additionalTroops.put(new JSONObject().put("owner", 3).put("troops", 3));
+        result.put("additionalTroops", additionalTroops);
         return ok(result.toString());
     }
 
