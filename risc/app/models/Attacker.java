@@ -17,6 +17,10 @@ public class Attacker{
 		myLocation = territory;
 	}
 
+	public int getTerritory(){
+		return myLocation;
+	}
+	
 	public int getStrength(){
 		return myStrength;
 	}
