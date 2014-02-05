@@ -41,7 +41,7 @@
             var data = {
                 "name": initialization.playerName()
             };
-            $.ajax('/test/game', {
+            $.ajax('/game', {
                         method: 'POST',
                         data: data,
                         settings: [
