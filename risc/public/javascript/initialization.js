@@ -38,17 +38,13 @@
         };
         /*          END GLOBAL FUNCTIONS                    */
         initialization.enterGame = function() {
-            var data = {
-                "name": initialization.playerName()
+            var sendingData = {
+                name: initialization.playerName()
             };
             $.ajax('/game', {
                         method: 'POST',
-                        data: data,
-                        settings: [
-                            {
-                                contentType: "application/json"
-                            }
-                        ]
+                        data: JSON.stringify(sendingData),
+                        contentType: "application/json",
                     }).done(function(result) {
                         initialization.displayGameWaitingRoom(true);
                         initialization.displayGameStart(false);
@@ -74,17 +70,13 @@
             }
         };
         initialization.startGame = function() {
-            $.ajax('/test/game/' + initialization.gameID + '/start', {
+            $.ajax('/game/' + initialization.gameID + '/start', {
                 method: 'POST',
-                settings: [
-                            {
-                                contentType: "application/json"
-                            }
-                        ],
-                data: {
+                contentType: "application/json",
+                data: JSON.stringify({
                     'name': initialization.playerName(),
                     'playerNumber': initialization.playerNumber
-                }
+                })
             }).done(function() {
                 initialization.loadWaitingPlayers($.Deferred());
             });
@@ -103,7 +95,8 @@
                 });
         };
         initialization.loadWaitingPlayers = function(deferredObject) {
-            $.ajax('/test/game/' + initialization.gameID, {
+            console.log("trying to load waiting players");
+            $.ajax('/game/' + initialization.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);

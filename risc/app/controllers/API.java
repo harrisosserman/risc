@@ -27,9 +27,13 @@ public class API extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createGame() throws UnknownHostException{
+        System.out.println("IN CREATE GAME");
+        System.out.println("REQUEST IS " + request().body().toString());
         RequestBody body = request().body();
+        System.out.println("WE HAVE REQUEST BODY");
+        System.out.println("body is: " + body.asJson().toString());
+        System.out.println("PLAYER NAME IS " + body.asJson().get(NAME).toString());
         String playerName = body.asJson().get(NAME).toString();
-
         Game game = new Game();
         if (game.getWaitingPlayerCount() >= 5) {
             return badRequest("The maximum number of players are already playing. Please try again later");
@@ -41,36 +45,12 @@ public class API extends Controller {
         result.put(PLAYER_ID, game.getWaitingPlayerCount());
         return ok(result.toString());
     }
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> 828a2245d6da3c7fb2c19bc2892271eab6eca7c8
     public static Result getWaitingPlayers(String id) throws UnknownHostException{
         Game game = new Game();
         String json = game.getWaitingPlayersJson(id);
     	return ok(json);
     }
 
-<<<<<<< HEAD
-    public static Result startGame(String id) {
-        return ok("will start game:" + id);
-    }
-
-    public static Result getMap(String id) {
-        return ok("will return map for game:" + id);
-    }
-    
-    @BodyParser.Of(BodyParser.Json.class)
-    public static Result commitTurn(String id) throws UnknownHostException {
-        RequestBody body = request().body();
-        Turn turn = new Turn();
-
-        int json = turn.createTurn(body);
-        return ok("Turn commited for game:" + json);
-    }
-
-=======
     @BodyParser.Of(BodyParser.Json.class)
     public static Result startGame(String id) throws UnknownHostException{
         RequestBody body = request().body();
@@ -91,5 +71,4 @@ public class API extends Controller {
     public static Result commitTurn(String id) {
         return ok("Turn commited for game:" + id);
     }
->>>>>>> 828a2245d6da3c7fb2c19bc2892271eab6eca7c8
 }
