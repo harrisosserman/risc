@@ -76,7 +76,7 @@ public class Turn {
        
         
         Attacker a = attackers.get(3);
-        int turn_ = a.getSize();
+        int turn_ = a.getStrength();
 
         connection.closeConnection();
 
