@@ -48,14 +48,9 @@
                     }).done(function(result) {
                         initialization.displayGameWaitingRoom(true);
                         initialization.displayGameStart(false);
-                        var players = $.parseJSON(result);
-                        initialization.gameID = players.gameID;
-                        initialization.createPlayerList(players.players);
-                        for(var k=0; k<players.players.length; k++) {
-                            if(initialization.playerName() === players.players[k].name) {
-                                initialization.playerNumber = k + 1;
-                            }
-                        }
+                        var resultData = $.parseJSON(result);
+                        initialization.playerNumber = resultData.playerId;
+                        initialization.gameID = resultData.gameID;
                         initialization.pollGameWaitingRoom();
                     });
         };
@@ -95,7 +90,6 @@
                 });
         };
         initialization.loadWaitingPlayers = function(deferredObject) {
-            console.log("trying to load waiting players");
             $.ajax('/game/' + initialization.gameID, {
                         method: 'GET',
                     }).done(function(result) {
