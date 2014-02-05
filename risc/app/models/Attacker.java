@@ -7,10 +7,13 @@ public class Attacker{
 	private int myOwner;
 	private int myStrength;
 	private int myLocation;
+	private int myHome;
 
-	public Attacker(int owner, int size, int territory){
+	public Attacker(int owner, int size, int territory, int home){
 		myStrength = size;
 		myOwner = owner; 
+		myHome = home;
+		myLocation = territory;
 	}
 
 	public void setTerritory(int territory){
@@ -20,7 +23,7 @@ public class Attacker{
 	public int getTerritory(){
 		return myLocation;
 	}
-	
+
 	public int getStrength(){
 		return myStrength;
 	}
@@ -35,6 +38,14 @@ public class Attacker{
 
 	public int getOwner(){
 		return myOwner;
+	}
+
+	public void setHome(int home){
+		myHome = home;
+	}
+
+	public int getHome(){
+		return myHome;
 	}
 
 }
