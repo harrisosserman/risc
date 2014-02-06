@@ -12,7 +12,7 @@ import models.Troop;
 
 
 public class Turn {
-
+    
 	private static final int NUM_TERRITORIES = 25;
 	private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
@@ -25,7 +25,7 @@ public class Turn {
     private static final String TERRITORY = "territory";
     private static final String TURN = "turn";
     private static final String GAME_ID = "_id";
-     private static final String POSITION = "position";
+    private static final String POSITION = "position";
 	
     private ArrayList<Territory> territories;
     private int playerID;
@@ -121,6 +121,5 @@ public class Turn {
 
 
     }
-        
 
 }

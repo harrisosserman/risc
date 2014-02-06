@@ -10,7 +10,7 @@ import models.Troop;
 import models.Attacker;
 
 public class State{
- 
+
 	private static final int NUM_TERRITORIES = 25;
 	private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
@@ -45,4 +45,4 @@ public int assembleState() throws UnknownHostException{
      System.out.println(turns);
      return 0;
 }
-
+}

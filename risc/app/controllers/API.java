@@ -19,7 +19,11 @@ public class API extends Controller {
     private static final String NAME = "name";
     private static final String GAME_ID = "gameID";
     private static final String PLAYER_ID = "playerId";
+<<<<<<< HEAD
     private static final int TURN = 1;
+=======
+    private static final String PLAYER_NUMBER = "playerNumber";
+>>>>>>> 1faca581c899ac64f0b16d21edf41b5f09dcb019
 
     public static MongoConnection initDB() throws UnknownHostException{
         MongoConnection mongoConnection = new MongoConnection();
@@ -42,13 +46,18 @@ public class API extends Controller {
         result.put(PLAYER_ID, game.getWaitingPlayerCount());
         return ok(result.toString());
     }
+<<<<<<< HEAD
+    
+=======
 
+>>>>>>> 828a2245d6da3c7fb2c19bc2892271eab6eca7c8
     public static Result getWaitingPlayers(String id) throws UnknownHostException{
         Game game = new Game();
         String json = game.getWaitingPlayersJson(id);
     	return ok(json);
     }
 
+<<<<<<< HEAD
     public static Result startGame(String id) {
         return ok("will start game:" + id);
     }
@@ -61,8 +70,34 @@ public class API extends Controller {
     public static Result commitTurn(String id) throws UnknownHostException {
         RequestBody body = request().body();
         Turn turn = new Turn();
+<<<<<<< HEAD
+=======
 
         int json = turn.createTurn(body);
         return ok("Turn commited for game:" + json);
     }
+
+=======
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result startGame(String id) throws UnknownHostException{
+        RequestBody body = request().body();
+        int startingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
+        String startingPlayerName = body.asJson().get(NAME).toString();
+
+        Game game = new Game();
+        game.start(id, startingPlayerNumber, startingPlayerName);
+        return ok();
+    }
+
+    public static Result getMap(String id) throws UnknownHostException{
+        Game game = new Game();
+        String mapJson = game.getMapJson(id);
+        return ok(mapJson);
+    }
+>>>>>>> 1faca581c899ac64f0b16d21edf41b5f09dcb019
+
+        int json = turn.createTurn(body);
+        return ok("Turn commited for game:" + json);
+    }
+>>>>>>> 828a2245d6da3c7fb2c19bc2892271eab6eca7c8
 }

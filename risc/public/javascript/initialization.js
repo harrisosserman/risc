@@ -1,75 +1,118 @@
-(function(ko, Board) {
+(function(ko, Board, Turn) {
     function initializationViewModel() {
-        var self = this;
-        self.playerName = ko.observable();
-        self.playerNumber = -1;
-        self.displayGameWaitingRoom = ko.observable(false);
-        self.displayGameStart = ko.observable(true);
-        self.displayModal = ko.observable(true);
-        self.displayMap = ko.observable(false);
-        self.playerList = ko.observableArray([]);
-        self.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
-        self.gameID = -1;
-        self.enterGame = function() {
-            var data = {
-                "name": self.playerName()
+        var initialization = this;
+        var globalFunctions = {};
+        initialization.playerName = ko.observable();
+        initialization.playerNumber = -1;
+        initialization.displayGameWaitingRoom = ko.observable(false);
+        initialization.displayGameStart = ko.observable(true);
+        initialization.displayModal = ko.observable(true);
+        initialization.displayMap = ko.observable(false);
+        initialization.playerList = ko.observableArray([]);
+        initialization.playerList.name = ko.observable();
+        initialization.playerList.ready = ko.observable();
+        initialization.playerList.color = ko.observable();
+        initialization.playerList.additionalTroops = ko.observable();
+        initialization.gameID = -1;
+        initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
+        /*          GLOBAL FUNCTIONS                        */
+        globalFunctions.setDisplayMap = function(input) {
+            initialization.displayMap(input);
+        };
+        globalFunctions.getGameID = function() {
+            return initialization.gameID;
+        };
+        globalFunctions.getPlayerNumber = function() {
+            return initialization.playerNumber;
+        };
+        globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
+            var playerObject = initialization.playerList()[playerNumber - 1];
+            var newPlayerObject = {
+                "name": playerObject.name,
+                "ready": playerObject.ready,
+                "color": playerObject.color,
+                "additionalTroops": additionalTroops
             };
-            $.ajax('/test/game', {
+            initialization.playerList.remove(playerObject);
+            initialization.playerList.splice(playerNumber - 1, 0, newPlayerObject);
+        };
+        /*          END GLOBAL FUNCTIONS                    */
+        initialization.enterGame = function() {
+            var data = {
+                "name": initialization.playerName()
+            };
+            $.ajax('/game', {
                         method: 'POST',
-                        data: data
-                    }).done(function(result) {
-                        self.displayGameWaitingRoom(true);
-                        self.displayGameStart(false);
-                        var players = $.parseJSON(result);
-                        self.gameID = players.gameID;
-                        for(var k=0; k<players.players.length; k++) {
-                            if(self.playerName() === players.players[k].name) {
-                                self.playerNumber = k + 1;
+                        data: data,
+                        settings: [
+                            {
+                                contentType: "application/json"
                             }
-                            self.playerList.push({
-                                'name': players.players[k].name,
-                                'ready': players.players[k].ready});
+                        ]
+                    }).done(function(result) {
+                        initialization.displayGameWaitingRoom(true);
+                        initialization.displayGameStart(false);
+                        var players = $.parseJSON(result);
+                        initialization.gameID = players.gameID;
+                        initialization.createPlayerList(players.players);
+                        for(var k=0; k<players.players.length; k++) {
+                            if(initialization.playerName() === players.players[k].name) {
+                                initialization.playerNumber = k + 1;
+                            }
                         }
-                        self.pollGameWaitingRoom();
+                        initialization.pollGameWaitingRoom();
                     });
         };
-        self.startGame = function() {
-            $.ajax('/test/game/' + self.gameID + '/start', {
+        initialization.createPlayerList = function(data) {
+            for(var k = 0; k<data.length; k++) {
+                initialization.playerList.push({
+                    'name': data[k].name,
+                    'ready': data[k].ready,
+                    'color': initialization.colorList[k],
+                    'additionalTroops': 0
+                });
+            }
+        };
+        initialization.startGame = function() {
+            $.ajax('/test/game/' + initialization.gameID + '/start', {
                 method: 'POST',
+                settings: [
+                            {
+                                contentType: "application/json"
+                            }
+                        ],
                 data: {
-                    'name': self.playerName(),
-                    'playerNumber': self.playerNumber
+                    'name': initialization.playerName(),
+                    'playerNumber': initialization.playerNumber
                 }
             }).done(function() {
-                self.loadWaitingPlayers($.Deferred());
+                initialization.loadWaitingPlayers($.Deferred());
             });
         };
-        self.pollGameWaitingRoom = function() {
+        initialization.pollGameWaitingRoom = function() {
                 var deferred = $.Deferred();
-                var result = self.loadWaitingPlayers(deferred);
+                var result = initialization.loadWaitingPlayers(deferred);
                 deferred.done(function(allPlayersReady) {
                     if(allPlayersReady === true) {
-                        self.displayModal(false);
-                        self.displayMap(true);
-                        new Board(self);
+                        initialization.displayModal(false);
+                        initialization.displayMap(true);
+                        new Board(globalFunctions);
                     } else {
-                        setTimeout(self.pollGameWaitingRoom, 1000); //wait 1 second before polling again
+                        setTimeout(initialization.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                     }
                 });
         };
-        self.loadWaitingPlayers = function(deferredObject) {
-            $.ajax('/test/game/' + self.gameID, {
+        initialization.loadWaitingPlayers = function(deferredObject) {
+            $.ajax('/test/game/' + initialization.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
-                        self.playerList.removeAll();
+                        initialization.playerList.removeAll();
                         var allPlayersReady = true;
                         var k=0;
+                        initialization.createPlayerList(players.players);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === 'false') allPlayersReady = false;
-                            self.playerList.push({
-                                'name': players.players[k].name,
-                                'ready': players.players[k].ready});
                         }
                         if(allPlayersReady === true && k > 1) {
                             //Can start the game if everyone is ready and there are at least 2 players
@@ -79,12 +122,13 @@
                         }
                     });
         };
-        self.playerColor = ko.computed(function(index) {
-            return self.colorList[index];
-        }, self);
+        initialization.submitTurnClick = function() {
+            new Turn(globalFunctions);
+        };
+
     }
     ko.applyBindings(new initializationViewModel());
-})(window.ko, window.Board);
+})(window.ko, window.Board, window.Turn);
 
 (function() {
     //function to build map out of table

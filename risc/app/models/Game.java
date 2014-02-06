@@ -10,13 +10,21 @@ public class Game {
 
 	private static final String DEFAULT_GAME_ID = "12345";
 	private static final int NUM_TERRITORIES = 50;
+	private static final int TOTAL_TROOP_COUNT = 240;	//(2*3*4*5)*2
 	private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
+    private static final String GAME_DB = "game";
+    private static final String MAP_COLLECTION = "map";
     private static final String NAME = "name";
     private static final String COUNT = "count";
     private static final String READY = "ready";
     private static final String PLAYERS = "players";
     private static final String GAME_ID = "gameID";
+    private static final String NUM_PLAYERS = "numPlayers";
+    private static final String TERRITORIES = "territories";
+    private static final String OWNER = "owner";
+    private static final String TROOPS = "troops";
+    private static final String ADDITIONAL_TROOPS = "additionalTroops";
 
 	private String myGameID;
 	private ArrayList<Player> myPlayers;
@@ -63,11 +71,8 @@ public class Game {
 
 	public String getWaitingPlayersJson(String gameID) throws UnknownHostException{
 		MongoConnection connection = new MongoConnection();
-        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
 
-        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
-        DBCursor playersList = waitingPlayers.find(query);
-
+		DBCursor playersList = getPlayersList(connection, gameID);
         String json = JSON.serialize(playersList);
         String trimmedJson = json.substring(1, json.length() - 1);	//need to remove '[' and ']' which converts it from BSON to JSON
 
@@ -75,32 +80,108 @@ public class Game {
         return trimmedJson;
 	}
 
-	public void start(){
-		System.out.println("Should start game: " + this.myGameID);
-		assert (myPlayers.size() > 1);
+	public void start(String gameID, int startingPlayerNumber, String startingPlayerName) throws UnknownHostException{
+		//update initialization.waitingPlayers to show that someone is ready
+		MongoConnection connection = new MongoConnection();
 
-		myTerritories = divyCountries();
+		markWaitingPlayerReady(connection, gameID, startingPlayerNumber, startingPlayerName);
+
+		int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
+		makeInitialGameMap(territoryOwners, gameID);
+
+		connection.closeConnection();
 	}
 
-	private Territory[] divyCountries(){
-		int playerCount = myPlayers.size();
+	private void markWaitingPlayerReady(MongoConnection connection, String gameID, int playerNumber, String playerName) throws UnknownHostException{
+		DBCursor playersListCursor = getPlayersList(connection, gameID);
+		DBObject playersList = playersListCursor.next();
 
+		ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(PLAYERS);
+		int playerIndex = playerNumber - 1;	// - 1 because 1-indexed instead of 0-indexed
+		BasicDBObject startingPlayer = players.get(playerIndex);
+
+		BasicDBObject newDocument = new BasicDBObject("$set", playersList);
+		String readyPath = PLAYERS + "." + playerIndex + "." + READY;
+		newDocument.append("$set", new BasicDBObject().append(readyPath, true));
+
+		DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+		waitingPlayers.update(new BasicDBObject(), newDocument);
+	}
+
+	private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{	
+		MongoConnection connection = new MongoConnection();
+        DBCollection map = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+
+        BasicDBObject doc = new BasicDBObject();
+
+        doc.append(GAME_ID, gameID);
+
+        int waitingPlayerCount = getWaitingPlayerCount();
+        doc.append(NUM_PLAYERS, waitingPlayerCount);
+
+        ArrayList<BasicDBObject> territories = new ArrayList<BasicDBObject>();
+        for (int ownerIndex : territoryOwners) {
+        	BasicDBObject territory = new BasicDBObject();
+        	int ownerNumber = ownerIndex + 1; //beacuse 1-indexed instead of 0-indexed
+        	territory.append(OWNER, ownerNumber);
+        	territory.append(TROOPS, 0);
+
+        	territories.add(territory);
+        }
+        doc.append(TERRITORIES, territories);
+
+        ArrayList<BasicDBObject> additionalTroops = new ArrayList<BasicDBObject>();
+        for (int i = 0; i < waitingPlayerCount; i++) {
+        	BasicDBObject additionalTroop = new BasicDBObject();
+        	additionalTroop.append(OWNER, i);
+        	additionalTroop.append(TROOPS, (TOTAL_TROOP_COUNT/waitingPlayerCount));
+
+        	additionalTroops.add(additionalTroop);
+        }
+        doc.append(ADDITIONAL_TROOPS, additionalTroops);
+
+        map.insert(doc);
+
+        connection.closeConnection();
+	}
+
+	private DBCursor getPlayersList(MongoConnection connection, String gameID){
+        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
+        DBCursor playersList = waitingPlayers.find(query);
+        return playersList;
+	}
+
+	private int[] assignCountryOwners(int playerCount) {
 		ArrayList<Integer> indices = new ArrayList<Integer>();
 		for(int i = 0; i < NUM_TERRITORIES; i++){
 			indices.add(i);
 		}
 		Collections.shuffle(indices);
 
-		Territory[] territories = new Territory[NUM_TERRITORIES];
+		int[] owners = new int[NUM_TERRITORIES];
 		for (int i = 0; i < NUM_TERRITORIES; i++) {
 			int index = indices.indexOf(i);
 			int ownerIndex = index % playerCount;
-
-			Territory t = new Territory(i, myPlayers.get(ownerIndex));
-			territories[i] = t;
+			owners[i] = ownerIndex;
 		}
+		return owners;
+	}
 
-		return territories;
+	public String getMapJson(String gameID) throws UnknownHostException{
+		MongoConnection connection = new MongoConnection();
+        DBCollection waitingPlayers = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
+        DBCursor mapCursor = waitingPlayers.find(query);
+
+        String json = JSON.serialize(mapCursor);
+        String trimmedJson = json.substring(1, json.length() - 1);	//need to remove '[' and ']' which converts it from BSON to JSON
+
+        connection.closeConnection();
+        
+        return trimmedJson;
 	}
 
 	public String getGameID(){
