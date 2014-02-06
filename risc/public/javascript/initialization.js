@@ -97,9 +97,10 @@
                         initialization.playerList.removeAll();
                         var allPlayersReady = true;
                         var k=0;
+                        console.log(players);
                         initialization.createPlayerList(players.players);
                         for(k=0; k<players.players.length; k++) {
-                            if(players.players[k].ready === 'false') allPlayersReady = false;
+                            if(players.players[k].ready === false) allPlayersReady = false;
                         }
                         if(allPlayersReady === true && k > 1) {
                             //Can start the game if everyone is ready and there are at least 2 players
