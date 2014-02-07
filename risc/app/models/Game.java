@@ -133,7 +133,8 @@ public class Game {
         ArrayList<BasicDBObject> additionalTroops = new ArrayList<BasicDBObject>();
         for (int i = 0; i < waitingPlayerCount; i++) {
         	BasicDBObject additionalTroop = new BasicDBObject();
-        	additionalTroop.append(OWNER, i);
+        	int ownerNumber = i + 1;
+        	additionalTroop.append(OWNER, ownerNumber);
         	additionalTroop.append(TROOPS, (TOTAL_TROOP_COUNT/waitingPlayerCount));
 
         	additionalTroops.add(additionalTroop);
