@@ -26,6 +26,9 @@
                 method: 'GET',
                     }).done(function(result) {
                         console.log(result);
+                        if(globalFunctions.getPlayerNumber() === -1) {
+                            $('.submitTurnButton').remove();
+                        }
                         board.territoryInfo = $.parseJSON(result);
                         for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
                             globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,

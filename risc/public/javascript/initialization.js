@@ -36,6 +36,9 @@
         globalFunctions.getPlayerNumber = function() {
             return initialization.playerNumber;
         };
+        globalFunctions.setPlayerNumber = function(newPlayerNumber) {
+            initialization.playerNumber = newPlayerNumber;
+        };
         globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
             var playerObject = initialization.playerList()[playerNumber - 1];
             var newPlayerObject = {
@@ -63,6 +66,12 @@
                         initialization.playerNumber = resultData.playerId;
                         initialization.gameID = resultData.gameID;
                         initialization.pollGameWaitingRoom();
+                    }).fail(function(result) {
+                        //called when player tries to join after game has started
+                        alert('Unfortunately, a game is in progress.  You can follow along!');
+                        var resultData = $.parseJSON(result);
+                        initialization.gameID = resultData.gameID;
+                        new Board(globalFunctions);
                     });
         };
         initialization.createPlayerList = function(data) {
