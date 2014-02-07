@@ -29,6 +29,7 @@
                         for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
                             globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
                                 board.territoryInfo.additionalTroops[m].troops);
+                            board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
@@ -95,6 +96,7 @@
                                 $(this).click(function() {
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
+                                    board.listenForAdditionalTroops(index);
                                 });
                             } else {
                                 $(this).click(function() {
@@ -124,26 +126,30 @@
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
                 }
             }
-            board.listenForAdditionalTroops(index);
         };
         board.listenForAdditionalTroops = function(index) {
-            $("body").keydown(function(input) {
-                console.log(input);
-                if(input.keyCode === 38) {
-                    //up arrow
-                    board.calculateAdditionalTroops(1, index, input);
-                } else if(input.keyCode === 40) {
-                    //down arrow
-                    board.calculateAdditionalTroops(-1, index, input);
-                }
-            });
+                $("body").keydown(function(input) {
+                    if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
+                        if(input.keyCode === 38) {
+                            //up arrow
+                            board.calculateAdditionalTroops(1, index, input);
+                        } else if(input.keyCode === 40) {
+                            //down arrow
+                            board.calculateAdditionalTroops(-1, index, input);
+                        }
+                    }
+                });
         };
         board.calculateAdditionalTroops = function(troopDelta, index, key) {
             key.preventDefault();
             var currentTroops = board.troops[index];
-            var currentAdditionalTroops = board.additionalTroops[globalFunctions.getPlayerNumber() - 1];
+            var currentAdditionalTroops = board.additionalTroops[globalFunctions.getPlayerNumber()];
+            if(currentTroops === 0 && troopDelta === -1 || currentAdditionalTroops === 0 && troopDelta === 1) {
+                return;
+            }
             currentTroops = currentTroops + troopDelta;
             currentAdditionalTroops = currentAdditionalTroops - troopDelta;
+            board.additionalTroops[globalFunctions.getPlayerNumber()] = currentAdditionalTroops;
             board.updateTroopsOnTerritory(index, currentTroops, $("#map td"));
             globalFunctions.updateAdditionalTroops(globalFunctions.getPlayerNumber(), currentAdditionalTroops);
         };
