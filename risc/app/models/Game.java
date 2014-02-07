@@ -103,6 +103,20 @@ public class Game {
         return map.hasNext();
 	}
 
+	public boolean canPlayersStillJoin() throws UnknownHostException{
+		if (getWaitingPlayerCount() >= 5) {
+			return false;
+		}
+
+		MongoConnection connection = new MongoConnection();
+		if (gameMapHasBeenCreated(connection, myGameID)) {
+			return false;
+		}
+		connection.closeConnection();
+
+		return true;
+	}
+
 	private void markWaitingPlayerReady(MongoConnection connection, String gameID, int playerNumber, String playerName) throws UnknownHostException{
 		DBCursor playersListCursor = getPlayersList(connection, gameID);
 		DBObject playersList = playersListCursor.next();
