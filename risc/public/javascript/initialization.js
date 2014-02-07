@@ -41,7 +41,7 @@
             var sendingData = {
                 name: initialization.playerName()
             };
-            $.ajax('/game', {
+            $.ajax('/test/game', {
                         method: 'POST',
                         data: JSON.stringify(sendingData),
                         contentType: "application/json",
@@ -65,7 +65,7 @@
             }
         };
         initialization.startGame = function() {
-            $.ajax('/game/' + initialization.gameID + '/start', {
+            $.ajax('/test/game/' + initialization.gameID + '/start', {
                 method: 'POST',
                 contentType: "application/json",
                 data: JSON.stringify({
@@ -90,14 +90,13 @@
                 });
         };
         initialization.loadWaitingPlayers = function(deferredObject) {
-            $.ajax('/game/' + initialization.gameID, {
+            $.ajax('/test/game/' + initialization.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
                         initialization.playerList.removeAll();
                         var allPlayersReady = true;
                         var k=0;
-                        console.log(players);
                         initialization.createPlayerList(players.players);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === false) allPlayersReady = false;

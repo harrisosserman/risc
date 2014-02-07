@@ -124,6 +124,28 @@
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
                 }
             }
+            board.listenForAdditionalTroops(index);
+        };
+        board.listenForAdditionalTroops = function(index) {
+            $("body").keydown(function(input) {
+                console.log(input);
+                if(input.keyCode === 38) {
+                    //up arrow
+                    board.calculateAdditionalTroops(1, index, input);
+                } else if(input.keyCode === 40) {
+                    //down arrow
+                    board.calculateAdditionalTroops(-1, index, input);
+                }
+            });
+        };
+        board.calculateAdditionalTroops = function(troopDelta, index, key) {
+            key.preventDefault();
+            var currentTroops = board.troops[index];
+            var currentAdditionalTroops = board.additionalTroops[globalFunctions.getPlayerNumber() - 1];
+            currentTroops = currentTroops + troopDelta;
+            currentAdditionalTroops = currentAdditionalTroops - troopDelta;
+            board.updateTroopsOnTerritory(index, currentTroops, $("#map td"));
+            globalFunctions.updateAdditionalTroops(globalFunctions.getPlayerNumber(), currentAdditionalTroops);
         };
         board.removeAllPreviousAdjacencies = function() {
             $("#map td").each(function(){
