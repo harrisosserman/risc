@@ -29,12 +29,14 @@ public class API extends Controller {
     public static Result createGame() throws UnknownHostException{
         RequestBody body = request().body();
         String playerName = body.asJson().get(NAME).toString();
+        String playerNameWithoutQuotes = playerName.substring(1, playerName.length() - 1);
+        System.out.println(playerNameWithoutQuotes);
 
         Game game = new Game();
         if (game.getWaitingPlayerCount() >= 5) {
             return badRequest("The maximum number of players are already playing. Please try again later");
         }
-        game.addWaitingPlayer(playerName);
+        game.addWaitingPlayer(playerNameWithoutQuotes);
 
         JSONObject result = new JSONObject();
         result.put(GAME_ID, game.getGameID());
