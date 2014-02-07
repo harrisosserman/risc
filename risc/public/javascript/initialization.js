@@ -1,3 +1,14 @@
+// $(window).on('beforeunload', function(e){
+//     console.log('reloading page');
+//     e.preventDefault();
+// });
+
+// window.onbeforeunload = function(event){
+//         event.preventDefault();
+//         console.log('about to reload');
+//         // alert('sure you want to reload?');
+// };
+
 (function(ko, Board, Turn) {
     function initializationViewModel() {
         var initialization = this;
@@ -41,7 +52,7 @@
             var sendingData = {
                 name: initialization.playerName()
             };
-            $.ajax('/test/game', {
+            $.ajax('/game', {
                         method: 'POST',
                         data: JSON.stringify(sendingData),
                         contentType: "application/json",
@@ -65,7 +76,7 @@
             }
         };
         initialization.startGame = function() {
-            $.ajax('/test/game/' + initialization.gameID + '/start', {
+            $.ajax('/game/' + initialization.gameID + '/start', {
                 method: 'POST',
                 contentType: "application/json",
                 data: JSON.stringify({
@@ -90,7 +101,7 @@
                 });
         };
         initialization.loadWaitingPlayers = function(deferredObject) {
-            $.ajax('/test/game/' + initialization.gameID, {
+            $.ajax('/game/' + initialization.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);

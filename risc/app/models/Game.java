@@ -108,7 +108,7 @@ public class Game {
 		waitingPlayers.update(new BasicDBObject(), newDocument);
 	}
 
-	private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{	
+	private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
 		MongoConnection connection = new MongoConnection();
         DBCollection map = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
 
@@ -180,7 +180,7 @@ public class Game {
         String trimmedJson = json.substring(1, json.length() - 1);	//need to remove '[' and ']' which converts it from BSON to JSON
 
         connection.closeConnection();
-        
+
         return trimmedJson;
 	}
 
