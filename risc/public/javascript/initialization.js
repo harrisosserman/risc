@@ -34,6 +34,7 @@ function myUnloadEvent() {
         initialization.playerList.additionalTroops = ko.observable();
         initialization.gameID = -1;
         initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
+        initialization.displayInstructions = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.setDisplayMap = function(input) {
             initialization.displayMap(input);
@@ -142,6 +143,12 @@ function myUnloadEvent() {
         };
         initialization.submitTurnClick = function() {
             new Turn(globalFunctions);
+        };
+        initialization.openInstructions = function() {
+            initialization.displayInstructions(true);
+        };
+        initialization.closeInstructions = function() {
+            initialization.displayInstructions(false);
         };
 
     }
