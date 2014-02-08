@@ -75,7 +75,7 @@
 
         turn.constructComittedTurn = function() {
             var returnData = {};
-            returnData['_id'] = gameID;
+            returnData['gameID'] = gameID;
             returnData['player'] = playerNumber;
             var territories = [];
             for(var k=0; k<territoryOwner.length; k++) {
