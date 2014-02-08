@@ -9,13 +9,22 @@
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")' />
     </head>
     <body>
-        <div class="container">
-            <div class="navbar">
-                <div class="navbar-inner">
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <div class="brand">
                         <h3 style="text-align: center; color: white">Risc</h3>
-                        <div data-bind="visible: displayMap">
-                            <button data-bind="click: submitTurnClick" class="submitTurnButton">Submit Turn</button>
-                        </div>
+                    </div>
+                    <ul class="nav pull-right">
+                        <li>
+                            <button>Instructions</button>
+                        </li>
+                        <li>
+                            <div data-bind="visible: displayMap">
+                                <button data-bind="click: submitTurnClick" class="submitTurnButton">Submit Turn</button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
