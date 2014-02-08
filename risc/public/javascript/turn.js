@@ -33,16 +33,25 @@
             deferred.done(function(data) {
                     $(pollingNextTurnDOM).remove();
                     var gameMap = data.map;
+                    //handling when player loses or when player wins
+                    var playerNumber = globalFunctions.getPlayerNumber();
+                    var playerNumberFound = false;
+                    var otherPlayersFound = false;
                     var owner = gameMap[0].owner;
                     for(var k=0; k<gameMap.length; k++) {
                         if(gameMap[k].owner !== owner) {
-                            break;
+                            otherPlayersFound = true;
                         }
-                        if(k === 24) {
-                            alert("Player " + owner + " wins!!!");
-                            location.reload(true);
-                            break;
+                        if(gameMap[k].owner === playerNumber) {
+                            playerNumberFound = true;
                         }
+                    }
+                    if(playerNumberFound === false) {
+                        globalFunctions.setPlayerNumber(-1);
+                    }
+                    if(otherPlayersFound === false) {
+                        alert("Player " + owner + " wins!!!");
+                        location.reload(true);
                     }
                     globalFunctions.destroyAndRebuildMap();
                 }).fail(function() {
@@ -66,7 +75,7 @@
 
         turn.constructComittedTurn = function() {
             var returnData = {};
-            returnData['_id'] = gameID;
+            returnData['gameID'] = gameID;
             returnData['player'] = playerNumber;
             var territories = [];
             for(var k=0; k<territoryOwner.length; k++) {

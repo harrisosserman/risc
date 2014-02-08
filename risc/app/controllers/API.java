@@ -32,17 +32,30 @@ public class API extends Controller {
     public static Result createGame() throws UnknownHostException{
         RequestBody body = request().body();
         String playerName = body.asJson().get(NAME).toString();
+        String playerNameWithoutQuotes = playerName.substring(1, playerName.length() - 1);
 
         Game game = new Game();
-        if (game.getWaitingPlayerCount() >= 5) {
-            return badRequest("The maximum number of players are already playing. Please try again later");
+        
+        boolean canStillJoin = game.canPlayersStillJoin();
+        String gameID = game.getGameID();
+        int playerID;
+
+        if(canStillJoin){
+            game.addWaitingPlayer(playerNameWithoutQuotes);
+            playerID = game.getWaitingPlayerCount();
+        }else{
+            playerID = 0;
         }
-        game.addWaitingPlayer(playerName);
 
         JSONObject result = new JSONObject();
-        result.put(GAME_ID, game.getGameID());
-        result.put(PLAYER_ID, game.getWaitingPlayerCount());
-        return ok(result.toString());
+        result.put(GAME_ID, gameID);
+        result.put(PLAYER_ID, playerID);
+
+        if (canStillJoin) {
+            return ok(result.toString());
+        }else{
+            return badRequest(result.toString());
+        }
     }
 
     public static Result getWaitingPlayers(String id) throws UnknownHostException{
@@ -80,4 +93,5 @@ public class API extends Controller {
         String mapJson = game.getMapJson(id);
         return ok(mapJson);
     }
+
 }

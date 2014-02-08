@@ -22,13 +22,17 @@
         };
         /*          END GLOBAL FUNCTIONS                    */
         globalFunctions.getMap = function() {
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
+                        if(globalFunctions.getPlayerNumber() === -1) {
+                            $('.submitTurnButton').remove();
+                        }
                         board.territoryInfo = $.parseJSON(result);
                         for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
                             globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
                                 board.territoryInfo.additionalTroops[m].troops);
+                            board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
@@ -95,6 +99,7 @@
                                 $(this).click(function() {
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
+                                    board.listenForAdditionalTroops(index);
                                 });
                             } else {
                                 $(this).click(function() {
@@ -106,7 +111,6 @@
                         });
                 });
         };
-        globalFunctions.getMap();
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
             var map = board.territoryDOMElements;
@@ -124,6 +128,32 @@
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
                 }
             }
+        };
+        board.listenForAdditionalTroops = function(index) {
+                $("body").keydown(function(input) {
+                    if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
+                        if(input.keyCode === 38) {
+                            //up arrow
+                            board.calculateAdditionalTroops(1, index, input);
+                        } else if(input.keyCode === 40) {
+                            //down arrow
+                            board.calculateAdditionalTroops(-1, index, input);
+                        }
+                    }
+                });
+        };
+        board.calculateAdditionalTroops = function(troopDelta, index, key) {
+            key.preventDefault();
+            var currentTroops = board.troops[index];
+            var currentAdditionalTroops = board.additionalTroops[globalFunctions.getPlayerNumber()];
+            if(currentTroops === 0 && troopDelta === -1 || currentAdditionalTroops === 0 && troopDelta === 1) {
+                return;
+            }
+            currentTroops = currentTroops + troopDelta;
+            currentAdditionalTroops = currentAdditionalTroops - troopDelta;
+            board.additionalTroops[globalFunctions.getPlayerNumber()] = currentAdditionalTroops;
+            board.updateTroopsOnTerritory(index, currentTroops, $("#map td"));
+            globalFunctions.updateAdditionalTroops(globalFunctions.getPlayerNumber(), currentAdditionalTroops);
         };
         board.removeAllPreviousAdjacencies = function() {
             $("#map td").each(function(){
@@ -305,6 +335,17 @@
             board.removeAllPreviousAdjacencies($('#map'));
             globalFunctions.getMap();
         };
+
+        board.playerWatching = function() {
+            //reloads the map every 10 seconds for any players watching game
+            if(globalFunctions.getPlayerNumber() !== -1) {
+                return;
+            }
+            globalFunctions.destroyAndRebuildMap();
+            setTimeout(board.playerWatching, 10000);
+        };
+        globalFunctions.getMap();
+        board.playerWatching();
     }
     window.Board = boardViewModel;
 })(window.ko);

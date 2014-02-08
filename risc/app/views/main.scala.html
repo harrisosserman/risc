@@ -9,13 +9,22 @@
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")' />
     </head>
     <body>
-        <div class="container">
-            <div class="navbar">
-                <div class="navbar-inner">
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="container">
+                    <div class="brand">
                         <h3 style="text-align: center; color: white">Risc</h3>
-                        <div data-bind="visible: displayMap">
-                            <button data-bind="click: submitTurnClick">Submit Turn</button>
-                        </div>
+                    </div>
+                    <ul class="nav pull-right">
+                        <li>
+                            <button data-bind="click: openInstructions">Instructions</button>
+                        </li>
+                        <li>
+                            <div data-bind="visible: displayMap">
+                                <button data-bind="click: submitTurnClick" class="submitTurnButton">Submit Turn</button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -54,6 +63,37 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="modal" data-bind="visible: displayInstructions">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Instructions</h4>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <ol>
+                            <li>Enter your name and press Play</li>
+                            <li>Click 'I'm Ready' when you are ready to play.  For the game to start, there have to be between 2 and 5 players and every player must be ready</li>
+                            <li>Once the game starts:
+                                <ul>
+                                    <li>Click on one of your territories to take an action.  Any surrounding territories that you can attack or move troops to will be highlighted in red or green, respectively</li>
+                                    <li>If you have additional troops that you can place (which will be displayed in the table at the bottom), you can select a territory that you own and press the up and down arrows to add/remove additional troops in that territory</li>
+                                    <li>When you are happy with your turn, click Submit Turn
+                                        <ul>
+                                            <li>
+                                                The map will reload with the result of your turn once all of the other players have finished their turns
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>The game ends when one player owns all the territories</li>
+                        </ol>
+                        <button class="pull-right" data-bind="click: closeInstructions">Close</button>
+                    </div>
+                </div>
             </div>
 
             <div data-bind="visible: displayMap">

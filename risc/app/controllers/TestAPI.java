@@ -15,11 +15,7 @@ public class TestAPI extends Controller {
     public static Result createTestGame() {
         JSONObject result = new JSONObject();
         result.put("gameID", "3938383");
-        JSONArray names = new JSONArray();
-        names.put(new JSONObject().put("name", "Kat").put("ready", "false"));
-        names.put(new JSONObject().put("name", "Julian").put("ready", "false"));
-        names.put(new JSONObject().put("name", "Harris").put("ready", "false"));
-        result.put("players", names);
+        result.put("playerId", 1);
         return ok(result.toString());
     }
 
