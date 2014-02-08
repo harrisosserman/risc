@@ -272,4 +272,10 @@ public class Game {
         }
         return count;
     }
+
+    public void removePlayer(int pid){
+        //for each territory t
+        //  if t is owned by player
+        //      set troops in t to 0
+    }
 }

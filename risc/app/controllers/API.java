@@ -29,7 +29,7 @@ public class API extends Controller {
     public static Result createGame() throws UnknownHostException{
         RequestBody body = request().body();
         String playerName = body.asJson().get(NAME).toString();
-        String playerNameWithoutQuotes = playerName.substring(1, playerName.length() - 1);
+        String playerNameWithoutQuotes = removeQuotes(playerName);
 
         Game game = new Game();
         
@@ -79,5 +79,20 @@ public class API extends Controller {
 
     public static Result commitTurn(String id) {
         return ok("Turn commited for game:" + id);
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result exit(String id) {
+        RequestBody body = request().body();
+        int exitingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
+
+        Game game = new Game();
+        game.removePlayer(exitingPlayerNumber);
+
+        return ok("will do an exit for player:" + exitingPlayerNumber);
+    }
+
+    private static String removeQuotes(String stringWithQuotes){
+        return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
 }
