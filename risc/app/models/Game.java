@@ -86,11 +86,36 @@ public class Game {
 
         markWaitingPlayerReady(connection, gameID, startingPlayerNumber, startingPlayerName);
 
-        int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
-        makeInitialGameMap(territoryOwners, gameID);
+		if (!gameMapHasBeenCreated(connection, gameID)) {
+			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
+			makeInitialGameMap(territoryOwners, gameID);
+		}
 
-        connection.closeConnection();
-    }
+		connection.closeConnection();
+	}
+
+	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){
+		DBCollection mapCollection = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
+        DBCursor map = mapCollection.find(query);
+
+        return map.hasNext();
+	}
+
+	public boolean canPlayersStillJoin() throws UnknownHostException{
+		if (getWaitingPlayerCount() >= 5) {
+			return false;
+		}
+
+		MongoConnection connection = new MongoConnection();
+		if (gameMapHasBeenCreated(connection, myGameID)) {
+			return false;
+		}
+		connection.closeConnection();
+
+		return true;
+	}
 
     private void markWaitingPlayerReady(MongoConnection connection, String gameID, int playerNumber, String playerName) throws UnknownHostException{
         DBCursor playersListCursor = getPlayersList(connection, gameID);
@@ -132,10 +157,10 @@ public class Game {
 
         ArrayList<BasicDBObject> additionalTroops = new ArrayList<BasicDBObject>();
         for (int i = 0; i < waitingPlayerCount; i++) {
-            BasicDBObject additionalTroop = new BasicDBObject();
-            additionalTroop.append(OWNER, i);
-            additionalTroop.append(TROOPS, (TOTAL_TROOP_COUNT/waitingPlayerCount));
-
+        	BasicDBObject additionalTroop = new BasicDBObject();
+        	int ownerNumber = i + 1;
+        	additionalTroop.append(OWNER, ownerNumber);
+        	additionalTroop.append(TROOPS, (TOTAL_TROOP_COUNT/waitingPlayerCount));
             additionalTroops.add(additionalTroop);
         }
         doc.append(ADDITIONAL_TROOPS, additionalTroops);

@@ -9,6 +9,14 @@
 //         // alert('sure you want to reload?');
 // };
 
+window.onbeforeunload = function(){
+    myUnloadEvent();
+};
+function myUnloadEvent() {
+    alert ('You can have Ur Logic Here');
+
+}
+
 (function(ko, Board, Turn) {
     function initializationViewModel() {
         var initialization = this;
