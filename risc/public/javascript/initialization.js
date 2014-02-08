@@ -77,8 +77,11 @@ function myUnloadEvent() {
                     }).fail(function(result) {
                         //called when player tries to join after game has started
                         alert('Unfortunately, a game is in progress.  You can follow along!');
-                        var resultData = $.parseJSON(result);
+                        var resultData = $.parseJSON(result.responseText);
                         initialization.gameID = resultData.gameID;
+                        initialization.loadWaitingPlayers($.Deferred());
+                        initialization.displayModal(false);
+                        initialization.displayMap(true);
                         new Board(globalFunctions);
                     });
         };

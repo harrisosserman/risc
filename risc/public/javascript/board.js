@@ -25,7 +25,6 @@
             $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
-                        console.log(result);
                         if(globalFunctions.getPlayerNumber() === -1) {
                             $('.submitTurnButton').remove();
                         }
