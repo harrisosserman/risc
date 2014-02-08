@@ -86,13 +86,33 @@ public class Game {
 
         markWaitingPlayerReady(connection, gameID, startingPlayerNumber, startingPlayerName);
 
-		if (!gameMapHasBeenCreated(connection, gameID)) {
+		if (areAllPlayersReady(connection, gameID)) {
 			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
 			makeInitialGameMap(territoryOwners, gameID);
 		}
 
 		connection.closeConnection();
 	}
+
+    private boolean areAllPlayersReady(MongoConnection connection, String gameID) throws UnknownHostException{
+        int waitingPlayerCount = getWaitingPlayerCount();
+
+        DBCursor playersListCursor = getPlayersList(connection, gameID);
+        if (!playersListCursor.hasNext()) {
+            return false;
+        }
+
+        DBObject playersList = playersListCursor.next();
+
+        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(PLAYERS);
+        int readyCount = 0;
+        for (DBObject player : players) {
+            if ((boolean)player.get(READY)) {
+                readyCount++;
+            }
+        }
+        return readyCount == waitingPlayerCount;
+    }
 
 	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){
 		DBCollection mapCollection = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
