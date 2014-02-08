@@ -1,7 +1,7 @@
 {
-    "_id": 12,
-    "player": 2,
-    "turn": 4,
+    "gameID": 2,
+    "player": 1,
+    "turn": 1,
     "territories": [
         {
             "position" :1,
@@ -9,7 +9,7 @@
             "attacking": [
                 {
                     "territory": 2,
-                    "troops": 2
+                    "troops": 4
                 },
                 {
                     "territory": 5,

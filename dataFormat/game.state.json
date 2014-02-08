@@ -1,7 +1,7 @@
 {
-    "_id": "asdfasfdadf",
+    "gameID": 2,
     "numPlayers": 5,
-    "turn": 2
+    "turn": 2,
     "territories": [
             {
                 "position": 4,

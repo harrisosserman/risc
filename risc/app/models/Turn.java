@@ -24,7 +24,7 @@ public class Turn {
     private static final String TERRITORIES = "territories";
     private static final String TERRITORY = "territory";
     private static final String TURN = "turn";
-    private static final String GAME_ID = "_id";
+    private static final String GAME_ID = "gameID";
     private static final String POSITION = "position";
     private static final String COUNT = "count";
 	
@@ -67,9 +67,6 @@ public class Turn {
             }
         }
        
-        
-        Attacker a = attackers.get(3);
-        int turn_ = a.getStrength();
 
         commitTurn();
         boolean ready = allTurnsCommitted();
@@ -81,32 +78,43 @@ public class Turn {
         return false;
     }
 
-    public boolean allTurnsCommitted() throws UnknownHostException{
+    private boolean allTurnsCommitted() throws UnknownHostException{
         MongoConnection connection = new MongoConnection();
         DB game = connection.getDB(GAME_DB);
+        DB initialization = connection.getDB(INITIALIZATION_DB);
         DBCollection committedTurns = game.getCollection(COMMITTED_TURNS_COLLECTION);
         DBCollection state = game.getCollection(STATE);
         DB initialization_database = connection.getDB(INITIALIZATION_DB);
-        DBCollection waitingPlayers = game.getCollection(WAITING_PLAYERS_COLLECTION);
-        
+        DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
         BasicDBObject query_turn = new BasicDBObject(GAME_ID, id);
-        DBCursor highestTurn = state.find().sort(new BasicDBObject(TURN, -1));
-        int highestTurn_value = (Integer) highestTurn.next().get(TURN);
-
+        DBCursor highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
+        int highestTurn_value;
+        if(!highestTurn.hasNext())
+        {
+             highestTurn_value = 1;
+        }
+        else{
+             highestTurn_value = (Integer) highestTurn.next().get(TURN);
+        }
         BasicDBObject query_count = new BasicDBObject();
         query_count.put(GAME_ID, id);
         DBCursor playerCount = waitingPlayers.find(query_count);
-        int numPlayers = (Integer) playerCount.next().get(COUNT);
-        
+        double numPlayers_double = (Double) playerCount.next().get(COUNT);
+        int numPlayers = (int) numPlayers_double;
+        System.out.println("returned " );
         int numMaxTurns = 0;
+        highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
         while(highestTurn.hasNext()){
             DBObject obj = highestTurn.next();
+            System.out.println("entered while loop " );
             int document_turn = (Integer) obj.get(TURN);
             if(highestTurn_value == document_turn){
+                System.out.println("entered while loop  if statement :) " );
                 numMaxTurns ++;
             }
-        }
 
+        }
+        System.out.println("numMaxTurns = " + numMaxTurns + "numPlayers = " + numPlayers);
         boolean full = (numMaxTurns == numPlayers);
         return full; 
     }
@@ -154,10 +162,9 @@ public class Turn {
 
         committedTurns.insert(turn_doc);
 
-
         connection.closeConnection();
 
-
+        System.out.println("turn was committed");
 
         return;
 

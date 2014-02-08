@@ -56,9 +56,12 @@ public class API extends Controller {
     public static Result commitTurn(String id) throws UnknownHostException {
         RequestBody body = request().body();
         Turn turn = new Turn();
-        //int json = turn.createTurn(body);
-        State state = new State();
-        state.assembleState();
+        boolean json = turn.createTurn(body);
+        if(json){
+            State state = new State();
+            state.assembleState();
+            return ok("game state made");
+        }
         return ok("Turn commited for game:" );
     }
 
@@ -67,7 +70,6 @@ public class API extends Controller {
         RequestBody body = request().body();
         int startingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
         String startingPlayerName = body.asJson().get(NAME).toString();
-
         Game game = new Game();
         game.start(id, startingPlayerNumber, startingPlayerName);
         return ok();

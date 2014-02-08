@@ -25,7 +25,7 @@ public class State{
     private static final String TERRITORIES = "territories";
     private static final String TERRITORY = "territory";
     private static final String TURN = "turn";
-    private static final String GAME_ID = "_id";
+    private static final String GAME_ID = "gameID";
     private static final String OWNER = "owner";
     private static final String POSITION = "position";
     private static final int ADDITIONAL_TROOPS = 1;
@@ -83,6 +83,7 @@ public void assembleState() throws UnknownHostException{
         }
     }  
     findState();
+    saveState();
     return;
 }
 
@@ -155,7 +156,7 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
     }
 
     turn_doc.append(TERRITORIES, territory_list);   
-    committedTurns.insert(turn_doc);
+    state.insert(turn_doc);
 
     connection.closeConnection();
 
