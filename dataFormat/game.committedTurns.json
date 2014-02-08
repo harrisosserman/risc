@@ -1,6 +1,7 @@
 {
     "_id": 12,
     "player": 2,
+    "turn": 4,
     "territories": [
         {
             "position" :1,
@@ -15,7 +16,7 @@
                     "troops": 1
                 }
             ]   
-        }
+        },
         {
             "position" :2,
             "troops": 10,

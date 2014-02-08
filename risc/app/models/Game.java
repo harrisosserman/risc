@@ -208,20 +208,20 @@ public class Game {
 		return 0;
 	}
 
-	public ArrayList<Territory> territoriesOwnedByPlayer(Player p){
+	public ArrayList<Territory> territoriesOwnedByPlayer(int playerID){
 		ArrayList<Territory> playersTerritories = new ArrayList<Territory>();
 		for (Territory t : myTerritories) {
-			if (t.getOwner().equals(p)) {
+			if (t.getOwner() == playerID) {
 				playersTerritories.add(t);
 			}
 		}
 		return playersTerritories;
 	}
 
-	public int territoryCountForPlayer(Player p){
+	public int territoryCountForPlayer(int playerID){
 		int count = 0;
 		for (Territory t : myTerritories) {
-			if (t.getOwner().equals(p)) {
+			if (t.getOwner() == playerID) {
 				count++;
 			}
 		}
