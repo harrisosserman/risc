@@ -67,15 +67,18 @@ public class API extends Controller {
     
     @BodyParser.Of(BodyParser.Json.class)
     public static Result commitTurn(String id) throws UnknownHostException {
+        
         RequestBody body = request().body();
         Turn turn = new Turn();
-        boolean json = turn.createTurn(body);
+        int gameID = turn.getGameID(body);
+        int turn_number = turn.createTurn(body);
+        boolean json = turn.allTurnsCommitted();
         if(json){
-            State state = new State();
-            state.assembleState();
+            State state = new State(gameID);
+            state.assembleState(turn_number);
             return ok("game state made");
         }
-        return ok("Turn commited for game:" );
+        return ok("Turn commited for turn :" + turn_number );
     }
 
     @BodyParser.Of(BodyParser.Json.class)

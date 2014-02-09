@@ -30,7 +30,7 @@ public class Turn {
 	
     private ArrayList<Territory> territories;
     private int playerID;
-    private int id;
+    private int myGameID;
     private ArrayList<Attacker> attackers;
     private int turn;
 
@@ -39,11 +39,17 @@ public class Turn {
         attackers = new ArrayList<Attacker>();
         territories = new ArrayList<Territory>();
 	}
+
+    public int getGameID(RequestBody jsonObject) {
+        String gameID = jsonObject.asJson().get(GAME_ID).toString();
+        myGameID = Integer.parseInt(gameID);
+        return myGameID;
+    }
     
-    public boolean createTurn(RequestBody jsonObject) throws UnknownHostException{
+    public int createTurn(RequestBody jsonObject) throws UnknownHostException{
 		
         String gameID = jsonObject.asJson().get(GAME_ID).toString();
-        id = Integer.parseInt(gameID);
+        myGameID = Integer.parseInt(gameID);
         String _playerID = jsonObject.asJson().get(PLAYER).toString();
         playerID = Integer.parseInt(_playerID);
         
@@ -68,17 +74,12 @@ public class Turn {
         }
        
 
-        commitTurn();
-        boolean ready = allTurnsCommitted();
+        int result = commitTurn();
 
-        return ready;
+        return result;
 	}
 
-    public boolean validateTurn(){
-        return false;
-    }
-
-    private boolean allTurnsCommitted() throws UnknownHostException{
+    public boolean allTurnsCommitted() throws UnknownHostException{
         MongoConnection connection = new MongoConnection();
         DB game = connection.getDB(GAME_DB);
         DB initialization = connection.getDB(INITIALIZATION_DB);
@@ -86,18 +87,20 @@ public class Turn {
         DBCollection state = game.getCollection(STATE);
         DB initialization_database = connection.getDB(INITIALIZATION_DB);
         DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
-        BasicDBObject query_turn = new BasicDBObject(GAME_ID, id);
+        BasicDBObject query_turn = new BasicDBObject(GAME_ID, myGameID);
         DBCursor highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
         int highestTurn_value;
         if(!highestTurn.hasNext())
         {
              highestTurn_value = 1;
+             System.out.println("auto adding 1 as turn");
         }
         else{
+
              highestTurn_value = (Integer) highestTurn.next().get(TURN);
         }
         BasicDBObject query_count = new BasicDBObject();
-        query_count.put(GAME_ID, id);
+        query_count.put(GAME_ID, myGameID);
         DBCursor playerCount = waitingPlayers.find(query_count);
         double numPlayers_double = (Double) playerCount.next().get(COUNT);
         int numPlayers = (int) numPlayers_double;
@@ -119,23 +122,31 @@ public class Turn {
         return full; 
     }
 
-    public void commitTurn() throws UnknownHostException{
-
+    public int commitTurn() throws UnknownHostException{
+        System.out.println("commit Turn started");
         MongoConnection connection = new MongoConnection();
         DB game = connection.getDB(GAME_DB);
         DBCollection committedTurns = game.getCollection(COMMITTED_TURNS_COLLECTION);
         DB initialization_database = connection.getDB(INITIALIZATION_DB);
         DBCollection waitingPlayers = initialization_database.getCollection(WAITING_PLAYERS_COLLECTION);
         DBCollection state = game.getCollection(STATE);
-        if(state.find(new BasicDBObject(GAME_ID, id) ).hasNext()==false){
+        System.out.println(myGameID);
+        BasicDBObject query = new BasicDBObject();
+        query.put(GAME_ID, myGameID);
+        DBCursor states = state.find(query);
+        System.out.println(states);
+        if(!states.hasNext()){
+            System.out.println("in if statement ");
             turn = 1;
         }
         else{
+            System.out.println("in else statement ");
             DBCursor highestTurn = state.find().sort( new BasicDBObject(TURN, -1));
             turn = (Integer) highestTurn.next().get(TURN);
-        }
+            turn ++;
+    }
         BasicDBObject turn_doc = new BasicDBObject();
-        turn_doc.append(GAME_ID, id);
+        turn_doc.append(GAME_ID, myGameID);
         turn_doc.append(PLAYER, playerID);
         turn_doc.append(TURN, turn);
         List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
@@ -166,7 +177,7 @@ public class Turn {
 
         System.out.println("turn was committed");
 
-        return;
+        return turn;
 
 
     }

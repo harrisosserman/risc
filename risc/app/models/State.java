@@ -32,23 +32,25 @@ public class State{
 
     private int turn; 
     private int playerID;
-    private String myGameID;
+    private int myGameID;
     private ArrayList<Territory> territories;
     //private ArrayList<Attacker> attackers;
 
 
-public State(){
+public State(int gameID){
     territories = new ArrayList<Territory>();
+    myGameID = gameID;
   //  attackers = new ArrayList<Attacker>();
 }   
 
-public void assembleState() throws UnknownHostException{
+public void assembleState(int turn_number) throws UnknownHostException{
+    turn = turn_number;
     MongoConnection connection = new MongoConnection();
     DB initialization = connection.getDB(INITIALIZATION_DB);
     DBCollection committedTurns = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
     BasicDBObject query = new BasicDBObject();
-  //  query.put(GAME_ID, ID);
-  //  query.put(TURN, turn);
+    query.put(GAME_ID, myGameID);
+    query.put(TURN, turn);
     DBCursor cursor = committedTurns.find(query);
     for(int i=0; i<NUM_TERRITORIES; i++){
         Territory territory_empty = new Territory(i, -1, -1);
@@ -57,7 +59,6 @@ public void assembleState() throws UnknownHostException{
     System.out.println("sample");
     while(cursor.hasNext()) {
         DBObject object = cursor.next();
-        myGameID = object.get(GAME_ID).toString();
         System.out.println("my game id is " + myGameID);
         playerID = Integer.parseInt(object.get(PLAYER).toString());
         System.out.println("the territories object is: " + object.get(TERRITORIES).toString());
@@ -89,15 +90,20 @@ public void assembleState() throws UnknownHostException{
 
 public void findState(){
    for(int i=0; i<territories.size(); i++){
+    System.out.println("we are analyzing territory :" + i);
     Territory battlefield = territories.get(i);
     int defender = battlefield.getOwner();
     int defender_troops = battlefield.getDefendingArmy();
+    System.out.println("the defending player is " + defender + " with " + defender_troops + " troops.");
     ArrayList<Attacker> attackers = battlefield.getAttackers();
         for(int j=0; j<attackers.size(); j++){
             Attacker attacker = attackers.get(j);
+
+            System.out.println("attacker number " + j + "is " + attacker.getOwner() + " with " + attacker.getStrength() +" troops.");
             int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
             defender = winner[0];
             defender_troops = winner[1];
+            System.out.println("Territory " + i + " was just won by " + defender + " who now has " + defender_troops + " troops.");
         }
         battlefield.setOwner(defender);
         battlefield.setDefendingArmy(defender_troops);
@@ -111,11 +117,11 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
         double d = Math.random()*19 + 1;
         if(a > d){
             d_troops--;
-            System.out.println("defender lost a troop ");
+            System.out.println("defender " + defender + "lost a troop to " + attacker);
 
         }
         else{
-            System.out.println("the attacker lost a troop");
+            System.out.println("the attacker" + attacker + " lost a troop to " + defender);
             a_troops--;
         }
     }   
@@ -143,8 +149,7 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
     //int turn_number = waitingPlayers_doc.get(1);
     BasicDBObject turn_doc = new BasicDBObject();
     turn_doc.append(GAME_ID, myGameID);
-    turn_doc.append(TURN, turn);
-    turn_doc.append(PLAYER, playerID);
+    turn_doc.append(TURN, turn++);
     List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
     for(int i=0; i<territories.size(); i++){
         BasicDBObject territory_doc = new BasicDBObject();
