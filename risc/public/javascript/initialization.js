@@ -1,22 +1,3 @@
-// $(window).on('beforeunload', function(e){
-//     console.log('reloading page');
-//     e.preventDefault();
-// });
-
-// window.onbeforeunload = function(event){
-//         event.preventDefault();
-//         console.log('about to reload');
-//         // alert('sure you want to reload?');
-// };
-
-window.onbeforeunload = function(){
-    myUnloadEvent();
-};
-function myUnloadEvent() {
-    alert ('You can have Ur Logic Here');
-
-}
-
 (function(ko, Board, Turn) {
     function initializationViewModel() {
         var initialization = this;
@@ -151,6 +132,25 @@ function myUnloadEvent() {
             initialization.displayInstructions(false);
         };
 
+
+        //code to listen for user trying to exit or refresh page
+        //found here: http://stackoverflow.com/questions/14645011/window-onbeforeunload-and-window-onunload-is-not-working-in-firefox-safari-o
+        var myEvent = window.attachEvent || window.addEventListener;
+        var chkevent = window.attachEvent ? 'onbeforeunload' : 'beforeunload'; /// make IE7, IE8 compitable
+        myEvent(chkevent, function(e) { // For >=IE7, Chrome, Firefox
+            var confirmationMessage = 'Are you sure you want to leave the page?  You game will be lost';  // a space
+            (e || window.event).returnValue = confirmationMessage;
+            return confirmationMessage;
+        });
+        $(window).unload(function() {
+            $.ajax('/game/' + initialization.gameID + '/exit', {
+                method: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    'playerNumber': initialization.playerNumber
+                })
+            });
+        });
     }
     ko.applyBindings(new initializationViewModel());
 })(window.ko, window.Board, window.Turn);

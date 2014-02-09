@@ -111,7 +111,6 @@
                         });
                 });
         };
-        globalFunctions.getMap();
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
             var map = board.territoryDOMElements;
@@ -336,6 +335,17 @@
             board.removeAllPreviousAdjacencies($('#map'));
             globalFunctions.getMap();
         };
+
+        board.playerWatching = function() {
+            //reloads the map every 10 seconds for any players watching game
+            if(globalFunctions.getPlayerNumber() !== -1) {
+                return;
+            }
+            globalFunctions.destroyAndRebuildMap();
+            setTimeout(board.playerWatching, 10000);
+        };
+        globalFunctions.getMap();
+        board.playerWatching();
     }
     window.Board = boardViewModel;
 })(window.ko);
