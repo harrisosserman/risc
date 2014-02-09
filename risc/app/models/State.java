@@ -30,18 +30,18 @@ public class State{
     private static final String POSITION = "position";
     private static final int ADDITIONAL_TROOPS = 1;
 
-    private int turn; 
+    private int turn;
     private int playerID;
-    private int myGameID;
+    private String myGameID;
     private ArrayList<Territory> territories;
     //private ArrayList<Attacker> attackers;
 
 
-public State(int gameID){
+public State(String gameID){
     territories = new ArrayList<Territory>();
     myGameID = gameID;
   //  attackers = new ArrayList<Attacker>();
-}   
+}
 
 public void assembleState(int turn_number) throws UnknownHostException{
     turn = turn_number;
@@ -80,9 +80,9 @@ public void assembleState(int turn_number) throws UnknownHostException{
                 Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
                 territories.get(attacker_territory).addAttacker(a);
                 System.out.println("the owner of the attacker is " + a.getOwner());
-            }     
+            }
         }
-    }  
+    }
     findState();
     saveState();
     return;
@@ -107,7 +107,7 @@ public void findState(){
         }
         battlefield.setOwner(defender);
         battlefield.setDefendingArmy(defender_troops);
-    } 
+    }
 }
 //add in troops size
 public int[] battle(int attacker, int a_troops, int defender, int d_troops){
@@ -124,7 +124,7 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
             System.out.println("the attacker" + attacker + " lost a troop to " + defender);
             a_troops--;
         }
-    }   
+    }
     if(a_troops > 0){
         winnerStrength[0] = attacker;
         System.out.println("the attacker won " + attacker);
@@ -160,7 +160,7 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
         territory_list.add(territory_doc);
     }
 
-    turn_doc.append(TERRITORIES, territory_list);   
+    turn_doc.append(TERRITORIES, territory_list);
     state.insert(turn_doc);
 
     connection.closeConnection();
