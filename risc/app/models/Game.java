@@ -86,7 +86,7 @@ public class Game {
 
         markWaitingPlayerReady(connection, gameID, startingPlayerNumber, startingPlayerName);
 
-		if (areAllPlayersReady(connection, gameID)) {
+		if (areAllPlayersReady(connection, gameID) && getWaitingPlayerCount() >= 2) {
 			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
 			makeInitialGameMap(territoryOwners, gameID);
 		}
