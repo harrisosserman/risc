@@ -6,7 +6,7 @@
         var territoryOwner = globalFunctions.getTerritoryOwner();
         var troops = globalFunctions.getTroops();
         var attackingTroops = globalFunctions.getAttackingTroops();
-        var gameID = parseInt(globalFunctions.getGameID(), 10);
+        var gameID = globalFunctions.getGameID();
         var playerNumber = globalFunctions.getPlayerNumber();
         var troopDirections = ['up', 'down', 'left', 'right', 'up_left', 'up_right', 'down_left', 'down_right'];
 

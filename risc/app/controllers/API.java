@@ -35,7 +35,7 @@ public class API extends Controller {
         String playerNameWithoutQuotes = removeQuotes(playerName);
 
         Game game = new Game();
-        
+
         boolean canStillJoin = game.canPlayersStillJoin();
         String gameID = game.getGameID();
         int playerID;
@@ -64,13 +64,13 @@ public class API extends Controller {
     	return ok(json);
     }
 
-    
+
     @BodyParser.Of(BodyParser.Json.class)
     public static Result commitTurn(String id) throws UnknownHostException {
-        
+
         RequestBody body = request().body();
         Turn turn = new Turn();
-        int gameID = turn.getGameID(body);
+        String gameID = turn.getGameID(body);
         int turn_number = turn.createTurn(body);
         boolean json = turn.allTurnsCommitted();
         if(json){

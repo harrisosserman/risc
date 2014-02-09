@@ -11,7 +11,7 @@ import models.Territory;
 import models.Troop;
 
 public class Turn {
-    
+
 	private static final int NUM_TERRITORIES = 25;
 	private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
@@ -27,10 +27,10 @@ public class Turn {
     private static final String GAME_ID = "gameID";
     private static final String POSITION = "position";
     private static final String COUNT = "count";
-	
+
     private ArrayList<Territory> territories;
     private int playerID;
-    private int myGameID;
+    private String myGameID;
     private ArrayList<Attacker> attackers;
     private int turn;
 
@@ -40,19 +40,17 @@ public class Turn {
         territories = new ArrayList<Territory>();
 	}
 
-    public int getGameID(RequestBody jsonObject) {
-        String gameID = jsonObject.asJson().get(GAME_ID).toString();
-        myGameID = Integer.parseInt(gameID);
+    public String getGameID(RequestBody jsonObject) {
+        myGameID = jsonObject.asJson().get(GAME_ID).toString();
         return myGameID;
     }
-    
+
     public int createTurn(RequestBody jsonObject) throws UnknownHostException{
-		
-        String gameID = jsonObject.asJson().get(GAME_ID).toString();
-        myGameID = Integer.parseInt(gameID);
+
+        myGameID = jsonObject.asJson().get(GAME_ID).toString();
         String _playerID = jsonObject.asJson().get(PLAYER).toString();
         playerID = Integer.parseInt(_playerID);
-        
+
         for(Integer i=0; i<25; i++){
             if(jsonObject.asJson().get(TERRITORIES).get(i)!=null){
                 JsonNode territoryData = jsonObject.asJson().get(TERRITORIES).get(i);
@@ -69,10 +67,10 @@ public class Turn {
                     int attacker_number = Integer.parseInt(n.get(TROOPS).toString());
                     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
                     attackers.add(a);
-                }    
+                }
             }
         }
-       
+
 
         int result = commitTurn();
 
@@ -100,10 +98,12 @@ public class Turn {
              highestTurn_value = (Integer) highestTurn.next().get(TURN);
         }
         BasicDBObject query_count = new BasicDBObject();
-        query_count.put(GAME_ID, myGameID);
-        DBCursor playerCount = waitingPlayers.find(query_count);
-        double numPlayers_double = (Double) playerCount.next().get(COUNT);
-        int numPlayers = (int) numPlayers_double;
+        query_count.put(GAME_ID, myGameID.substring(1, myGameID.length() - 1));
+        System.out.println("myGameID is " + myGameID + " and is of type " + myGameID.getClass().getName());
+        System.out.println("basic db object is " + query_count);
+        DBObject playerCount = waitingPlayers.findOne(query_count);
+        System.out.println("playerCount is: " + playerCount);
+        Integer numPlayers = ((Integer)(playerCount.get(COUNT)));
         System.out.println("returned " );
         int numMaxTurns = 0;
         highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
@@ -119,7 +119,7 @@ public class Turn {
         }
         System.out.println("numMaxTurns = " + numMaxTurns + "numPlayers = " + numPlayers);
         boolean full = (numMaxTurns == numPlayers);
-        return full; 
+        return full;
     }
 
     public int commitTurn() throws UnknownHostException{
@@ -161,15 +161,15 @@ public class Turn {
                     BasicDBObject attacker_doc = new BasicDBObject();
                     attacker_doc.append(TERRITORY, attackers.get(j).getTerritory());
                     attacker_doc.append(TROOPS, attackers.get(j).getStrength());
-                    attacker_list.add(attacker_doc); 
-                    
+                    attacker_list.add(attacker_doc);
+
                 }
             }
             territory_doc.append(ATTACKING, attacker_list);
             territory_list.add(territory_doc);
         }
 
-        turn_doc.append(TERRITORIES, territory_list);   
+        turn_doc.append(TERRITORIES, territory_list);
 
         committedTurns.insert(turn_doc);
 
