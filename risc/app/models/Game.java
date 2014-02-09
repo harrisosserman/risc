@@ -13,6 +13,7 @@ public class Game {
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
     private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
+    private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
     private static final String GAME_DB = "game";
     private static final String MAP_COLLECTION = "map";
     private static final String NAME = "name";
@@ -112,6 +113,22 @@ public class Game {
            }
         }
         return readyCount == waitingPlayerCount;
+    }
+
+    public boolean areAllPlayersCommitted() throws UnknownHostException{
+        MongoConnection connection = new MongoConnection();
+        DBCollection committedTurnsCollection = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
+
+        BasicDBObject query = new BasicDBObject(GAME_ID, "12345");
+        DBCursor committedTurnsCursor = committedTurnsCollection.find(query);
+
+        while (committedTurnsCursor.hasNext()){
+            DBObject committedTurn = committedTurnsCursor.next();
+            System.out.println(committedTurn);
+        }
+
+        connection.closeConnection();
+        return false;
     }
 
 	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){

@@ -41,13 +41,14 @@ public class Turn {
 	}
 
     public String getGameID(RequestBody jsonObject) {
-        myGameID = jsonObject.asJson().get(GAME_ID).toString();
+        String quotedGameID = jsonObject.asJson().get(GAME_ID).toString();
+        myGameID = quotedGameID.substring(1, quotedGameID.length() - 1);
         return myGameID;
     }
 
     public int createTurn(RequestBody jsonObject) throws UnknownHostException{
-
-        myGameID = jsonObject.asJson().get(GAME_ID).toString();
+        String quotedGameID = jsonObject.asJson().get(GAME_ID).toString();
+        myGameID = quotedGameID.substring(1, quotedGameID.length() - 1);
         String _playerID = jsonObject.asJson().get(PLAYER).toString();
         playerID = Integer.parseInt(_playerID);
 
