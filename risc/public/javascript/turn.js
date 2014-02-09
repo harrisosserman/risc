@@ -63,7 +63,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/game/' + gameID + '/polling', {
+            $.ajax('/game/' + gameID + '/mapReady', {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
