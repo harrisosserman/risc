@@ -108,6 +108,10 @@ public class API extends Controller {
         return ok("will do an exit for player:" + exitingPlayerNumber);
     }
 
+    public static Result isMapReady(String id) {
+        return ok("will return if map is ready");
+    }
+
     private static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
