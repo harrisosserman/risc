@@ -97,10 +97,6 @@ public class API extends Controller {
         return ok(mapJson);
     }
 
-    public static Result commitTurn(String id) {
-        return ok("Turn commited for game:" + id);
-    }
-
     @BodyParser.Of(BodyParser.Json.class)
     public static Result exit(String id) {
         RequestBody body = request().body();
