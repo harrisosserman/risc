@@ -256,6 +256,21 @@ public class Game {
         return trimmedJson;
     }
 
+    public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
+        MongoConnection connection = new MongoConnection();
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, gameID);
+        DBCursor allTurnsCursor = stateCollection.find(stateQuery);
+        int currentTurnCount = allTurnsCursor.count();
+
+        BasicDBObject currentTurnQuery = new BasicDBObject(GAME_ID, gameID);
+        currentTurnQuery.append(TURN, currentTurnCount);
+        DBObject currentTurn = stateCollection.findOne(currentTurnQuery);
+
+        return currentTurn.toString();
+    }
+
     public String getGameID(){
         return this.myGameID;
     }

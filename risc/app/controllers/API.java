@@ -111,8 +111,8 @@ public class API extends Controller {
     public static Result isMapReady(String id) throws UnknownHostException{
         Game game = new Game();
         if (game.areAllPlayersCommitted()) {
-            String mapJson = game.getMapJson(id);
-            return ok(mapJson);
+            String gameStateJson = game.getCurrentGameStateJson(id);
+            return ok(gameStateJson);
         }else{
             return badRequest("all players havent committed yet");
         }
