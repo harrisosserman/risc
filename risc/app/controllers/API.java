@@ -111,13 +111,14 @@ public class API extends Controller {
     public static Result isMapReady(String id) throws UnknownHostException{
         Game game = new Game();
         if (game.areAllPlayersCommitted()) {
-            return ok("will return if map is ready");
+            String mapJson = game.getMapJson(id);
+            return ok(mapJson);
         }else{
             return badRequest("all players havent committed yet");
         }
     }
 
-    private static String removeQuotes(String stringWithQuotes){
+    public static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
 }

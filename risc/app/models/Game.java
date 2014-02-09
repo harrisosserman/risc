@@ -14,6 +14,7 @@ public class Game {
     private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
     private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
+    private static final String STATE_COLLECTION = "state";
     private static final String GAME_DB = "game";
     private static final String MAP_COLLECTION = "map";
     private static final String NAME = "name";
@@ -26,6 +27,7 @@ public class Game {
     private static final String OWNER = "owner";
     private static final String TROOPS = "troops";
     private static final String ADDITIONAL_TROOPS = "additionalTroops";
+    private static final String TURN = "turn";
 
     private String myGameID;
     private ArrayList<Player> myPlayers;
@@ -117,18 +119,26 @@ public class Game {
 
     public boolean areAllPlayersCommitted() throws UnknownHostException{
         MongoConnection connection = new MongoConnection();
+
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
+        DBObject state = stateCollection.findOne(stateQuery);
+        int completedTurns = (Integer)state.get(TURN);
+
         DBCollection committedTurnsCollection = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
+        BasicDBObject committedTurnsQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
+        committedTurnsQuery.append(TURN, new Integer(completedTurns));
+        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery);
+        int committedTurnsCount = committedTurnsCursor.count();
 
-        BasicDBObject query = new BasicDBObject(GAME_ID, "12345");
-        DBCursor committedTurnsCursor = committedTurnsCollection.find(query);
-
-        while (committedTurnsCursor.hasNext()){
-            DBObject committedTurn = committedTurnsCursor.next();
-            System.out.println(committedTurn);
-        }
+        //TODO: put activePlayerCount into game.state
+        DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
+        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
+        int playerCount = (Integer)waitingPlayers.get(COUNT);
 
         connection.closeConnection();
-        return false;
+        return (playerCount == committedTurnsCount);
     }
 
 	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){

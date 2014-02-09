@@ -9,6 +9,7 @@ import play.mvc.Http.RequestBody;
 import java.net.UnknownHostException;
 import models.Territory;
 import models.Troop;
+import controllers.API;
 
 public class Turn {
 
@@ -41,13 +42,14 @@ public class Turn {
 	}
 
     public String getGameID(RequestBody jsonObject) {
-        myGameID = jsonObject.asJson().get(GAME_ID).toString();
+        myGameID = API.removeQuotes(jsonObject.asJson().get(GAME_ID).toString());
         return myGameID;
     }
 
     public int createTurn(RequestBody jsonObject) throws UnknownHostException{
-        myGameID = jsonObject.asJson().get(GAME_ID).toString();
-        String _playerID = jsonObject.asJson().get(PLAYER).toString();
+        myGameID = API.removeQuotes(jsonObject.asJson().get(GAME_ID).toString());
+        System.out.println(myGameID);
+        String _playerID = (String)jsonObject.asJson().get(PLAYER).toString();
         playerID = Integer.parseInt(_playerID);
 
         for(Integer i=0; i<25; i++){
@@ -97,7 +99,7 @@ public class Turn {
              highestTurn_value = (Integer) highestTurn.next().get(TURN);
         }
         BasicDBObject query_count = new BasicDBObject();
-        query_count.put(GAME_ID, myGameID.substring(1, myGameID.length() - 1));
+        query_count.put(GAME_ID, myGameID);
         System.out.println("myGameID is " + myGameID + " and is of type " + myGameID.getClass().getName());
         System.out.println("basic db object is " + query_count);
         DBObject playerCount = waitingPlayers.findOne(query_count);
