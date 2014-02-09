@@ -6,7 +6,7 @@
         var territoryOwner = globalFunctions.getTerritoryOwner();
         var troops = globalFunctions.getTroops();
         var attackingTroops = globalFunctions.getAttackingTroops();
-        var gameID = globalFunctions.getGameID();
+        var gameID = parseInt(globalFunctions.getGameID(), 10);
         var playerNumber = globalFunctions.getPlayerNumber();
         var troopDirections = ['up', 'down', 'left', 'right', 'up_left', 'up_right', 'down_left', 'down_right'];
 
@@ -63,7 +63,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/test/game/' + gameID + '/polling', {
+            $.ajax('/game/' + gameID + '/polling', {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
@@ -89,14 +89,10 @@
                 territories.push(territoryInfo);
             }
             returnData['territories'] = territories;
-            $.ajax('/test/game/' + gameID, {
+            $.ajax('/game/' + gameID, {
                 method: 'POST',
-                data: returnData,
-                settings: [
-                    {
-                        contentType: "application/json"
-                    }
-                ]
+                data: JSON.stringify(returnData),
+                contentType: "application/json"
             }).done(function() {
                 globalFunctions.setDisplayMap(false);
                 $('.attackComponent').each(function() {
