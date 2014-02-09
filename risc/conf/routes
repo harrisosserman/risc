@@ -9,6 +9,7 @@ POST 	/game/:id 					controllers.API.commitTurn(id: String)
 POST	/game/:id/start				controllers.API.startGame(id: String)
 GET 	/game/:id/map 				controllers.API.getMap(id: String)
 POST	/game/:id/exit				controllers.API.exit(id: String)
+GET 	/game/:id/mapReady			controllers.API.isMapReady(id: String)
 
 #   API calls that Harris made for testing the front end
 POST    /test/game                  controllers.TestAPI.createTestGame()

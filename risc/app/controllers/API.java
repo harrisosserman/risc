@@ -108,7 +108,17 @@ public class API extends Controller {
         return ok("will do an exit for player:" + exitingPlayerNumber);
     }
 
-    private static String removeQuotes(String stringWithQuotes){
+    public static Result isMapReady(String id) throws UnknownHostException{
+        Game game = new Game();
+        if (game.areAllPlayersCommitted()) {
+            String mapJson = game.getMapJson(id);
+            return ok(mapJson);
+        }else{
+            return badRequest("all players havent committed yet");
+        }
+    }
+
+    public static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
 }
