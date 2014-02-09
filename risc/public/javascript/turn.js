@@ -20,7 +20,7 @@
                 else {
                     result.push({
                         "territory": attack[troopDirections[k]].destination,
-                        "troops": attack[troopDirections[k]].troops
+                        "troops": parseInt(attack[troopDirections[k]].troops, 10)
                     });
                 }
             }
@@ -79,6 +79,9 @@
             returnData['player'] = playerNumber;
             var territories = [];
             for(var k=0; k<territoryOwner.length; k++) {
+                if(territoryOwner[k] !== playerNumber) {
+                    continue;
+                }
                 var territoryInfo = {};
                 var attacking = turn.constructAttackingTroops(k);
                 territoryInfo = {
