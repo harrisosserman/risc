@@ -108,20 +108,34 @@ public class DBHelper{
 
 	public static DBObject getWaitingPlayersForGame(String gameID){
 		DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-		BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID_KEY, gameID);
-		return waitingPlayersCollection.findOne(waitingPlayersQuery);
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		return waitingPlayersCollection.findOne(gameQuery);
 	}
 
 	public static DBObject getMapForGame(String gameID){
 		DBCollection mapsCollection = DBHelper.getMapCollection();
-		BasicDBObject mapQuery = new BasicDBObject(GAME_ID_KEY, gameID);
-		return mapsCollection.findOne(mapQuery);
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		return mapsCollection.findOne(gameQuery);
 	}
 
 	public static DBObject getInfoForGame(String gameID){
 		DBCollection infoCollection = DBHelper.getInfoCollection();
-		BasicDBObject infoQuery = new BasicDBObject(GAME_ID_KEY, gameID);
-		return infoCollection.findOne(infoQuery);
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		return infoCollection.findOne(gameQuery);
+	}
+
+	public static DBObject getCurrentTurnForGame(String gameID){
+		DBCursor stateCursor = DBHelper.getStateCursorForGame(gameID);
+		DBCursor highestTurnCursor = stateCursor.sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
+		return highestTurnCursor.next();
+	}
+
+	//Get Cursors
+
+	public static DBCursor getStateCursorForGame(String gameID){
+		DBCollection stateCollection = DBHelper.getStateCollection();
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		return stateCollection.find(gameQuery);
 	}
 
 

@@ -22,11 +22,6 @@ public class Game {
         this.myPlayers = new ArrayList<Player>();
     }
 
-    public void addPlayer(String name){ //can likely delete this
-        Player p = new Player(name);
-        myPlayers.add(p);
-    }
-
     public void addWaitingPlayer(String playerName) throws UnknownHostException{
         DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
 
@@ -186,9 +181,7 @@ public class Game {
     }
 
     private void makeInitialInfo(){
-        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-        BasicDBObject waitingPlayersQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
+        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
         int activePlayerCount = (Integer)waitingPlayers.get(DBHelper.COUNT_KEY);
 
         ArrayList<DBObject> activePlayers = new ArrayList<DBObject>();
@@ -227,32 +220,12 @@ public class Game {
     }
 
     public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
-        DBCollection stateCollection = DBHelper.getStateCollection();
-
-        int currentTurnCount = getTurnCount(gameID);
-
-        BasicDBObject currentTurnQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, gameID);
-        currentTurnQuery.append(DBHelper.TURN_KEY, currentTurnCount);
-        DBObject currentTurn = stateCollection.findOne(currentTurnQuery);
-
+        DBObject currentTurn = DBHelper.getCurrentTurnForGame(gameID);
         return currentTurn.toString();
-    }
-
-    private int getTurnCount(String gameID){
-        DBCollection stateCollection = DBHelper.getStateCollection();
-
-        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, gameID);
-        DBCursor allTurnsCursor = stateCollection.find(stateQuery);
-        int currentTurnCount = allTurnsCursor.count();
-        return currentTurnCount;
     }
 
     public String getGameID(){
         return this.myGameID;
-    }
-
-    public int getPlayerCount(){    //can likely delete later
-        return this.myPlayers.size();
     }
 
     public Integer getWaitingPlayerCount() throws UnknownHostException{
@@ -297,7 +270,6 @@ public class Game {
 
         //info is null while the players are still waiting and the map hasn't yet been created
         if(info == null){
-            //TODO:remove from waitingPlayers
             DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
             DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
             ArrayList<DBObject> players = (ArrayList<DBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
@@ -341,18 +313,15 @@ public class Game {
         infoCollection.update(gameQuery, newInfo);
 
         //Second update most recent state turn
-        DBCollection stateCollection = DBHelper.getStateCollection();
-        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        DBCursor highestTurnCursor = stateCollection.find(stateQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
+        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
 
         // is null if no turns have yet been committed to state
-        if (!highestTurnCursor.hasNext()) {
+        if (currentTurn == null) {
             return;
         }
-        DBObject highestTurn = highestTurnCursor.next();
 
         //Then set all troops in that player's territories to 0
-        ArrayList<DBObject> territories = (ArrayList<DBObject>)highestTurn.get(DBHelper.TERRITORIES_KEY);
+        ArrayList<DBObject> territories = (ArrayList<DBObject>)currentTurn.get(DBHelper.TERRITORIES_KEY);
         for (DBObject territory : territories) {
             boolean isOwnedByPid = ((Integer)territory.get(DBHelper.OWNER_KEY)).equals(pid);
             if (isOwnedByPid) {
@@ -360,8 +329,9 @@ public class Game {
             }
         }
 
-        BasicDBObject newHighestTurn = new BasicDBObject("$set", highestTurn);
-        newHighestTurn.append("$set", new BasicDBObject(DBHelper.TERRITORIES_KEY, territories));
-        stateCollection.update(gameQuery, newHighestTurn);
+        BasicDBObject updatedCurrentTurn = new BasicDBObject("$set", currentTurn);
+        updatedCurrentTurn.append("$set", new BasicDBObject(DBHelper.TERRITORIES_KEY, territories));
+        DBCollection stateCollection = DBHelper.getStateCollection();
+        stateCollection.update(gameQuery, updatedCurrentTurn);
     }
 }
