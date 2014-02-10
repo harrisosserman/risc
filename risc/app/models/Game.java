@@ -229,16 +229,13 @@ public class Game {
     }
 
     public Integer getWaitingPlayerCount() throws UnknownHostException{
-        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
-        BasicDBObject query = new BasicDBObject(DBHelper.COUNT_KEY,  new BasicDBObject("$gt", 0));
-        DBCursor cursor = waitingPlayers.find(query);
-
-        if (!cursor.hasNext()) {
+        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
+        if (waitingPlayers == null) {
             return 0;
+        }else{
+            Integer count = (Integer)waitingPlayers.get(DBHelper.COUNT_KEY);
+            return count;
         }
-
-        Integer count = ((Integer)(cursor.next().get(DBHelper.COUNT_KEY)));
-        return count;
     }
 
     public ArrayList<Territory> territoriesOwnedByPlayer(int pid){
