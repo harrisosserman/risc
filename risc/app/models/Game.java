@@ -50,7 +50,11 @@ public class Game {
         MongoConnection connection = new MongoConnection();
         DB initialization = connection.getDB(INITIALIZATION_DB);
         DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
-        if (!initialization.collectionExists(WAITING_PLAYERS_COLLECTION)) {
+
+        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBCursor waitingPlayersCursor = waitingPlayers.find(waitingPlayersQuery);
+
+        if (!waitingPlayersCursor.hasNext()) {
             BasicDBObject doc = new BasicDBObject();
 
             BasicDBObject firstPlayer = new BasicDBObject(NAME, playerName).append(READY, false);
