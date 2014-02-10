@@ -31,12 +31,15 @@ public class State{
     private static final int ADDITIONAL_TROOPS = 1;
     private static final String ACTIVE_PLAYER_COUNT = "activePlayerCount";
     private static final String COUNT = "count";
+    private static final String ACTIVE_PLAYERS = "activePlayers";
+    private static final String PLAYER_NUMBER = "playerNumber";
 
     private int turn;
     private int myActivePlayerCount;
     private int playerID;
     private String myGameID;
     private ArrayList<Territory> territories;
+    private ArrayList<DBObject> myActivePlayers;
     //private ArrayList<Attacker> attackers;
 
 
@@ -157,11 +160,23 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
         DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
         int waitingPlayerCount = (Integer)waitingPlayers.get(COUNT);
         myActivePlayerCount = waitingPlayerCount;
+
+        myActivePlayers = new ArrayList<DBObject>();
+        for (int i = 1; i <= waitingPlayerCount; i++) {
+            DBObject activePlayer = new BasicDBObject(PLAYER_NUMBER, i);
+            myActivePlayers.add(activePlayer);
+        }
+    }else{
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE);
+        DBObject highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1)).next();
+        myActivePlayerCount = (Integer)highestTurn.get(ACTIVE_PLAYER_COUNT);
+        myActivePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
     }
     
     turn_doc.append(GAME_ID, myGameID);
     turn_doc.append(TURN, turn++);
     turn_doc.append(ACTIVE_PLAYER_COUNT, myActivePlayerCount);
+    turn_doc.append(ACTIVE_PLAYERS, myActivePlayers);
     List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
     for(int i=0; i<territories.size(); i++){
         BasicDBObject territory_doc = new BasicDBObject();

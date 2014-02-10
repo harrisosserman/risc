@@ -29,6 +29,8 @@ public class Game {
     private static final String ADDITIONAL_TROOPS = "additionalTroops";
     private static final String TURN = "turn";
     private static final String ACTIVE_PLAYER_COUNT = "activePlayerCount";
+    private static final String ACTIVE_PLAYERS = "activePlayers";
+    private static final String PLAYER_NUMBER = "playerNumber";
 
     private String myGameID;
     private ArrayList<Player> myPlayers;
@@ -337,6 +339,15 @@ public class Game {
         BasicDBObject intModifier = new BasicDBObject("$inc", incValue);
         stateCollection.update(updateCriteria, intModifier);
 
+        //remove player from activePlayers
+        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
+        ArrayList<DBObject> updatedActivePlayers = new ArrayList<DBObject>();
+        for (DBObject activePlayer : activePlayers) {
+            if ((Integer)activePlayer.get(PLAYER_NUMBER) != pid) {
+                updatedActivePlayers.add(activePlayer);
+            }
+        }
+
         //Then set all troops in that player's territories to 0
         ArrayList<DBObject> territories = (ArrayList<DBObject>)highestTurn.get(TERRITORIES);
         for (DBObject territory : territories) {
@@ -348,6 +359,7 @@ public class Game {
 
         BasicDBObject newDocument = new BasicDBObject("$set", highestTurn);
         newDocument.append("$set", new BasicDBObject(TERRITORIES, territories));
+        newDocument.append("$set", new BasicDBObject(ACTIVE_PLAYERS, updatedActivePlayers));
         stateCollection.update(updateCriteria, newDocument);
 
         connection.closeConnection();
