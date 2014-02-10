@@ -18,12 +18,6 @@ import libraries.DBHelper;
 
 public class API extends Controller {
 
-    private static final String NAME = "name";
-    private static final String GAME_ID = "gameID";
-    private static final String PLAYER_ID = "playerId";
-    private static final int TURN = 1;
-    private static final String PLAYER_NUMBER = "playerNumber";
-
     public static MongoConnection initDB() throws UnknownHostException{
         MongoConnection mongoConnection = new MongoConnection();
         return mongoConnection;
@@ -32,7 +26,7 @@ public class API extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createGame() throws UnknownHostException{
         RequestBody body = request().body();
-        String playerName = body.asJson().get(NAME).toString();
+        String playerName = body.asJson().get(DBHelper.NAME_KEY).toString();
         String playerNameWithoutQuotes = removeQuotes(playerName);
 
         Game game = new Game();
@@ -49,8 +43,8 @@ public class API extends Controller {
         }
 
         JSONObject result = new JSONObject();
-        result.put(GAME_ID, gameID);
-        result.put(PLAYER_ID, playerID);
+        result.put(DBHelper.GAME_ID_KEY, gameID);
+        result.put(DBHelper.PLAYER_ID_KEY, playerID);
 
         if (canStillJoin) {
             return ok(result.toString());
@@ -85,8 +79,8 @@ public class API extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result startGame(String id) throws UnknownHostException{
         RequestBody body = request().body();
-        int startingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
-        String startingPlayerName = body.asJson().get(NAME).toString();
+        int startingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
+        String startingPlayerName = body.asJson().get(DBHelper.NAME_KEY).toString();
         Game game = new Game();
         game.start(id, startingPlayerNumber, startingPlayerName);
         return ok();
@@ -101,7 +95,7 @@ public class API extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result exit(String id) throws UnknownHostException{
         RequestBody body = request().body();
-        int exitingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
+        int exitingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
 
         Game game = new Game();
         game.removePlayer(exitingPlayerNumber);

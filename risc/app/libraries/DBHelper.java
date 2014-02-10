@@ -30,6 +30,7 @@ public class DBHelper{
     public static final String ACTIVE_PLAYER_COUNT_KEY = "activePlayerCount";
     public static final String ACTIVE_PLAYERS_KEY = "activePlayers";
     public static final String PLAYER_NUMBER_KEY = "playerNumber";
+    public static final String PLAYER_ID_KEY = "playerId";
 
 	private static MongoConnection myConnection;
 
