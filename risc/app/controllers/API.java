@@ -98,14 +98,13 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result exit(String id) {
+    public static Result exit(String id) throws UnknownHostException{
         RequestBody body = request().body();
         int exitingPlayerNumber = Integer.parseInt(body.asJson().get(PLAYER_NUMBER).toString());
 
         Game game = new Game();
         game.removePlayer(exitingPlayerNumber);
-
-        return ok("will do an exit for player:" + exitingPlayerNumber);
+        return ok("Exiting for player:" + exitingPlayerNumber);
     }
 
     public static Result isMapReady(String id) throws UnknownHostException{
