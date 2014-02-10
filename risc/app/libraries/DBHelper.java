@@ -3,6 +3,7 @@ package libraries;
 import java.util.*;
 import com.mongodb.*;
 import java.net.UnknownHostException;
+import libraries.ConnectionManager;
 
 public class DBHelper{
 
@@ -15,18 +16,13 @@ public class DBHelper{
 
 	private static final String GAME_ID = "gameID";
 
+	private static MongoConnection myConnection;
+
 	private static MongoConnection getConnection(){
-		try{
-			MongoConnection connection = new MongoConnection();
-			return connection;
-		}catch (UnknownHostException exception){
-			System.out.println(exception.toString());
-			return null;
-		}
+		return ConnectionManager.getInstance().getConnection();
 	}
 
 	public static void reset(String gameID){
-		System.out.println("reset dbs");
 		MongoConnection connection = DBHelper.getConnection();
 
 		BasicDBObject removalCriteria = new BasicDBObject(GAME_ID, gameID);
@@ -44,7 +40,42 @@ public class DBHelper{
 
 		DBCollection stateCollection = gameDB.getCollection(STATE_COLLECTION);
 		stateCollection.remove(removalCriteria);
-
-		connection.closeConnection();
 	}
+
+	private static DB getDB(String dbName){
+		MongoConnection connection = DBHelper.getConnection();
+		DB db = connection.getDB(dbName);
+		return db;
+	}
+
+	public static DB getInitializationDB(){
+		return DBHelper.getDB(INITIALIZATION_DB);
+	}
+
+	public static DB getGameDB(){
+		return DBHelper.getDB(GAME_DB);
+	}
+
+	private static DBCollection getCollection(String dbName, String collectionName){
+		MongoConnection connection = DBHelper.getConnection();
+		DBCollection collection = connection.getDB(dbName).getCollection(collectionName);
+		return collection;
+	}
+
+	public static DBCollection getWaitingPlayersCollection(){
+		return DBHelper.getCollection(INITIALIZATION_DB, WAITING_PLAYERS_COLLECTION);
+	}
+
+	public static DBCollection getMapCollection(){
+		return DBHelper.getCollection(GAME_DB, MAP_COLLECTION);
+	}
+
+	public static DBCollection getCommittedTurnsCollection(){
+		return DBHelper.getCollection(GAME_DB, COMMITTED_TURNS_COLLECTION);
+	}
+
+	public static DBCollection getStateCollection(){
+		return DBHelper.getCollection(GAME_DB, STATE_COLLECTION);
+	}
+
 }

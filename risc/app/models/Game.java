@@ -5,18 +5,13 @@ import libraries.MongoConnection;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import java.net.UnknownHostException;
+import libraries.DBHelper;
 
 public class Game {
 
     private static final String DEFAULT_GAME_ID = "12345";
     private static final int NUM_TERRITORIES = 50;
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
-    private static final String INITIALIZATION_DB = "initialization";
-    private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
-    private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
-    private static final String STATE_COLLECTION = "state";
-    private static final String GAME_DB = "game";
-    private static final String MAP_COLLECTION = "map";
     private static final String NAME = "name";
     private static final String COUNT = "count";
     private static final String READY = "ready";
@@ -47,9 +42,7 @@ public class Game {
     }
 
     public void addWaitingPlayer(String playerName) throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-        DB initialization = connection.getDB(INITIALIZATION_DB);
-        DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
+        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
 
         BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
         DBCursor waitingPlayersCursor = waitingPlayers.find(waitingPlayersQuery);
@@ -75,39 +68,29 @@ public class Game {
             BasicDBObject intModifier = new BasicDBObject("$inc", incValue);
             waitingPlayers.update(query, intModifier);
         }
-
-        connection.closeConnection();
     }
 
     public String getWaitingPlayersJson(String gameID) throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-
-        DBCursor playersList = getPlayersList(connection, gameID);
+        DBCursor playersList = getPlayersList(gameID);
         String json = JSON.serialize(playersList);
         String trimmedJson = json.substring(1, json.length() - 1);  //need to remove '[' and ']' which converts it from BSON to JSON
-
-        connection.closeConnection();
         return trimmedJson;
     }
 
     public void start(String gameID, int startingPlayerNumber, String startingPlayerName) throws UnknownHostException{
         //update initialization.waitingPlayers to show that someone is ready
-        MongoConnection connection = new MongoConnection();
+        markWaitingPlayerReady(gameID, startingPlayerNumber, startingPlayerName);
 
-        markWaitingPlayerReady(connection, gameID, startingPlayerNumber, startingPlayerName);
-
-		if (areAllPlayersReady(connection, gameID) && getWaitingPlayerCount() >= 2) {
+		if (areAllPlayersReady(gameID) && getWaitingPlayerCount() >= 2) {
 			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
 			makeInitialGameMap(territoryOwners, gameID);
 		}
-
-		connection.closeConnection();
 	}
 
-    private boolean areAllPlayersReady(MongoConnection connection, String gameID) throws UnknownHostException{
+    private boolean areAllPlayersReady(String gameID) throws UnknownHostException{
         int waitingPlayerCount = getWaitingPlayerCount();
 
-        DBCursor playersListCursor = getPlayersList(connection, gameID);
+        DBCursor playersListCursor = getPlayersList(gameID);
         if (!playersListCursor.hasNext()) {
             return false;
         }
@@ -125,9 +108,7 @@ public class Game {
     }
 
     public boolean areAllPlayersCommitted() throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-
-        DBCollection committedTurnsCollection = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
+        DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
         BasicDBObject committedTurnsQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
         DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(TURN, -1));
         int turn = -1;
@@ -143,24 +124,21 @@ public class Game {
             committedTurnsInSameTurn++;
         }
         if(turn == -1) {
-            connection.closeConnection();
             return false;
         }
 
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+        DBCollection stateCollection = DBHelper.getStateCollection();
         BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID).append(TURN, turn);
         DBObject state = stateCollection.findOne(stateQuery);
         if(state == null) {
-            connection.closeConnection();
             return false;
         }
 
-        connection.closeConnection();
         return true;
     }
 
-	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){
-		DBCollection mapCollection = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+	private boolean gameMapHasBeenCreated(String gameID){
+		DBCollection mapCollection = DBHelper.getMapCollection();
 
         BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
         DBCursor map = mapCollection.find(query);
@@ -173,17 +151,15 @@ public class Game {
 			return false;
 		}
 
-		MongoConnection connection = new MongoConnection();
-		if (gameMapHasBeenCreated(connection, myGameID)) {
+		if (gameMapHasBeenCreated(myGameID)) {
 			return false;
 		}
-		connection.closeConnection();
 
 		return true;
 	}
 
-    private void markWaitingPlayerReady(MongoConnection connection, String gameID, int playerNumber, String playerName) throws UnknownHostException{
-        DBCursor playersListCursor = getPlayersList(connection, gameID);
+    private void markWaitingPlayerReady(String gameID, int playerNumber, String playerName) throws UnknownHostException{
+        DBCursor playersListCursor = getPlayersList(gameID);
         DBObject playersList = playersListCursor.next();
 
         ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(PLAYERS);
@@ -194,13 +170,12 @@ public class Game {
         String readyPath = PLAYERS + "." + playerIndex + "." + READY;
         newDocument.append("$set", new BasicDBObject().append(readyPath, true));
 
-        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
         waitingPlayers.update(new BasicDBObject(), newDocument);
     }
 
     private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-        DBCollection map = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+        DBCollection map = DBHelper.getMapCollection();
 
         BasicDBObject doc = new BasicDBObject();
 
@@ -231,12 +206,10 @@ public class Game {
         doc.append(ADDITIONAL_TROOPS, additionalTroops);
 
         map.insert(doc);
-
-        connection.closeConnection();
     }
 
-    private DBCursor getPlayersList(MongoConnection connection, String gameID){
-        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+    private DBCursor getPlayersList(String gameID){
+        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
 
         BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
         DBCursor playersList = waitingPlayers.find(query);
@@ -260,36 +233,31 @@ public class Game {
     }
 
     public String getMapJson(String gameID) throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-        DBCollection waitingPlayers = connection.getDB(GAME_DB).getCollection(MAP_COLLECTION);
+        DBCollection mapCollection = DBHelper.getMapCollection();
 
         BasicDBObject query = new BasicDBObject(GAME_ID, gameID);
-        DBCursor mapCursor = waitingPlayers.find(query);
+        DBCursor mapCursor = mapCollection.find(query);
 
         String json = JSON.serialize(mapCursor);
         String trimmedJson = json.substring(1, json.length() - 1);  //need to remove '[' and ']' which converts it from BSON to JSON
-
-        connection.closeConnection();
 
         return trimmedJson;
     }
 
     public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+        DBCollection stateCollection = DBHelper.getStateCollection();
 
-        int currentTurnCount = getTurnCount(connection, gameID);
+        int currentTurnCount = getTurnCount(gameID);
 
         BasicDBObject currentTurnQuery = new BasicDBObject(GAME_ID, gameID);
         currentTurnQuery.append(TURN, currentTurnCount);
         DBObject currentTurn = stateCollection.findOne(currentTurnQuery);
 
-        connection.closeConnection();
         return currentTurn.toString();
     }
 
-    private int getTurnCount(MongoConnection connection, String gameID){
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+    private int getTurnCount(String gameID){
+        DBCollection stateCollection = DBHelper.getStateCollection();
 
         BasicDBObject stateQuery = new BasicDBObject(GAME_ID, gameID);
         DBCursor allTurnsCursor = stateCollection.find(stateQuery);
@@ -306,9 +274,7 @@ public class Game {
     }
 
     public Integer getWaitingPlayerCount() throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-        DB initialization = connection.getDB(INITIALIZATION_DB);
-        DBCollection waitingPlayers = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
         BasicDBObject query = new BasicDBObject(COUNT,  new BasicDBObject("$gt", 0));
         DBCursor cursor = waitingPlayers.find(query);
 
@@ -317,7 +283,6 @@ public class Game {
         }
 
         Integer count = ((Integer)(cursor.next().get(COUNT)));
-        connection.closeConnection();
         return count;
     }
 
@@ -343,8 +308,7 @@ public class Game {
 
     public void removePlayer(int pid) throws UnknownHostException{
         //decrement game.state.activePlayerCount
-        MongoConnection connection = new MongoConnection();
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+        DBCollection stateCollection = DBHelper.getStateCollection();
 
         BasicDBObject stateQuery = new BasicDBObject(GAME_ID, myGameID);
         DBObject highestTurn = stateCollection.find(stateQuery).sort( new BasicDBObject(TURN, -1)).next();
@@ -377,7 +341,5 @@ public class Game {
         newDocument.append("$set", new BasicDBObject(TERRITORIES, territories));
         newDocument.append("$set", new BasicDBObject(ACTIVE_PLAYERS, updatedActivePlayers));
         stateCollection.update(updateCriteria, newDocument);
-
-        connection.closeConnection();
     }
 }
