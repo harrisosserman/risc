@@ -22,7 +22,6 @@
         };
         /*          END GLOBAL FUNCTIONS                    */
         globalFunctions.getMap = function(mapReady) {
-            console.log(mapReady);
             var appendUrl = "/map";
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
@@ -349,7 +348,12 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-            globalFunctions.destroyAndRebuildMap();
+
+            $.ajax('/game/' + globalFunctions.getGameID() + '/mapReady', {
+                method: 'GET',
+            }).done(function() {
+                globalFunctions.destroyAndRebuildMap();
+            });
             setTimeout(board.playerWatching, 10000);
         };
         globalFunctions.getMap();
