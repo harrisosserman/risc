@@ -47,6 +47,13 @@
                         }
                     }
                     if(playerNumberFound === false) {
+                        $.ajax('/game/' + globalFunctions.getGameID() + '/exit', {
+                            method: 'POST',
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                'playerNumber': globalFunctions.getPlayerNumber()
+                            })
+                        });
                         globalFunctions.setPlayerNumber(-1);
                     }
                     if(otherPlayersFound === false) {

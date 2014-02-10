@@ -138,12 +138,18 @@ public class Game {
             }
             committedTurnsInSameTurn++;
         }
-        if(turn == -1) return false;
+        if(turn == -1) {
+            connection.closeConnection();
+            return false;
+        }
 
         DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
         BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID).append(TURN, turn);
         DBObject state = stateCollection.findOne(stateQuery);
-        if(state == null) return false;
+        if(state == null) {
+            connection.closeConnection();
+            return false;
+        }
 
         connection.closeConnection();
         return true;
