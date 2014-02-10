@@ -58,6 +58,12 @@
                     }
                     if(otherPlayersFound === false) {
                         alert("Player " + owner + " wins!!!");
+                        //Note: This is a terrible security vulnerability, but will be removed in evolution 2
+                        //We needed it because the backend uses the same GameID (12345) for every game
+                        $.ajax('/game/' + globalFunctions.getGameID() + '/reset', {
+                            method: 'DELETE',
+                            contentType: "application/json"
+                        });
                         location.reload(true);
                     }
                     globalFunctions.destroyAndRebuildMap();

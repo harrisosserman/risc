@@ -105,7 +105,7 @@
                                 $(this).click(function() {
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
-                                        board.listenForAdditionalTroops(index);
+                                    board.listenForAdditionalTroops(index);
                                 });
                             } else {
                                 $(this).click(function() {
@@ -136,8 +136,9 @@
             }
         };
         board.listenForAdditionalTroops = function(index) {
+            $("body").unbind("keydown");
+            if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
                 $("body").keydown(function(input) {
-                    if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
                         if(input.keyCode === 38) {
                             //up arrow
                             board.calculateAdditionalTroops(1, index, input);
@@ -145,9 +146,12 @@
                             //down arrow
                             board.calculateAdditionalTroops(-1, index, input);
                         }
-                    }
                 });
+            }
         };
+
+
+
         board.calculateAdditionalTroops = function(troopDelta, index, key) {
             key.preventDefault();
             var currentTroops = board.troops[index];
@@ -332,13 +336,8 @@
             board.territoryDOMElements = [];
             board.troops = [];
             board.attackingTroops = [];
-            $('.troopTotals').each(function() {
-                $(this).remove();
-            });
-            $("#map td").each(function() {
-                $(this).off('click');
-            });
-            board.removeAllPreviousAdjacencies($('#map'));
+            $("#map").empty();
+            globalFunctions.createMap();
             var callMapReady = true;
             globalFunctions.getMap(callMapReady);
         };
