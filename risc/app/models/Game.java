@@ -28,6 +28,9 @@ public class Game {
     private static final String TROOPS = "troops";
     private static final String ADDITIONAL_TROOPS = "additionalTroops";
     private static final String TURN = "turn";
+    private static final String ACTIVE_PLAYER_COUNT = "activePlayerCount";
+    private static final String ACTIVE_PLAYERS = "activePlayers";
+    private static final String PLAYER_NUMBER = "playerNumber";
 
     private String myGameID;
     private ArrayList<Player> myPlayers;
@@ -120,25 +123,30 @@ public class Game {
     public boolean areAllPlayersCommitted() throws UnknownHostException{
         MongoConnection connection = new MongoConnection();
 
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
-        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
-        DBObject state = stateCollection.findOne(stateQuery);
-        int completedTurns = (Integer)state.get(TURN);
-
         DBCollection committedTurnsCollection = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
         BasicDBObject committedTurnsQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
-        committedTurnsQuery.append(TURN, new Integer(completedTurns));
-        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery);
-        int committedTurnsCount = committedTurnsCursor.count();
+        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(TURN, -1));
+        int turn = -1;
+        int committedTurnsInSameTurn = 0;
+        while(committedTurnsCursor.hasNext()) {
+            DBObject committedTurn = committedTurnsCursor.next();
+            if(turn == -1) {
+                turn = (Integer)committedTurn.get(TURN);
+            }
+            if(turn != (Integer)committedTurn.get(TURN)) {
+                break;
+            }
+            committedTurnsInSameTurn++;
+        }
+        if(turn == -1) return false;
 
-        //TODO: put activePlayerCount into game.state
-        DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
-        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
-        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
-        int playerCount = (Integer)waitingPlayers.get(COUNT);
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID).append(TURN, turn);
+        DBObject state = stateCollection.findOne(stateQuery);
+        if(state == null) return false;
 
         connection.closeConnection();
-        return (playerCount == committedTurnsCount);
+        return true;
     }
 
 	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){
@@ -260,15 +268,22 @@ public class Game {
         MongoConnection connection = new MongoConnection();
         DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
 
-        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, gameID);
-        DBCursor allTurnsCursor = stateCollection.find(stateQuery);
-        int currentTurnCount = allTurnsCursor.count();
+        int currentTurnCount = getTurnCount(connection, gameID);
 
         BasicDBObject currentTurnQuery = new BasicDBObject(GAME_ID, gameID);
         currentTurnQuery.append(TURN, currentTurnCount);
         DBObject currentTurn = stateCollection.findOne(currentTurnQuery);
 
         return currentTurn.toString();
+    }
+
+    private int getTurnCount(MongoConnection connection, String gameID){
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, gameID);
+        DBCursor allTurnsCursor = stateCollection.find(stateQuery);
+        int currentTurnCount = allTurnsCursor.count();
+        return currentTurnCount;
     }
 
     public String getGameID(){
@@ -315,9 +330,43 @@ public class Game {
         return count;
     }
 
-    public void removePlayer(int pid){
-        //for each territory t
-        //  if t is owned by player
-        //      set troops in t to 0
+    public void removePlayer(int pid) throws UnknownHostException{
+        //decrement game.state.activePlayerCount
+        MongoConnection connection = new MongoConnection();
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBObject highestTurn = stateCollection.find(stateQuery).sort( new BasicDBObject(TURN, -1)).next();
+        int highestTurnCount = (Integer)highestTurn.get(TURN);
+
+        BasicDBObject updateCriteria = new BasicDBObject(GAME_ID, myGameID).append(TURN, highestTurnCount);
+        BasicDBObject incValue = new BasicDBObject(ACTIVE_PLAYER_COUNT, -1);
+        BasicDBObject intModifier = new BasicDBObject("$inc", incValue);
+        stateCollection.update(updateCriteria, intModifier);
+
+        //remove player from activePlayers
+        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
+        ArrayList<DBObject> updatedActivePlayers = new ArrayList<DBObject>();
+        for (DBObject activePlayer : activePlayers) {
+            if ((Integer)activePlayer.get(PLAYER_NUMBER) != pid) {
+                updatedActivePlayers.add(activePlayer);
+            }
+        }
+
+        //Then set all troops in that player's territories to 0
+        ArrayList<DBObject> territories = (ArrayList<DBObject>)highestTurn.get(TERRITORIES);
+        for (DBObject territory : territories) {
+            boolean isOwnedByPid = ((Integer)territory.get(OWNER)).equals(pid);
+            if (isOwnedByPid) {
+                territory.put(TROOPS, 0);
+            }
+        }
+
+        BasicDBObject newDocument = new BasicDBObject("$set", highestTurn);
+        newDocument.append("$set", new BasicDBObject(TERRITORIES, territories));
+        newDocument.append("$set", new BasicDBObject(ACTIVE_PLAYERS, updatedActivePlayers));
+        stateCollection.update(updateCriteria, newDocument);
+
+        connection.closeConnection();
     }
 }
