@@ -13,6 +13,7 @@ public class DBHelper{
 	private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
 	private static final String MAP_COLLECTION = "map";
 	private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
+	private static final String INFO_COLLECTION = "info";
 
 	private static final String GAME_ID = "gameID";
 
@@ -40,6 +41,9 @@ public class DBHelper{
 
 		DBCollection stateCollection = gameDB.getCollection(STATE_COLLECTION);
 		stateCollection.remove(removalCriteria);
+
+		DBCollection infoCollection = gameDB.getCollection(INFO_COLLECTION);
+		infoCollection.remove(removalCriteria);
 	}
 
 	private static DB getDB(String dbName){
@@ -76,6 +80,10 @@ public class DBHelper{
 
 	public static DBCollection getStateCollection(){
 		return DBHelper.getCollection(GAME_DB, STATE_COLLECTION);
+	}
+
+	public static DBCollection getInfoCollection(){
+		return DBHelper.getCollection(GAME_DB, INFO_COLLECTION);
 	}
 
 }

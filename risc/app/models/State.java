@@ -184,50 +184,32 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
     DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
+    turn_doc.append(GAME_ID, myGameID);
+    turn_doc.append(TURN, turn++);
+    List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
+    for(int i=0; i<territories.size(); i++){
+        BasicDBObject territory_doc = new BasicDBObject();
+        int position = territories.get(i).getPosition();
+        territory_doc.append(POSITION, position);
+        int owner = territories.get(i).getOwner();
+        territory_doc.append(OWNER, owner);
 
-    if (turn == 1) {
-        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
-        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
-        int waitingPlayerCount = (Integer)waitingPlayers.get(COUNT);
-        myActivePlayerCount = waitingPlayerCount;
+        BasicDBObject gameQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBObject info = DBHelper.getInfoCollection().findOne(gameQuery);
+        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)info.get(ACTIVE_PLAYERS);
 
-        myActivePlayers = new ArrayList<DBObject>();
-        for (int i = 1; i <= waitingPlayerCount; i++) {
-            DBObject activePlayer = new BasicDBObject(PLAYER_NUMBER, i);
-            myActivePlayers.add(activePlayer);
-        }
-    }
-    else{
-        DBCollection stateCollection = DBHelper.getStateCollection();
-        DBObject highestTurn = stateCollection.find().sort(new BasicDBObject(TURN, -1)).next();
-        myActivePlayerCount = (Integer)highestTurn.get(ACTIVE_PLAYER_COUNT);
-        myActivePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
-    }
-    
-        turn_doc.append(GAME_ID, myGameID);
-        turn_doc.append(TURN, turn++);
-        turn_doc.append(ACTIVE_PLAYER_COUNT, myActivePlayerCount);
-        turn_doc.append(ACTIVE_PLAYERS, myActivePlayers);
-        List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
-        for(int i=0; i<territories.size(); i++){
-            BasicDBObject territory_doc = new BasicDBObject();
-            int position = territories.get(i).getPosition();
-            territory_doc.append(POSITION, position);
-            int owner = territories.get(i).getOwner();
-            territory_doc.append(OWNER, owner);
-            int additionalToopCount = 0;
-            for (DBObject activePlayer : myActivePlayers) {
-                if ((Integer)activePlayer.get(PLAYER_NUMBER) == owner) {
-                    additionalToopCount = ADDITIONAL_TROOPS;
-                }
+        int additionalTroopCount = 0;
+        for (DBObject activePlayer : activePlayers) {
+            if ((Integer)activePlayer.get(PLAYER_NUMBER) == owner) {
+                additionalTroopCount = ADDITIONAL_TROOPS;
             }
-            territory_doc.append(TROOPS, territories.get(i).getDefendingArmy() + additionalToopCount);
-            territory_list.add(territory_doc);
         }
+        territory_doc.append(TROOPS, territories.get(i).getDefendingArmy() + additionalTroopCount);
+        territory_list.add(territory_doc);
+    }
 
-        turn_doc.append(TERRITORIES, territory_list);
-        state.insert(turn_doc);
+    turn_doc.append(TERRITORIES, territory_list);
+    state.insert(turn_doc);
 
     return;
 }
