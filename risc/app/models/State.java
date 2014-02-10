@@ -29,8 +29,11 @@ public class State{
     private static final String OWNER = "owner";
     private static final String POSITION = "position";
     private static final int ADDITIONAL_TROOPS = 1;
+    private static final String ACTIVE_PLAYER_COUNT = "activePlayerCount";
+    private static final String COUNT = "count";
 
     private int turn;
+    private int myActivePlayerCount;
     private int playerID;
     private String myGameID;
     private ArrayList<Territory> territories;
@@ -142,14 +145,23 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
     MongoConnection connection = new MongoConnection();
     DB game = connection.getDB(GAME_DB);
     DBCollection committedTurns = game.getCollection(COMMITTED_TURNS_COLLECTION);
-    DB initialization_database = connection.getDB(INITIALIZATION_DB);
     DBCollection state = game.getCollection(STATE);
   //  DBObject waitingPlayers_doc = initialization_database.waitingPlayers.findOne(new BasicDBObject().append(GAME_ID, id));
     //this might not work
     //int turn_number = waitingPlayers_doc.get(1);
     BasicDBObject turn_doc = new BasicDBObject();
+
+    if (turn == 1) {
+        DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
+        int waitingPlayerCount = (Integer)waitingPlayers.get(COUNT);
+        myActivePlayerCount = waitingPlayerCount;
+    }
+    
     turn_doc.append(GAME_ID, myGameID);
     turn_doc.append(TURN, turn++);
+    turn_doc.append(ACTIVE_PLAYER_COUNT, myActivePlayerCount);
     List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
     for(int i=0; i<territories.size(); i++){
         BasicDBObject territory_doc = new BasicDBObject();
