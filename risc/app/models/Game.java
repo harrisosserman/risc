@@ -307,11 +307,20 @@ public class Game {
     }
 
     public void removePlayer(int pid) throws UnknownHostException{
+        System.out.println("------- Remove called");
+
         //decrement game.state.activePlayerCount
         DBCollection stateCollection = DBHelper.getStateCollection();
 
         BasicDBObject stateQuery = new BasicDBObject(GAME_ID, myGameID);
-        DBObject highestTurn = stateCollection.find(stateQuery).sort( new BasicDBObject(TURN, -1)).next();
+
+        DBCursor highestTurnCursor = stateCollection.find(stateQuery).sort( new BasicDBObject(TURN, -1));
+        if (!highestTurnCursor.hasNext()) {
+            DBHelper.reset(myGameID);
+            System.out.println("----- Resetting game");
+            return;
+        }
+        DBObject highestTurn = highestTurnCursor.next();
         int highestTurnCount = (Integer)highestTurn.get(TURN);
 
         BasicDBObject updateCriteria = new BasicDBObject(GAME_ID, myGameID).append(TURN, highestTurnCount);
@@ -326,6 +335,13 @@ public class Game {
             if ((Integer)activePlayer.get(PLAYER_NUMBER) != pid) {
                 updatedActivePlayers.add(activePlayer);
             }
+        }
+
+        //If no players remain, reset game
+        if (updatedActivePlayers.size() == 0) {
+            DBHelper.reset(myGameID);
+            System.out.println("----- Resetting game");
+            return;
         }
 
         //Then set all troops in that player's territories to 0
