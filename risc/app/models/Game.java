@@ -110,7 +110,7 @@ public class Game {
         ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(PLAYERS);
         int readyCount = 0;
         for (DBObject player : players) {
-           if ((boolean)player.get(READY)) {
+           if ((Boolean)player.get(READY)) {
                 readyCount++;
            }
         }
