@@ -84,6 +84,7 @@ public class Game {
 		if (areAllPlayersReady(gameID) && getWaitingPlayerCount() >= 2) {
 			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
 			makeInitialGameMap(territoryOwners, gameID);
+            makeInitialInfo();
 		}
 	}
 
@@ -208,6 +209,26 @@ public class Game {
         map.insert(doc);
     }
 
+    private void makeInitialInfo(){
+        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
+        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
+        int activePlayerCount = (Integer)waitingPlayers.get(COUNT);
+
+        ArrayList<DBObject> activePlayers = new ArrayList<DBObject>();
+        for (int i = 1; i <= activePlayerCount; i++) {
+            DBObject activePlayer = new BasicDBObject(PLAYER_NUMBER, i);
+            activePlayers.add(activePlayer);
+        }
+
+        DBCollection infoCollection = DBHelper.getInfoCollection();
+
+        BasicDBObject info = new BasicDBObject(GAME_ID, myGameID);
+        info.append(ACTIVE_PLAYERS, activePlayers);
+
+        infoCollection.insert(info);
+    }
+
     private DBCursor getPlayersList(String gameID){
         DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
 
@@ -308,28 +329,39 @@ public class Game {
 
     public void removePlayer(int pid) throws UnknownHostException{
         System.out.println("------- Remove called");
-
+        //First update info collection
         //decrement game.state.activePlayerCount
-        DBCollection stateCollection = DBHelper.getStateCollection();
+        DBCollection infoCollection = DBHelper.getInfoCollection();
 
-        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, myGameID);
+        BasicDBObject gameQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBObject info = infoCollection.findOne(gameQuery);
 
-        DBCursor highestTurnCursor = stateCollection.find(stateQuery).sort( new BasicDBObject(TURN, -1));
-        if (!highestTurnCursor.hasNext()) {
-            DBHelper.reset(myGameID);
-            System.out.println("----- Resetting game");
-            return;
+        //info is null while the players are still waiting and the map hasn't yet been created
+        if(info == null){
+            //TODO:remove from waitingPlayers
+            DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
+            DBObject waitingPlayers = waitingPlayersCollection.findOne(gameQuery);
+            ArrayList<DBObject> players = (ArrayList<DBObject>)waitingPlayers.get(PLAYERS);
+            players.remove((pid - 1));
+            waitingPlayers.put(COUNT, players.size());
+
+            BasicDBObject newWaitingPlayers = new BasicDBObject("$set", waitingPlayers);
+            newWaitingPlayers.append("$set", new BasicDBObject(PLAYERS, players));
+            waitingPlayersCollection.update(gameQuery, newWaitingPlayers);
+
+            BasicDBObject newWaitingPlayers2 = new BasicDBObject("$set", waitingPlayers);
+            newWaitingPlayers2.append("$set", new BasicDBObject(COUNT, players.size()));
+            waitingPlayersCollection.update(gameQuery, newWaitingPlayers2);
+
+            if (players.size() == 0) {
+                DBHelper.reset(myGameID);
+                System.out.println("----- Resetting game");
+                return;
+            }
         }
-        DBObject highestTurn = highestTurnCursor.next();
-        int highestTurnCount = (Integer)highestTurn.get(TURN);
-
-        BasicDBObject updateCriteria = new BasicDBObject(GAME_ID, myGameID).append(TURN, highestTurnCount);
-        BasicDBObject incValue = new BasicDBObject(ACTIVE_PLAYER_COUNT, -1);
-        BasicDBObject intModifier = new BasicDBObject("$inc", incValue);
-        stateCollection.update(updateCriteria, intModifier);
 
         //remove player from activePlayers
-        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
+        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)info.get(ACTIVE_PLAYERS);
         ArrayList<DBObject> updatedActivePlayers = new ArrayList<DBObject>();
         for (DBObject activePlayer : activePlayers) {
             if ((Integer)activePlayer.get(PLAYER_NUMBER) != pid) {
@@ -337,12 +369,26 @@ public class Game {
             }
         }
 
-        //If no players remain, reset game
         if (updatedActivePlayers.size() == 0) {
             DBHelper.reset(myGameID);
             System.out.println("----- Resetting game");
             return;
         }
+
+        BasicDBObject newInfo = new BasicDBObject("$set", info);
+        newInfo.append("$set", new BasicDBObject(ACTIVE_PLAYERS, updatedActivePlayers));
+        infoCollection.update(gameQuery, newInfo);
+
+        //Second update most recent state turn
+        DBCollection stateCollection = DBHelper.getStateCollection();
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBCursor highestTurnCursor = stateCollection.find(stateQuery).sort(new BasicDBObject(TURN, -1));
+
+        // is null if no turns have yet been committed to state
+        if (!highestTurnCursor.hasNext()) {
+            return;
+        }
+        DBObject highestTurn = highestTurnCursor.next();
 
         //Then set all troops in that player's territories to 0
         ArrayList<DBObject> territories = (ArrayList<DBObject>)highestTurn.get(TERRITORIES);
@@ -353,9 +399,8 @@ public class Game {
             }
         }
 
-        BasicDBObject newDocument = new BasicDBObject("$set", highestTurn);
-        newDocument.append("$set", new BasicDBObject(TERRITORIES, territories));
-        newDocument.append("$set", new BasicDBObject(ACTIVE_PLAYERS, updatedActivePlayers));
-        stateCollection.update(updateCriteria, newDocument);
+        BasicDBObject newHighestTurn = new BasicDBObject("$set", highestTurn);
+        newHighestTurn.append("$set", new BasicDBObject(TERRITORIES, territories));
+        stateCollection.update(gameQuery, newHighestTurn);
     }
 }
