@@ -279,7 +279,7 @@ public class Game {
         BasicDBObject currentTurnQuery = new BasicDBObject(GAME_ID, gameID);
         currentTurnQuery.append(TURN, currentTurnCount);
         DBObject currentTurn = stateCollection.findOne(currentTurnQuery);
-
+        connection.closeConnection();
         return currentTurn.toString();
     }
 
