@@ -80,9 +80,17 @@ public void assembleState(int turn_number) throws UnknownHostException{
             System.out.println("the owner of territory " + position + " is " + territories.get(position).getOwner());
             BasicDBList attackerData = (BasicDBList) terr.get(ATTACKING);
             BasicDBObject[] attackerArray = attackerData.toArray(new BasicDBObject[0]);
+            attackerLoop:
             for(BasicDBObject attack : attackerArray){
                 int attacker_territory = Integer.parseInt(attack.get(TERRITORY).toString());
                 int attacker_number = Integer.parseInt(attack.get(TROOPS).toString());
+                ArrayList<Attacker> attackers_inTerritory = territories.get(attacker_territory).getAttackers();
+                for(Attacker _attacker : attackers_inTerritory){
+                    if(_attacker.getOwner() == playerID){
+                        _attacker.setStrength(_attacker.getStrength() + attacker_number);
+                        continue attackerLoop;
+                    }
+                }
                 Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
                 territories.get(attacker_territory).addAttacker(a);
                 System.out.println("the owner of the attacker is " + a.getOwner());

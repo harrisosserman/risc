@@ -50,7 +50,11 @@ public class Game {
         MongoConnection connection = new MongoConnection();
         DB initialization = connection.getDB(INITIALIZATION_DB);
         DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
-        if (!initialization.collectionExists(WAITING_PLAYERS_COLLECTION)) {
+
+        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
+        DBCursor waitingPlayersCursor = waitingPlayers.find(waitingPlayersQuery);
+
+        if (!waitingPlayersCursor.hasNext()) {
             BasicDBObject doc = new BasicDBObject();
 
             BasicDBObject firstPlayer = new BasicDBObject(NAME, playerName).append(READY, false);
@@ -113,7 +117,7 @@ public class Game {
         ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(PLAYERS);
         int readyCount = 0;
         for (DBObject player : players) {
-           if ((boolean)player.get(READY)) {
+           if ((Boolean)player.get(READY)) {
                 readyCount++;
            }
         }
@@ -279,6 +283,7 @@ public class Game {
         BasicDBObject currentTurnQuery = new BasicDBObject(GAME_ID, gameID);
         currentTurnQuery.append(TURN, currentTurnCount);
         DBObject currentTurn = stateCollection.findOne(currentTurnQuery);
+
         connection.closeConnection();
         return currentTurn.toString();
     }

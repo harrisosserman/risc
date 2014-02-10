@@ -14,6 +14,7 @@ import com.mongodb.*;
 import java.net.UnknownHostException;
 import models.Turn;
 import models.State;
+import libraries.DBHelper;
 
 public class API extends Controller {
 
@@ -119,5 +120,10 @@ public class API extends Controller {
 
     public static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
+    }
+    
+    public static Result reset(String id) throws UnknownHostException{
+        DBHelper.reset(id);
+        return ok("Reset DB for gameID:" + id);
     }
 }
