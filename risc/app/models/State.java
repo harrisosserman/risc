@@ -10,6 +10,25 @@ import models.Territory;
 import models.Troop;
 import play.mvc.Http.RequestBody;
 import models.Attacker;
+import libraries.DBHelper;
+
+/**
+ * This class is responsible for computing and updating the state after all
+ * the turns are committed. The 
+ * 
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * 
+ */
+
 
 public class State{
 
@@ -49,11 +68,22 @@ public State(String gameID){
   //  attackers = new ArrayList<Attacker>();
 }
 
+/*
+ * This method assembles the state by reading the committed turns from the database after
+ * all the turns have been committed. This method returns void because it saves the state
+ * down to the database beore completion.  
+ * 
+ * This implementation first queries the database for the 
+ *
+ * @param turn_number the number turn the game is on
+ * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
+ * be determined.
+ */
+
 public void assembleState(int turn_number) throws UnknownHostException{
     turn = turn_number;
     MongoConnection connection = new MongoConnection();
-    DB initialization = connection.getDB(INITIALIZATION_DB);
-    DBCollection committedTurns = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
+    DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
     BasicDBObject query = new BasicDBObject();
     query.put(GAME_ID, myGameID);
     query.put(TURN, turn);
@@ -154,16 +184,12 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
 
  public void saveState() throws UnknownHostException{
     MongoConnection connection = new MongoConnection();
-    DB game = connection.getDB(GAME_DB);
-    DBCollection committedTurns = game.getCollection(COMMITTED_TURNS_COLLECTION);
-    DBCollection state = game.getCollection(STATE);
-  //  DBObject waitingPlayers_doc = initialization_database.waitingPlayers.findOne(new BasicDBObject().append(GAME_ID, id));
-    //this might not work
-    //int turn_number = waitingPlayers_doc.get(1);
+    DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+    DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
 
     if (turn == 1) {
-        DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
+        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
         BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, myGameID);
         DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
         int waitingPlayerCount = (Integer)waitingPlayers.get(COUNT);
@@ -174,38 +200,39 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
             DBObject activePlayer = new BasicDBObject(PLAYER_NUMBER, i);
             myActivePlayers.add(activePlayer);
         }
-    }else{
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE);
+    }
+    else{
+        DBCollection stateCollection = DBHelper.getStateCollection();
         DBObject highestTurn = stateCollection.find().sort(new BasicDBObject(TURN, -1)).next();
         myActivePlayerCount = (Integer)highestTurn.get(ACTIVE_PLAYER_COUNT);
         myActivePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
     }
     
-    turn_doc.append(GAME_ID, myGameID);
-    turn_doc.append(TURN, turn++);
-    turn_doc.append(ACTIVE_PLAYER_COUNT, myActivePlayerCount);
-    turn_doc.append(ACTIVE_PLAYERS, myActivePlayers);
-    List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
-    for(int i=0; i<territories.size(); i++){
-        BasicDBObject territory_doc = new BasicDBObject();
-        int position = territories.get(i).getPosition();
-        territory_doc.append(POSITION, position);
-        int owner = territories.get(i).getOwner();
-        territory_doc.append(OWNER, owner);
-        int additionalToopCount = 0;
-        for (DBObject activePlayer : myActivePlayers) {
-            if ((Integer)activePlayer.get(PLAYER_NUMBER) == owner) {
-                additionalToopCount = ADDITIONAL_TROOPS;
+        turn_doc.append(GAME_ID, myGameID);
+        turn_doc.append(TURN, turn++);
+        turn_doc.append(ACTIVE_PLAYER_COUNT, myActivePlayerCount);
+        turn_doc.append(ACTIVE_PLAYERS, myActivePlayers);
+        List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
+        for(int i=0; i<territories.size(); i++){
+            BasicDBObject territory_doc = new BasicDBObject();
+            int position = territories.get(i).getPosition();
+            territory_doc.append(POSITION, position);
+            int owner = territories.get(i).getOwner();
+            territory_doc.append(OWNER, owner);
+            int additionalToopCount = 0;
+            for (DBObject activePlayer : myActivePlayers) {
+                if ((Integer)activePlayer.get(PLAYER_NUMBER) == owner) {
+                    additionalToopCount = ADDITIONAL_TROOPS;
+                }
             }
+            territory_doc.append(TROOPS, territories.get(i).getDefendingArmy() + additionalToopCount);
+            territory_list.add(territory_doc);
         }
-        territory_doc.append(TROOPS, territories.get(i).getDefendingArmy() + additionalToopCount);
-        territory_list.add(territory_doc);
-    }
 
-    turn_doc.append(TERRITORIES, territory_list);
-    state.insert(turn_doc);
+        turn_doc.append(TERRITORIES, territory_list);
+        state.insert(turn_doc);
 
-    connection.closeConnection();
+        connection.closeConnection();
 
     return;
 }

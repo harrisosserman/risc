@@ -1,7 +1,6 @@
 package models;
 
 import java.util.*;
-import libraries.MongoConnection;
 import com.mongodb.*;
 import com.fasterxml.jackson.databind.*;
 import com.mongodb.util.JSON;
@@ -10,6 +9,7 @@ import java.net.UnknownHostException;
 import models.Territory;
 import models.Troop;
 import controllers.API;
+import libraries.DBHelper;
 
 public class Turn {
 
@@ -65,9 +65,11 @@ public class Turn {
                 while(attackerData.hasNext()){
                     JsonNode n = attackerData.next();
                     int attacker_territory = Integer.parseInt(n.get(TERRITORY).toString());
+                    if(!n.get(TROOPS).toString().equals("null")){
                     int attacker_number = Integer.parseInt(n.get(TROOPS).toString());
                     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
                     attackers.add(a);
+                    } 
                 }
             }
         }
@@ -79,13 +81,9 @@ public class Turn {
 	}
 
     public boolean allTurnsCommitted() throws UnknownHostException{
-        MongoConnection connection = new MongoConnection();
-        DB game = connection.getDB(GAME_DB);
-        DB initialization = connection.getDB(INITIALIZATION_DB);
-        DBCollection committedTurns = game.getCollection(COMMITTED_TURNS_COLLECTION);
-        DBCollection state = game.getCollection(STATE);
-        DB initialization_database = connection.getDB(INITIALIZATION_DB);
-        DBCollection waitingPlayers = initialization.getCollection(WAITING_PLAYERS_COLLECTION);
+        DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+        DBCollection state = DBHelper.getStateCollection();
+        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
         BasicDBObject query_turn = new BasicDBObject(GAME_ID, myGameID);
         DBCursor highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
         int highestTurn_value;
@@ -125,12 +123,9 @@ public class Turn {
 
     public int commitTurn() throws UnknownHostException{
         System.out.println("commit Turn started");
-        MongoConnection connection = new MongoConnection();
-        DB game = connection.getDB(GAME_DB);
-        DBCollection committedTurns = game.getCollection(COMMITTED_TURNS_COLLECTION);
-        DB initialization_database = connection.getDB(INITIALIZATION_DB);
-        DBCollection waitingPlayers = initialization_database.getCollection(WAITING_PLAYERS_COLLECTION);
-        DBCollection state = game.getCollection(STATE);
+        DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
+        DBCollection state = DBHelper.getStateCollection();
         System.out.println(myGameID);
         BasicDBObject query = new BasicDBObject();
         query.put(GAME_ID, myGameID);
@@ -174,7 +169,7 @@ public class Turn {
 
         committedTurns.insert(turn_doc);
 
-        connection.closeConnection();
+
 
         System.out.println("turn was committed");
 
