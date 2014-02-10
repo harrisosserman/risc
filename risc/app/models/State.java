@@ -182,8 +182,15 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
         BasicDBObject territory_doc = new BasicDBObject();
         int position = territories.get(i).getPosition();
         territory_doc.append(POSITION, position);
-        territory_doc.append(OWNER, territories.get(i).getOwner());
-        territory_doc.append(TROOPS, territories.get(i).getDefendingArmy()+ADDITIONAL_TROOPS);
+        int owner = territories.get(i).getOwner();
+        territory_doc.append(OWNER, owner);
+        int additionalToopCount = 0;
+        for (DBObject activePlayer : myActivePlayers) {
+            if ((Integer)activePlayer.get(PLAYER_NUMBER) == owner) {
+                additionalToopCount = ADDITIONAL_TROOPS;
+            }
+        }
+        territory_doc.append(TROOPS, territories.get(i).getDefendingArmy() + additionalToopCount);
         territory_list.add(territory_doc);
     }
 
