@@ -168,7 +168,7 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
         }
     }else{
         DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE);
-        DBObject highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1)).next();
+        DBObject highestTurn = stateCollection.find().sort(new BasicDBObject(TURN, -1)).next();
         myActivePlayerCount = (Integer)highestTurn.get(ACTIVE_PLAYER_COUNT);
         myActivePlayers = (ArrayList<DBObject>)highestTurn.get(ACTIVE_PLAYERS);
     }
