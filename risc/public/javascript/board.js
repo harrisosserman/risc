@@ -336,13 +336,8 @@
             board.territoryDOMElements = [];
             board.troops = [];
             board.attackingTroops = [];
-            $('.troopTotals').each(function() {
-                $(this).remove();
-            });
-            $("#map td").each(function() {
-                $(this).off('click');
-            });
-            board.removeAllPreviousAdjacencies($('#map'));
+            $("#map").empty();
+            globalFunctions.createMap();
             var callMapReady = true;
             globalFunctions.getMap(callMapReady);
         };
