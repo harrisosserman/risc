@@ -32,7 +32,7 @@
             var result = turn.loadGameMap(deferred);
             deferred.done(function(data) {
                     $(pollingNextTurnDOM).remove();
-                    var gameMap = data.map;
+                    var gameMap = data.territories;
                     //handling when player loses or when player wins
                     var playerNumber = globalFunctions.getPlayerNumber();
                     var playerNumberFound = false;

@@ -21,18 +21,25 @@
             return board.attackingTroops;
         };
         /*          END GLOBAL FUNCTIONS                    */
-        globalFunctions.getMap = function() {
-            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
+        globalFunctions.getMap = function(mapReady) {
+            console.log(mapReady);
+            var appendUrl = "/map";
+            if(typeof mapReady !== 'undefined' && mapReady === true) {
+                appendUrl = "/mapReady";
+            }
+            $.ajax('/game/' + globalFunctions.getGameID() + appendUrl, {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
                             $('.submitTurnButton').remove();
                         }
                         board.territoryInfo = $.parseJSON(result);
-                        for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
-                            globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
-                                board.territoryInfo.additionalTroops[m].troops);
-                            board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
+                        if(typeof board.territoryInfo.additionalTroops !== 'undefined') {
+                            for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
+                                globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
+                                    board.territoryInfo.additionalTroops[m].troops);
+                                board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
+                            }
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
@@ -99,7 +106,7 @@
                                 $(this).click(function() {
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
-                                    board.listenForAdditionalTroops(index);
+                                        board.listenForAdditionalTroops(index);
                                 });
                             } else {
                                 $(this).click(function() {
@@ -333,7 +340,8 @@
                 $(this).off('click');
             });
             board.removeAllPreviousAdjacencies($('#map'));
-            globalFunctions.getMap();
+            var callMapReady = true;
+            globalFunctions.getMap(callMapReady);
         };
 
         board.playerWatching = function() {

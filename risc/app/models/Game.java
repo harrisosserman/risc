@@ -123,25 +123,30 @@ public class Game {
     public boolean areAllPlayersCommitted() throws UnknownHostException{
         MongoConnection connection = new MongoConnection();
 
-        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
-        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
-        DBObject state = stateCollection.findOne(stateQuery);
-        int completedTurns = (Integer)state.get(TURN);
-
         DBCollection committedTurnsCollection = connection.getDB(GAME_DB).getCollection(COMMITTED_TURNS_COLLECTION);
         BasicDBObject committedTurnsQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
-        committedTurnsQuery.append(TURN, new Integer(completedTurns));
-        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery);
-        int committedTurnsCount = committedTurnsCursor.count();
+        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(TURN, -1));
+        int turn = -1;
+        int committedTurnsInSameTurn = 0;
+        while(committedTurnsCursor.hasNext()) {
+            DBObject committedTurn = committedTurnsCursor.next();
+            if(turn == -1) {
+                turn = (Integer)committedTurn.get(TURN);
+            }
+            if(turn != (Integer)committedTurn.get(TURN)) {
+                break;
+            }
+            committedTurnsInSameTurn++;
+        }
+        if(turn == -1) return false;
 
-        //TODO: put activePlayerCount into game.state
-        DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
-        BasicDBObject waitingPlayersQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID);
-        DBObject waitingPlayers = waitingPlayersCollection.findOne(waitingPlayersQuery);
-        int playerCount = (Integer)waitingPlayers.get(COUNT);
+        DBCollection stateCollection = connection.getDB(GAME_DB).getCollection(STATE_COLLECTION);
+        BasicDBObject stateQuery = new BasicDBObject(GAME_ID, DEFAULT_GAME_ID).append(TURN, turn);
+        DBObject state = stateCollection.findOne(stateQuery);
+        if(state == null) return false;
 
         connection.closeConnection();
-        return (playerCount == committedTurnsCount);
+        return true;
     }
 
 	private boolean gameMapHasBeenCreated(MongoConnection connection, String gameID){
