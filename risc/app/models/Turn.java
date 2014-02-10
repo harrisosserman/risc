@@ -65,6 +65,7 @@ public class Turn {
                 while(attackerData.hasNext()){
                     JsonNode n = attackerData.next();
                     int attacker_territory = Integer.parseInt(n.get(TERRITORY).toString());
+                   /// change this to a front end change soon!!!
                     if(!n.get(TROOPS).toString().equals("null")){
                     int attacker_number = Integer.parseInt(n.get(TROOPS).toString());
                     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);

@@ -1,7 +1,6 @@
 package models;
 
 import java.util.*;
-import libraries.MongoConnection;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.fasterxml.jackson.databind.*;
@@ -82,7 +81,6 @@ public State(String gameID){
 
 public void assembleState(int turn_number) throws UnknownHostException{
     turn = turn_number;
-    MongoConnection connection = new MongoConnection();
     DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
     BasicDBObject query = new BasicDBObject();
     query.put(GAME_ID, myGameID);
@@ -183,7 +181,6 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
 }
 
  public void saveState() throws UnknownHostException{
-    MongoConnection connection = new MongoConnection();
     DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
@@ -231,8 +228,6 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
 
         turn_doc.append(TERRITORIES, territory_list);
         state.insert(turn_doc);
-
-        connection.closeConnection();
 
     return;
 }
