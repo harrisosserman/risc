@@ -74,14 +74,12 @@ public class Game {
     private boolean areAllPlayersReady(String gameID) throws UnknownHostException{
         int waitingPlayerCount = getWaitingPlayerCount();
 
-        DBCursor playersListCursor = getPlayersList(gameID);
-        if (!playersListCursor.hasNext()) {
+        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(gameID);
+        if (waitingPlayers == null) {
             return false;
         }
 
-        DBObject playersList = playersListCursor.next();
-
-        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(DBHelper.PLAYERS_KEY);
+        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
         int readyCount = 0;
         for (DBObject player : players) {
            if ((Boolean)player.get(DBHelper.READY_KEY)) {
@@ -122,12 +120,8 @@ public class Game {
     }
 
 	private boolean gameMapHasBeenCreated(String gameID){
-		DBCollection mapCollection = DBHelper.getMapCollection();
-
-        BasicDBObject query = new BasicDBObject(DBHelper.GAME_ID_KEY, gameID);
-        DBCursor map = mapCollection.find(query);
-
-        return map.hasNext();
+        DBObject map = DBHelper.getMapForGame(gameID);
+        return (map != null);
 	}
 
 	public boolean canPlayersStillJoin() throws UnknownHostException{
@@ -143,23 +137,22 @@ public class Game {
 	}
 
     private void markWaitingPlayerReady(String gameID, int playerNumber, String playerName) throws UnknownHostException{
-        DBCursor playersListCursor = getPlayersList(gameID);
-        DBObject playersList = playersListCursor.next();
+        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(gameID);
 
-        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)playersList.get(DBHelper.PLAYERS_KEY);
+        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
         int playerIndex = playerNumber - 1; // - 1 because 1-indexed instead of 0-indexed
         BasicDBObject startingPlayer = players.get(playerIndex);
 
-        BasicDBObject newDocument = new BasicDBObject("$set", playersList);
+        BasicDBObject newDocument = new BasicDBObject("$set", waitingPlayers);
         String readyPath = DBHelper.PLAYERS_KEY + "." + playerIndex + "." + DBHelper.READY_KEY;
         newDocument.append("$set", new BasicDBObject().append(readyPath, true));
 
-        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
-        waitingPlayers.update(new BasicDBObject(), newDocument);
+        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
+        waitingPlayersCollection.update(new BasicDBObject(), newDocument);
     }
 
     private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
-        DBCollection map = DBHelper.getMapCollection();
+        DBCollection mapCollection = DBHelper.getMapCollection();
 
         BasicDBObject doc = new BasicDBObject();
 
@@ -189,7 +182,7 @@ public class Game {
         }
         doc.append(DBHelper.ADDITIONAL_TROOPS_KEY, additionalTroops);
 
-        map.insert(doc);
+        mapCollection.insert(doc);
     }
 
     private void makeInitialInfo(){
@@ -212,14 +205,6 @@ public class Game {
         infoCollection.insert(info);
     }
 
-    private DBCursor getPlayersList(String gameID){
-        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
-
-        BasicDBObject query = new BasicDBObject(DBHelper.GAME_ID_KEY, gameID);
-        DBCursor playersList = waitingPlayers.find(query);
-        return playersList;
-    }
-
     private int[] assignCountryOwners(int playerCount) {
         ArrayList<Integer> indices = new ArrayList<Integer>();
         for(int i = 0; i < NUM_TERRITORIES; i++){
@@ -237,15 +222,8 @@ public class Game {
     }
 
     public String getMapJson(String gameID) throws UnknownHostException{
-        DBCollection mapCollection = DBHelper.getMapCollection();
-
-        BasicDBObject query = new BasicDBObject(DBHelper.GAME_ID_KEY, gameID);
-        DBCursor mapCursor = mapCollection.find(query);
-
-        String json = JSON.serialize(mapCursor);
-        String trimmedJson = json.substring(1, json.length() - 1);  //need to remove '[' and ']' which converts it from BSON to JSON
-
-        return trimmedJson;
+        DBObject map = DBHelper.getMapForGame(gameID);
+        return map.toString();
     }
 
     public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
@@ -315,21 +293,20 @@ public class Game {
         //First update info collection
         //decrement game.state.activePlayerCount
         DBCollection infoCollection = DBHelper.getInfoCollection();
-
-        BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        DBObject info = infoCollection.findOne(gameQuery);
+        DBObject info = DBHelper.getInfoForGame(myGameID);
 
         //info is null while the players are still waiting and the map hasn't yet been created
         if(info == null){
             //TODO:remove from waitingPlayers
             DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-            DBObject waitingPlayers = waitingPlayersCollection.findOne(gameQuery);
+            DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
             ArrayList<DBObject> players = (ArrayList<DBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
             players.remove((pid - 1));
             waitingPlayers.put(DBHelper.COUNT_KEY, players.size());
 
             BasicDBObject newWaitingPlayers = new BasicDBObject("$set", waitingPlayers);
             newWaitingPlayers.append("$set", new BasicDBObject(DBHelper.PLAYERS_KEY, players));
+            BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
             waitingPlayersCollection.update(gameQuery, newWaitingPlayers);
 
             BasicDBObject newWaitingPlayers2 = new BasicDBObject("$set", waitingPlayers);
@@ -360,6 +337,7 @@ public class Game {
 
         BasicDBObject newInfo = new BasicDBObject("$set", info);
         newInfo.append("$set", new BasicDBObject(DBHelper.ACTIVE_PLAYERS_KEY, updatedActivePlayers));
+        BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
         infoCollection.update(gameQuery, newInfo);
 
         //Second update most recent state turn
