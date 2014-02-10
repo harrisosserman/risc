@@ -18,12 +18,12 @@ public class DBHelper{
 
 	private static MongoConnection myConnection;
 
-	private static MongoConnection newConnection(){
+	private static MongoConnection getConnection(){
 		return ConnectionManager.getInstance().getConnection();
 	}
 
 	public static void reset(String gameID){
-		MongoConnection connection = DBHelper.newConnection();
+		MongoConnection connection = DBHelper.getConnection();
 
 		BasicDBObject removalCriteria = new BasicDBObject(GAME_ID, gameID);
 
@@ -40,14 +40,11 @@ public class DBHelper{
 
 		DBCollection stateCollection = gameDB.getCollection(STATE_COLLECTION);
 		stateCollection.remove(removalCriteria);
-
-		connection.closeConnection();
 	}
 
 	private static DB getDB(String dbName){
-		MongoConnection connection = DBHelper.newConnection();
+		MongoConnection connection = DBHelper.getConnection();
 		DB db = connection.getDB(dbName);
-		connection.closeConnection();
 		return db;
 	}
 
@@ -60,11 +57,8 @@ public class DBHelper{
 	}
 
 	private static DBCollection getCollection(String dbName, String collectionName){
-		System.out.println("got here 1");
-		MongoConnection connection = DBHelper.newConnection();
+		MongoConnection connection = DBHelper.getConnection();
 		DBCollection collection = connection.getDB(dbName).getCollection(collectionName);
-		// connection.closeConnection();
-		System.out.println("got here 2");
 		return collection;
 	}
 
