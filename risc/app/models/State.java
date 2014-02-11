@@ -16,16 +16,12 @@ import libraries.DBHelper;
  * the turns are committed. The constants listed below are used for accessing
  * the different things in the database. 
  *
+ * The private ints, and ArrayLists are common to the entire state and
+ * instatitated in the constructor, and edited by all methods in the 
+ * class. 
  *
- *
- *
- *
- *
- *
- *
- *
- *
- * 
+ * This class is instatitated and called after all turns are committed, 
+ * within the commitTurn API post call. 
  */
 
 
@@ -100,13 +96,10 @@ public void assembleState(int turn_number) throws UnknownHostException{
     for(int i=0; i<NUM_TERRITORIES; i++){
         Territory territory_empty = new Territory(i, -1, -1);
         territories.add(territory_empty);
-    }
-    System.out.println("sample");
+   }
     while(cursor.hasNext()) {
         DBObject object = cursor.next();
-        System.out.println("my game id is " + myGameID);
         playerID = Integer.parseInt(object.get(PLAYER).toString());
-        System.out.println("the territories object is: " + object.get(TERRITORIES).toString());
         BasicDBList territoryData = (BasicDBList) object.get(TERRITORIES);
         BasicDBObject[] territoryArray = territoryData.toArray(new BasicDBObject[0]);
         for(BasicDBObject terr : territoryArray){
@@ -116,7 +109,6 @@ public void assembleState(int turn_number) throws UnknownHostException{
             int position = Integer.parseInt(position_str);
             territories.get(position).setOwner(playerID);
             territories.get(position).setDefendingArmy(troops);
-            System.out.println("the owner of territory " + position + " is " + territories.get(position).getOwner());
             BasicDBList attackerData = (BasicDBList) terr.get(ATTACKING);
             BasicDBObject[] attackerArray = attackerData.toArray(new BasicDBObject[0]);
             attackerLoop:
@@ -132,7 +124,6 @@ public void assembleState(int turn_number) throws UnknownHostException{
                 }
                 Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
                 territories.get(attacker_territory).addAttacker(a);
-                System.out.println("the owner of the attacker is " + a.getOwner());
             }
         }
     }
@@ -148,11 +139,12 @@ public void assembleState(int turn_number) throws UnknownHostException{
  * of the battle is set as the owner, and the array list of attackers is assembled.
  * 
  * Each attacker individually attacks the defender and if the attacker wins, they
- * become the defender. The battle method is called to execute the battles. 
- *
+ * become the defender for the next attacker. The battle method is called to 
+ * execute the battles. 
  * 
- *
- *
+ * The method updates the already existing Territory ArrayList so that the list
+ * is ready to be stored down to the database in the saveState method that is called
+ * after findState().
  *
  * 
  * 
@@ -186,10 +178,10 @@ public void findState(){
  * twenty sided dice, and the lower dice loses a troop. 
  *
  * When the while loop exits, whichever owner has zero troops is the loser,
- * and the method returns the winner's owner id and the 
+ * and the method returns the winner's owner id and the number of troops
+ * remaining. 
  *
- *
- *
+ * 
  *
  *
  * @param attacker is the owner of the attacker
@@ -227,21 +219,25 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
 }
 
 /* 
+ * The save state method takes the current ArrayList of territories
+ * and stores it into the game.state format that can be queried and 
+ * read by the front end. 
+ *
+ * It accesses the state collection, creates a new document in the 
+ * form of a BasicDBObject, appends the turn number and gameID and 
+ * then iterates through the territories, storing the data for each 
+ * territory in an ArrayList of BasicDBObjects, and eventually appending
+ * the array list to the original object.
+ *
+ * The document is then added to the appropriate collection.
  * 
  *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- * 
+ * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
+ * be determined.
  */
 
  public void saveState() throws UnknownHostException{
+    // delete first line?
     DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
