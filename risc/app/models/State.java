@@ -13,8 +13,8 @@ import libraries.DBHelper;
 
 /**
  * This class is responsible for computing and updating the state after all
- * the turns are committed. The 
- * 
+ * the turns are committed. The constants listed below are used for accessing
+ * the different things in the database. 
  *
  *
  *
@@ -32,10 +32,6 @@ import libraries.DBHelper;
 public class State{
 
     private static final int NUM_TERRITORIES = 25;
-    private static final String INITIALIZATION_DB = "initialization";
-    private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
-    private static final String GAME_DB = "game";
-    private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
     private static final String PLAYER = "player";
     private static final String ATTACKING = "attacking";
     private static final String TROOPS = "troops";
@@ -72,8 +68,23 @@ public State(String gameID){
  * all the turns have been committed. This method returns void because it saves the state
  * down to the database beore completion.  
  * 
- * This implementation first queries the database for the 
- *
+ * This implementation first queries the database for the instances of committed turn by 
+ * the turn number and gameID. This is done by creating a BasicDBObject with the those
+ * parameters and querying the committedTurns collection in the game database. 
+ * 
+ * An empty territories map is then created so that the correct number of territories are
+ * in the arraylist and can be accessed and updated and will remain in the correct order. 
+ * (territory 0 will be in position 0 etc). 
+ * 
+ * A cursor points to the first document that was returned by the query, and the territories
+ * and attackers that are in each committed turn are updated into the state. The attackers 
+ * are added to an array list within the territory they are attacking. 
+ * 
+ * The attackers that come from the same owner in one attacker are combined into a single 
+ * attacker. Once the state is assembled (the array of territories is created), the state
+ * is calculated and then the state is saved in the database. Those methods are called 
+ * and explained below.
+ * 
  * @param turn_number the number turn the game is on
  * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
  * be determined.
@@ -130,28 +141,63 @@ public void assembleState(int turn_number) throws UnknownHostException{
     return;
 }
 
+/* 
+ * The find state method is where the new state is found after all of the turns
+ * are entered into an array list of territories. The territories are then updated
+ * after each attack takes place. In a for loop for each territory, the defender 
+ * of the battle is set as the owner, and the array list of attackers is assembled.
+ * 
+ * Each attacker individually attacks the defender and if the attacker wins, they
+ * become the defender. The battle method is called to execute the battles. 
+ *
+ * 
+ *
+ *
+ *
+ * 
+ * 
+ */
+
+
 public void findState(){
    for(int i=0; i<territories.size(); i++){
-    System.out.println("we are analyzing territory :" + i);
+    //System.out.println("we are analyzing territory :" + i);
     Territory battlefield = territories.get(i);
     int defender = battlefield.getOwner();
     int defender_troops = battlefield.getDefendingArmy();
-    System.out.println("the defending player is " + defender + " with " + defender_troops + " troops.");
+    //System.out.println("the defending player is " + defender + " with " + defender_troops + " troops.");
     ArrayList<Attacker> attackers = battlefield.getAttackers();
         for(int j=0; j<attackers.size(); j++){
             Attacker attacker = attackers.get(j);
-
-            System.out.println("attacker number " + j + "is " + attacker.getOwner() + " with " + attacker.getStrength() +" troops.");
+            //System.out.println("attacker number " + j + "is " + attacker.getOwner() + " with " + attacker.getStrength() +" troops.");
             int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
             defender = winner[0];
             defender_troops = winner[1];
-            System.out.println("Territory " + i + " was just won by " + defender + " who now has " + defender_troops + " troops.");
+            //System.out.println("Territory " + i + " was just won by " + defender + " who now has " + defender_troops + " troops.");
         }
         battlefield.setOwner(defender);
         battlefield.setDefendingArmy(defender_troops);
     }
 }
-//add in troops size
+
+/* 
+ * Determines the winner of a two person battle. Uses a while loop to
+ * make sure both parties have at least one player and then rolls two
+ * twenty sided dice, and the lower dice loses a troop. 
+ *
+ * When the while loop exits, whichever owner has zero troops is the loser,
+ * and the method returns the winner's owner id and the 
+ *
+ *
+ *
+ *
+ *
+ * @param attacker is the owner of the attacker
+ * @param a_troops is the number of troops the attacker has
+ * @param defender is the owner of the defender
+ * @param d_troops is the number of troops the defender has
+ */
+
 public int[] battle(int attacker, int a_troops, int defender, int d_troops){
     int[] winnerStrength = new int[2];
     while(a_troops > 0 && d_troops > 0){
@@ -159,26 +205,41 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
         double d = Math.random()*19 + 1;
         if(a > d){
             d_troops--;
-            System.out.println("defender " + defender + "lost a troop to " + attacker);
+            //System.out.println("defender " + defender + "lost a troop to " + attacker);
 
         }
         else{
-            System.out.println("the attacker" + attacker + " lost a troop to " + defender);
+            //System.out.println("the attacker" + attacker + " lost a troop to " + defender);
             a_troops--;
         }
     }
     if(a_troops > 0){
         winnerStrength[0] = attacker;
-        System.out.println("the attacker won " + attacker);
+        //System.out.println("the attacker won " + attacker);
         winnerStrength[1] = a_troops;
     }
     else{
         winnerStrength[0] = defender;
-        System.out.println("the defender won " + defender);
+        //System.out.println("the defender won " + defender);
         winnerStrength[1] = d_troops;
     }
     return winnerStrength;
 }
+
+/* 
+ * 
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * 
+ */
 
  public void saveState() throws UnknownHostException{
     DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
