@@ -11,17 +11,17 @@ import models.Troop;
 import controllers.API;
 import libraries.DBHelper;
 
-/* 
+/*
  * The turn model is created every time a POST API call to commitTurn
- * happens. It reads in from the RequestBody, as a JSON obejct, and 
- * parses the data into data structures, validates the turn (not yet), 
+ * happens. It reads in from the RequestBody, as a JSON obejct, and
+ * parses the data into data structures, validates the turn (not yet),
  * checks if its the final turn, and stores the turn to the committedTurns
- * collection in the game database. 
+ * collection in the game database.
  *
- * The private data structures below are used for the entire turn and are 
+ * The private data structures below are used for the entire turn and are
  * edited by all the methods.
  *
- * 
+ *
  */
 
 public class Turn {
@@ -58,23 +58,23 @@ public class Turn {
 
     /* Create turn is called directly from the API call and is responsible
      * for manually parsing the data into the data structures the model
-     * contains. This is necessary for data validation.  
-     * 
-     * Territories are looped through and data is extracted and added to 
+     * contains. This is necessary for data validation.
+     *
+     * Territories are looped through and data is extracted and added to
      * an array list of territories. Each Territory has an ArrayList of attackers
-     * that is updated as well. 
-     * 
+     * that is updated as well.
+     *
      * Other data extracted and stored includes gameID, and playerID.
      *
-     * Create Turn calls committTurn before finishing. 
+     * Create Turn calls committTurn before finishing.
      *
      * @returns int of the turn number that was just committed (for debugging).
      *
-     * @throwsUnknownHostException Thrown to indicate that the IP address of a 
+     * @throwsUnknownHostException Thrown to indicate that the IP address of a
      * host could not be determined.
      *
-     * @param RequestBody is the text that comes from the API POST Call, 
-     * and is treated like a JSON Object for parsing. 
+     * @param RequestBody is the text that comes from the API POST Call,
+     * and is treated like a JSON Object for parsing.
      */
 
     public int createTurn(RequestBody jsonObject) throws UnknownHostException{
@@ -100,7 +100,7 @@ public class Turn {
                     int attacker_number = Integer.parseInt(n.get(TROOPS).toString());
                     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
                     attackers.add(a);
-                    } 
+                    }
                 }
             }
         }
@@ -113,21 +113,21 @@ public class Turn {
 
     /*
      * This is a method called from every committedTurns API call, and it checks after
-     * each turn is committed if that was the final player to commit the turn. 
+     * each turn is committed if that was the final player to commit the turn.
      *
-     * Turns are checked by querying the committedTurns database for the number of 
+     * Turns are checked by querying the committedTurns database for the number of
      * documents with the current game ID and turn ID, and if it is equal to the number
      * of players in the game.
      *
      *
      *
-     * When the method returns true, the state model is instantiated and calculated 
-     * because all of the data is now in the database. 
+     * When the method returns true, the state model is instantiated and calculated
+     * because all of the data is now in the database.
      *
-     * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
+     * @throws UnknownHostException Thrown to indicate that the IP address of a host could not
      * be determined.
-     * 
-     * @return boolean determining if all of the turns have been committed. 
+     *
+     * @return boolean determining if all of the turns have been committed.
      */
 
     public boolean allTurnsCommitted() throws UnknownHostException{
@@ -165,16 +165,16 @@ public class Turn {
 
     /*
      * commitTurn stores the Turn model that has been created down to the database
-     * so it can be accessed by the state later. 
-     * 
-     * commitTurn is called by the createTurn method. In the future it will be called by 
-     * validateTurn, and only if the turn is valid will it be committed. 
+     * so it can be accessed by the state later.
      *
-     * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
+     * commitTurn is called by the createTurn method. In the future it will be called by
+     * validateTurn, and only if the turn is valid will it be committed.
+     *
+     * @throws UnknownHostException Thrown to indicate that the IP address of a host could not
      * be determined.
      *
      * @returns int of the turn number that was committed.
-     * 
+     *
      */
 
     public int commitTurn() throws UnknownHostException{
@@ -182,12 +182,12 @@ public class Turn {
         DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
         BasicDBObject query = new BasicDBObject();
         query.put(GAME_ID, myGameID);
-        DBCursor states = state.find(query);
+        DBCursor states = waitingPlayers.find(query);
         if(!states.hasNext()){
             turn = 1;
         }
         else{
-            DBCursor highestTurn = state.find().sort( new BasicDBObject(TURN, -1));
+            DBCursor highestTurn = waitingPlayers.find().sort( new BasicDBObject(TURN, -1));
             turn = (Integer) highestTurn.next().get(TURN);
             turn ++;
     }
@@ -225,11 +225,11 @@ public class Turn {
     }
 
     /*
-     * Helper method used to return the ID without repeating code in multiple places. 
-     * 
+     * Helper method used to return the ID without repeating code in multiple places.
+     *
      * @param RequestBody is the data from the front end and is treated as a JSON
-     * object that is queried for the Game Id. 
-     * 
+     * object that is queried for the Game Id.
+     *
      * @returns String of the gameId.
      */
 
