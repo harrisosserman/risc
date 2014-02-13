@@ -9,7 +9,7 @@
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")' />
     </head>
     <body>
-        <div class="navbar">
+        <div class="navbar" class="initializationKnockout">
             <div class="navbar-inner">
                 <div class="container">
                     <div class="brand">
@@ -29,18 +29,31 @@
             </div>
         </div>
         <div class="container">
-            <div class="modal" data-bind="visible: displayModal">
+            <div class="modal" data-bind="visible: displayModal" id="playerKnockout">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h4 class="modal-title">Play Risc!</h4>
                   </div>
-                  <div class="modal-body">
-                    <div data-bind="visible: displayGameStart" class="form-inline">
-                        <input type="text" data-bind="value: playerName" placeholder="Player Name"></input>
-                        <button data-bind="click: enterGame">Play</button>
+                  <div class="modal-body loginSignupForm">
+                    <div data-bind="visible: displayGameStart">
+                        <div data-bind="visible: displayLogin" class="control-group">
+                            <input type="text" data-bind="value: username" placeholder="Username"></input>
+                            <input type="password" data-bind="value: password" placeholder="Password"></input>
+                            <label data-bind="visible: loginError" class="alert-error">Your username and password don't match our records.  Please try again</label>
+                            <button data-bind="click: login">Login</button>
+                            <button data-bind="click: showSignup">Sign up</button>
+                        </div>
+                        <div data-bind="visible: displaySignup" class="control-group">
+                            <label data-bind="visible: usernameError" class="alert-error">Another user has that username.  Choose another username</label>
+                            <input type="text" data-bind="event: {change: usernameChanged}, value: username, valueUpdate: 'afterkeydown', css: {inputError: usernameError}" placeholder="Username"></input>
+                            <label data-bind="visible: passwordError" class="alert-error">Your passwords don't match</label>
+                            <input type="password" data-bind="value: password" placeholder="Password"></input>
+                            <input type="password" data-bind="value: passwordCheck" placeholder="Re-enter Password"></input>
+                            <button data-bind="click: createUser">Sign Up</button>
+                        </div>
                     </div>
-                    <div data-bind="visible: displayGameWaitingRoom">
+                    <!-- <div data-bind="visible: displayGameWaitingRoom">
                         <h3>Players in the game are:</h3>
                         <table class="table">
                             <thead>
@@ -59,49 +72,49 @@
                             </tbody>
                         </table>
                         <button data-bind="click: startGame">I'm ready</button>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="modal" data-bind="visible: displayInstructions">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Instructions</h4>
+            <div class="initializationKnockout">
+                <div class="modal" data-bind="visible: displayInstructions">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Instructions</h4>
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-body">
-                        <ol>
-                            <li>Enter your name and press Play</li>
-                            <li>Click 'I'm Ready' when you are ready to play.  For the game to start, there have to be between 2 and 5 players and every player must be ready</li>
-                            <li>Once the game starts:
-                                <ul>
-                                    <li>Click on one of your territories to take an action.  Any surrounding territories that you can attack or move troops to will be highlighted in red or green, respectively</li>
-                                    <li>If you have additional troops that you can place (which will be displayed in the table at the bottom), you can select a territory that you own and press the up and down arrows to add/remove additional troops in that territory</li>
-                                    <li>When you are happy with your turn, click Submit Turn
-                                        <ul>
-                                            <li>
-                                                The map will reload with the result of your turn once all of the other players have finished their turns
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>The game ends when one player owns all the territories</li>
-                        </ol>
-                        <button class="pull-right" data-bind="click: closeInstructions">Close</button>
+                        <div class="modal-body">
+                            <ol>
+                                <li>Enter your name and press Play</li>
+                                <li>Click 'I'm Ready' when you are ready to play.  For the game to start, there have to be between 2 and 5 players and every player must be ready</li>
+                                <li>Once the game starts:
+                                    <ul>
+                                        <li>Click on one of your territories to take an action.  Any surrounding territories that you can attack or move troops to will be highlighted in red or green, respectively</li>
+                                        <li>If you have additional troops that you can place (which will be displayed in the table at the bottom), you can select a territory that you own and press the up and down arrows to add/remove additional troops in that territory</li>
+                                        <li>When you are happy with your turn, click Submit Turn
+                                            <ul>
+                                                <li>
+                                                    The map will reload with the result of your turn once all of the other players have finished their turns
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>The game ends when one player owns all the territories</li>
+                            </ol>
+                            <button class="pull-right" data-bind="click: closeInstructions">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div data-bind="visible: displayMap">
+<!--             <div data-bind="visible: displayMap" class="initializationKnockout">
                 <div class="row-fluid">
                     <table class="table table-bordered">
-                        <tbody id="map">
+                        <tbody id="map"> -->
                             <!-- The table cells are created with JavaScript in the index.js file -->
-                        </tbody>
+<!--                         </tbody>
                     </table>
                 </div>
                 <div class="row-fluid">
@@ -126,14 +139,16 @@
                         </table>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/knockout.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/bootstrap.js")'></script>
-                <script type='text/javascript' src='@routes.Assets.at("javascript/turn.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/turn.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/board.js")'></script>
+        <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha512.js"></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/player.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/initialization.js")'></script>
     </body>
 </html>

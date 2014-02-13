@@ -49,3 +49,11 @@ table > tbody > td{
     padding-top: 20px;
     padding-right: 10px;
 }
+.loginSignupForm > div > div > input {
+    display: block;
+}
+.inputError {
+    color: #b94a48 !important;
+    background-color: #f2dede !important;
+    border-color: #b94a48 !important;
+}
