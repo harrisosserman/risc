@@ -1,79 +1,19 @@
 (function(ko) {
-    function playerViewModel(globals) {
+    function lobbyViewModel(globals) {
         var globalFunctions = globals;
-        var player = this;
-        player.username = ko.observable();
-        player.password = ko.observable();
-        player.passwordCheck = ko.observable();
-        player.displaySignupSigninModal = ko.observable(true);
-        player.displayGameStart = ko.observable(true);
-        player.displayLogin = ko.observable(true);
-        player.displaySignup = ko.observable(false);
-        player.usernameError = ko.observable(false);
-        player.passwordError = ko.observable(false);
-        player.loginError = ko.observable(false);
+        var lobby = this;
+        lobby.displayGameLobby = ko.observable(false);
+        lobby.myGamesList = ko.observableArray();
+        lobby.lobbyGamesList = ko.observableArray();
 
-        player.usernameChanged = function() {
-            $.ajax('/test/player/' + player.username(), {
-                method: 'GET'
-            }).fail(function() {
-                //there is no username in the db with the username the user tried to use
-                player.usernameError(false);
-            }).done(function() {
-                player.usernameError(true);
-            });
-
+        globalFunctions.setDisplayGameLobby = function(input) {
+            lobby.displayGameLobby(input);
         };
 
-        player.login = function() {
-            $.ajax('/test/player/' + player.username() + '/login', {
-                method: 'POST',
-                data: JSON.stringify({
-                    'password': CryptoJS.SHA512(player.password().toString())
-                }),
-                contentType: "application/json"
-            }).done(function(result) {
-                //do something with result
-                player.displaySignupSigninModal(false);
-                player.displayLogin(false);
-                player.loginError(false);
-                globalFunctions.setDisplayGameLobby(true);
-            }).fail(function() {
-                player.loginError(true);
-            });
-        };
-        player.showSignup = function() {
-            player.displaySignup(true);
-            player.displayLogin(false);
-        };
-        player.createUser = function() {
-            if(player.password() !== player.passwordCheck()) {
-                player.passwordError(true);
-                return;
-            }
-            player.passwordError(false);
-
-            $.ajax('/test/player', {
-                method: 'POST',
-                data: JSON.stringify({
-                    'username': player.username(),
-                    'password': CryptoJS.SHA512(player.password().toString())
-                }),
-                contentType: "application/json"
-            }).done(function() {
-                player.displaySignupSigninModal(false);
-                player.displayLogin(false);
-                player.usernameError(false);
-                globalFunctions.setDisplayGameLobby(true);
-                //do a get to the username
-            }).fail(function() {
-                player.usernameError(true);
-            });
-        };
-
-        ko.applyBindings(this, document.getElementById('playerKnockout'));
+        ko.applyBindings(this, document.getElementById('lobbyKnockout'));
     }
-    window.Player = playerViewModel;
+    window.Lobby = lobbyViewModel;
+
 })(window.ko);
 
 

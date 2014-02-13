@@ -29,30 +29,89 @@
             </div>
         </div>
         <div class="container">
-            <div class="modal" data-bind="visible: displayModal" id="playerKnockout">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h4 class="modal-title">Play Risc!</h4>
-                  </div>
-                  <div class="modal-body loginSignupForm">
-                    <div data-bind="visible: displayGameStart">
-                        <div data-bind="visible: displayLogin" class="control-group">
-                            <input type="text" data-bind="value: username" placeholder="Username"></input>
-                            <input type="password" data-bind="value: password" placeholder="Password"></input>
-                            <label data-bind="visible: loginError" class="alert-error">Your username and password don't match our records.  Please try again</label>
-                            <button data-bind="click: login">Login</button>
-                            <button data-bind="click: showSignup">Sign up</button>
+            <div class="modal" data-bind="visible: displaySignupSigninModal" id="playerKnockout">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Play Risc!</h4>
                         </div>
-                        <div data-bind="visible: displaySignup" class="control-group">
-                            <label data-bind="visible: usernameError" class="alert-error">Another user has that username.  Choose another username</label>
-                            <input type="text" data-bind="event: {change: usernameChanged}, value: username, valueUpdate: 'afterkeydown', css: {inputError: usernameError}" placeholder="Username"></input>
-                            <label data-bind="visible: passwordError" class="alert-error">Your passwords don't match</label>
-                            <input type="password" data-bind="value: password" placeholder="Password"></input>
-                            <input type="password" data-bind="value: passwordCheck" placeholder="Re-enter Password"></input>
-                            <button data-bind="click: createUser">Sign Up</button>
+                        <div class="modal-body loginSignupForm">
+                            <div data-bind="visible: displayGameStart">
+                                <div data-bind="visible: displayLogin" class="control-group">
+                                    <input type="text" data-bind="value: username" placeholder="Username"></input>
+                                    <input type="password" data-bind="value: password" placeholder="Password"></input>
+                                    <label data-bind="visible: loginError" class="alert-error">Your username and password don't match our records.  Please try again</label>
+                                    <button data-bind="click: login">Login</button>
+                                    <button data-bind="click: showSignup">Sign up</button>
+                                </div>
+                                <div data-bind="visible: displaySignup" class="control-group">
+                                    <label data-bind="visible: usernameError" class="alert-error">Another user has that username.  Choose another username</label>
+                                    <input type="text" data-bind="event: {change: usernameChanged}, value: username, valueUpdate: 'afterkeydown', css: {inputError: usernameError}" placeholder="Username"></input>
+                                    <label data-bind="visible: passwordError" class="alert-error">Your passwords don't match</label>
+                                    <input type="password" data-bind="value: password" placeholder="Password"></input>
+                                    <input type="password" data-bind="value: passwordCheck" placeholder="Re-enter Password"></input>
+                                    <button data-bind="click: createUser">Sign Up</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="modal" data-bind="visible: displayGameLobby" id="lobbyKnockout">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Play Risc!</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="control-group">
+                                <!-- MY GAMES -->
+                                <h4 class="centerAlign">My Games</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Number of Players</th>
+                                            <th>Game State</th>
+                                            <th>Join Game</th>
+                                        </tr>
+                                        <tbody data-bind="foreach: myGamesList">
+                                            <tr>
+                                                <td data-bind="text: numberPlayers"></td>
+                                                <td data-bind="text: state"></td>
+                                                <td><button data-bind="click: enterGame">Join</button></td>
+                                            </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="control-group">
+                                <!-- LOBBY GAMES -->
+                                <h4 class="centerAlign">Games In Lobby</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Number of Players</th>
+                                            <th>Game State</th>
+                                            <th>Join Game</th>
+                                        </tr>
+                                        <tbody data-bind="foreach: lobbyGamesList">
+                                            <tr>
+                                                <td data-bind="text: numberPlayers"></td>
+                                                <td data-bind="text: state"></td>
+                                                <td><button data-bind="click: enterGame">Join</button></td>
+                                            </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="control-group">
+                                <h4 class="centerAlign">Start New Game</h4>
+                                <!-- START A NEW GAME -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
                     <!-- <div data-bind="visible: displayGameWaitingRoom">
                         <h3>Players in the game are:</h3>
                         <table class="table">
@@ -149,6 +208,7 @@
         <script type='text/javascript' src='@routes.Assets.at("javascript/board.js")'></script>
         <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha512.js"></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/player.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/lobby.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/initialization.js")'></script>
     </body>
 </html>

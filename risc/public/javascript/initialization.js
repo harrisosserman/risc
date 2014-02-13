@@ -82,6 +82,7 @@
         });
 
         new Player(globalFunctions);
+        new Lobby(globalFunctions);
     }
     $('.initializationKnockout').each(function() {
         ko.applyBindings(new initializationViewModel(), $(this).get(0));
