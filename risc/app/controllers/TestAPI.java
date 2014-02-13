@@ -16,7 +16,7 @@ public class TestAPI extends Controller {
     public static Result getTestUsername(String username) {
         //if username is in database, return successful.  otherwise, return failure
         if(username.compareTo("asdf") == 0) {
-            return ok()
+            return ok();
         }
         return badRequest();
     }
@@ -33,9 +33,6 @@ public class TestAPI extends Controller {
         return ok(result.toString());
     }
     public static Result createTestPlayer() {
-        if(username.compareTo("asdf") == 0) {
-            return badRequest();
-        }
         return ok();
     }
     public static Result createTestGame() {

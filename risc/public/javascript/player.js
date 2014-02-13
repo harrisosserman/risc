@@ -13,24 +13,21 @@
         player.loginError = ko.observable(false);
 
         player.usernameChanged = function() {
-            player.usernameError(true);
-            $.ajax('/player/' + player.username(), {
+            $.ajax('/test/player/' + player.username(), {
                 method: 'GET'
             }).fail(function() {
-                player.usernameError(true);
-            }).done(function() {
+                //there is no username in the db with the username the user tried to use
                 player.usernameError(false);
+            }).done(function() {
+                player.usernameError(true);
             });
 
         };
 
         player.login = function() {
-            player.loginError(true);
-
-            $.ajax('/player/' + player.username() + '/login', {
+            $.ajax('/test/player/' + player.username() + '/login', {
                 method: 'POST',
                 data: JSON.stringify({
-                    'username': player.username(),
                     'password': CryptoJS.SHA512(player.password().toString())
                 }),
                 contentType: "application/json"
@@ -38,6 +35,9 @@
                 //do something with result
                 player.displayModal(false);
                 player.displayLogin(false);
+                player.loginError(false);
+            }).fail(function() {
+                player.loginError(true);
             });
         };
         player.showSignup = function() {
@@ -51,13 +51,20 @@
             }
             player.passwordError(false);
 
-            $.ajax('/player', {
+            $.ajax('/test/player', {
                 method: 'POST',
                 data: JSON.stringify({
                     'username': player.username(),
                     'password': CryptoJS.SHA512(player.password().toString())
                 }),
                 contentType: "application/json"
+            }).done(function() {
+                player.displayModal(false);
+                player.displayLogin(false);
+                player.usernameError(false);
+                //do a get to the username
+            }).fail(function() {
+                player.usernameError(true);
             });
         };
     }
