@@ -12,6 +12,32 @@ public class TestAPI extends Controller {
     public static int testCounterInGetTestGame = 0;
     public static int testCounterInGetTestMap = 0;
     public static String isHarrisReady = "false";
+
+    public static Result getTestUsername(String username) {
+        //if username is in database, return successful.  otherwise, return failure
+        if(username.compareTo("asdf") == 0) {
+            return ok()
+        }
+        return badRequest();
+    }
+    public static Result loginTest(String username) {
+        if(username.compareTo("asdf") == 0) {
+            return badRequest();
+        }
+        JSONObject result = new JSONObject();
+        result.put("username", "harris").put("password", "28394u298urwhiurwehaiufdsh");
+        JSONArray arr = new JSONArray();
+        arr.put(new JSONObject().put("game", "asdfjaslfdsa"));
+        arr.put(new JSONObject().put("game", "fdsafsadfsadsf"));
+        result.put("game", arr);
+        return ok(result.toString());
+    }
+    public static Result createTestPlayer() {
+        if(username.compareTo("asdf") == 0) {
+            return badRequest();
+        }
+        return ok();
+    }
     public static Result createTestGame() {
         JSONObject result = new JSONObject();
         result.put("gameID", "3938383");
