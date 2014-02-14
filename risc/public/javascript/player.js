@@ -13,6 +13,9 @@
         player.passwordError = ko.observable(false);
         player.loginError = ko.observable(false);
 
+        globalFunctions.getUsername = function() {
+            return player.username();
+        };
         player.usernameChanged = function() {
             $.ajax('/test/player/' + player.username(), {
                 method: 'GET'

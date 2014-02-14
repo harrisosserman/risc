@@ -3,11 +3,11 @@
     "state": 0,   <!--THIS STATE VALUE WILL BE 0=NOT STARTED, 1=GAME STARTED, 2=GAME DONE -->
     "players": [
         {
-            "player": "[PLAYER ID]",
+            "player": "[USERNAME]",
             "ready": true
         },
         {
-            "player": "[PLAYER ID]",
+            "player": "[USERNAME]",
             "ready": false
         }
     ]

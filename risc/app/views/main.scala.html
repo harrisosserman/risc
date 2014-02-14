@@ -70,15 +70,15 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Number of Players</th>
+                                            <th>Players</th>
                                             <th>Game State</th>
                                             <th>Join Game</th>
                                         </tr>
                                         <tbody data-bind="foreach: myGamesList">
                                             <tr>
-                                                <td data-bind="text: numberPlayers"></td>
+                                                <td data-bind="text: players"></td>
                                                 <td data-bind="text: state"></td>
-                                                <td><button data-bind="click: enterGame">Join</button></td>
+                                                <td><button data-bind="click: $parent.enterGame">Join</button></td>
                                             </tr>
                                     </thead>
                                 </table>
@@ -89,15 +89,15 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Number of Players</th>
+                                            <th>Players</th>
                                             <th>Game State</th>
                                             <th>Join Game</th>
                                         </tr>
                                         <tbody data-bind="foreach: lobbyGamesList">
                                             <tr>
-                                                <td data-bind="text: numberPlayers"></td>
+                                                <td data-bind="text: players"></td>
                                                 <td data-bind="text: state"></td>
-                                                <td><button data-bind="click: enterGame">Join</button></td>
+                                                <td><button data-bind="click: $parent.enterGame">Join</button></td>
                                             </tr>
                                     </thead>
                                 </table>
