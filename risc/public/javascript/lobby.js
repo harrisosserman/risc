@@ -5,6 +5,7 @@
         lobby.displayGameLobby = ko.observable(false);
         lobby.myGamesList = ko.observableArray();
         lobby.lobbyGamesList = ko.observableArray();
+        lobby.gameID = -1;
 
         globalFunctions.setDisplayGameLobby = function(input) {
             lobby.displayGameLobby(input);
@@ -23,6 +24,18 @@
         lobby.enterGame = function() {
 
         };
+        lobby.createNewGame = function() {
+            $.ajax('/test/game', {
+                method: 'POST',
+                data: JSON.stringify({
+                    'username': globalFunctions.getUsername()
+                }),
+                contentType: "application/json"
+            }).done(function(data) {
+                data = $.parseJSON(data);
+                lobby.gameID = data.gameID;
+            });
+        };
         lobby.loadMyGames = function() {
             $.ajax('/test/player/' + globalFunctions.getUsername(), {
                 method: 'GET'
@@ -32,12 +45,15 @@
                 for(var k=0; k<result.games.length; k++) {
                     $.ajax('/test/game/' + result.games[k].game, {
                         method: 'GET'
-                    }).done(function(gameResult) {
-                        gameResult = $.parseJSON(gameResult);
-                        lobby.loadGamesHelper(lobby.myGamesList, gameResult);
+                    }).done(function(data) {
+                        lobby.loadMyGamesInnerFunc(data);
                     });
                 }
             });
+        };
+        lobby.loadMyGamesInnerFunc = function(data) {
+            data = $.parseJSON(data);
+            lobby.loadGamesHelper(lobby.myGamesList, data);
         };
         lobby.loadAllGames = function() {
             $.ajax('/test/game', {

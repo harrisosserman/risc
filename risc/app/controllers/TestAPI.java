@@ -47,7 +47,6 @@ public class TestAPI extends Controller {
     public static Result createTestGame() {
         JSONObject result = new JSONObject();
         result.put("gameID", "3938383");
-        result.put("playerId", 1);
         return ok(result.toString());
     }
 
