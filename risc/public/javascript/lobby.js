@@ -16,6 +16,10 @@
             lobby.loadMyGames();
             lobby.loadAllGames();
         };
+        globalFunctions.getGameID = function() {
+            return lobby.gameID;
+        };
+
         lobby.getGameState = function(state) {
             if(state === 0) {
                 return "waiting to start";
@@ -127,6 +131,7 @@
                     lobby.displayGameLobby(false);
                     // initialization.displayMap(true);
                     new Board(globalFunctions);
+                    globalFunctions.createMap();
                 } else {
                     setTimeout(lobby.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                 }
@@ -141,8 +146,12 @@
                         var allPlayersReady = true;
                         var k=0;
                         lobby.createPlayerList(players.players);
+                        globalFunctions.setPlayerNumber(-1);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === false) allPlayersReady = false;
+                            if(players.players[k] === globalFunctions.getUsername()) {
+                                globalFunctions.setPlayerNumber(k + 1);
+                            }
                         }
                         if(allPlayersReady === true && k > 1) {
                             //Can start the game if everyone is ready and there are at least 2 players

@@ -12,9 +12,16 @@
         player.usernameError = ko.observable(false);
         player.passwordError = ko.observable(false);
         player.loginError = ko.observable(false);
+        player.playerNumber = -1;
 
         globalFunctions.getUsername = function() {
             return player.username();
+        };
+        globalFunctions.setPlayerNumber = function(number) {
+            player.playerNumber = number;
+        };
+        globalFunctions.getPlayerNumber = function() {
+            return player.playerNumber;
         };
         player.usernameChanged = function() {
             $.ajax('/test/player/' + player.username(), {

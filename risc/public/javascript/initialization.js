@@ -18,19 +18,6 @@
             initialization.playerList.remove(playerObject);
             initialization.playerList.splice(playerNumber - 1, 0, newPlayerObject);
         };
-        globalFunctions.createMap = function() {
-                //function to build map out of table
-                var map = $("#map");
-                var count = 1;
-                for(var k=0; k<5; k++) {
-                    map.append("<tr>");
-                    for(var m=0; m<5; m++) {
-                        map.append("<td>" + count + "</td>");
-                        count++;
-                    }
-                    map.append("</tr>");
-                }
-        };
         /*          END GLOBAL FUNCTIONS                    */
 
 
@@ -43,7 +30,6 @@
         initialization.closeInstructions = function() {
             initialization.displayInstructions(false);
         };
-        globalFunctions.createMap();
 
 
         //code to listen for user trying to exit or refresh page

@@ -153,7 +153,7 @@ public class TestAPI extends Controller {
     //     return ok(result.toString());
     // }
 
-    public static Result getTestMap(Long id) {
+    public static Result getTestMap(String id) {
         JSONObject result = new JSONObject();
         result.put("gameID", "3938383");
         result.put("numPlayers", 3);
@@ -192,7 +192,11 @@ public class TestAPI extends Controller {
         return ok(result.toString());
     }
 
-    public static Result commitTestTurn(Long id) {
+    public static Result getTestMapReady(String id) {
+        return getTestMap(id);
+    }
+
+    public static Result commitTestTurn(String id) {
         return ok();
     }
 
@@ -232,7 +236,7 @@ public class TestAPI extends Controller {
         return ok(result.toString());
     }
 
-    public static Result getTestMapPolling(Long id) {
+    public static Result getTestMapPolling(String id) {
         testCounterInGetTestMap++;
         if(testCounterInGetTestMap > 10) {
             return playerWinsMap();
