@@ -1,16 +1,26 @@
 {
-    "gameID": 2,
+    "gameID": "asdfasfdadf",
     "numPlayers": 5,
-    "turn": 2,
+    "turn": 4
     "territories": [
-            {
-                "position": 4,
-                "owner": 2,
-                "troops": 5
-            }
-        ]
-    }
-
-    ]
-
+                {
+                    "owner": "playerID",
+                    "infantry": 5,
+                    "auto": 6,
+                    ...
+                }
+    ],
+    "playerInfo": [   <-- NOTE, THIS IS USED AT GAME START, AT THE END OF A ROUND, ETC FOR NEW TROOPS
+        {
+            "owner": "playerID",
+            "level": 6,
+            "food": 5,
+            "technology": 10
+        },
+        {
+            "owner": "playerID",
+            "level": 6,
+            "food": 5,
+            "technology": 10
+        }
 }

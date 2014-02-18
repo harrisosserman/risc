@@ -61,8 +61,8 @@ public class Turn {
                     JsonNode n = attackerData.next();
                     int attacker_territory = Integer.parseInt(n.get(TERRITORY).toString());
                     int attacker_number = Integer.parseInt(n.get(TROOPS).toString());
-                    Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
-                    attackers.add(a);
+                  //  Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
+                    //attackers.add(a);
                 }    
             }
         }

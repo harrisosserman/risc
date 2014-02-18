@@ -76,9 +76,9 @@ public void assembleState() throws UnknownHostException{
             for(BasicDBObject attack : attackerArray){
                 int attacker_territory = Integer.parseInt(attack.get(TERRITORY).toString());
                 int attacker_number = Integer.parseInt(attack.get(TROOPS).toString());
-                Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
-                territories.get(attacker_territory).addAttacker(a);
-                System.out.println("the owner of the attacker is " + a.getOwner());
+           //     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
+           //     territories.get(attacker_territory).addAttacker(a);
+         //       System.out.println("the owner of the attacker is " + a.getOwner());
             }     
         }
     }  
@@ -95,42 +95,74 @@ public void findState(){
     ArrayList<Attacker> attackers = battlefield.getAttackers();
         for(int j=0; j<attackers.size(); j++){
             Attacker attacker = attackers.get(j);
-            int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
-            defender = winner[0];
-            defender_troops = winner[1];
+//            int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
+  //          defender = winner[0];
+    //        defender_troops = winner[1];
         }
         battlefield.setOwner(defender);
         battlefield.setDefendingArmy(defender_troops);
     } 
 }
-//add in troops size
-public int[] battle(int attacker, int a_troops, int defender, int d_troops){
-    int[] winnerStrength = new int[2];
-    while(a_troops > 0 && d_troops > 0){
-        double a = Math.random()*19 + 1;
-        double d = Math.random()*19 + 1;
-        if(a > d){
-            d_troops--;
-            System.out.println("defender lost a troop ");
 
+
+//add in troops size
+public Army battle(ArrayList<Army> attackers, Army defender){
+    Collections.shuffle(attackers);
+    while(attackers.size()>0){
+        for(int i=attackers.size(); i>0; i--){
+            Army attacker = attackers.get(i);
+            Troop battler_1 = defender.getStrongest();
+            Troop battler_2 = attacker.getWeakest();
+            if(battler_1.battle() > battler_2.battle()){
+                defender.deleteTroop(battler_1.getType());
+                if(defender.getSize()==0){
+                    defender = attacker;
+                    attackers.remove(i);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+
+                }
+            }
+            else{
+                attacker.deleteTroop(battler_2.getType());
+                if(attacker.getSize()==0){
+                    attackers.remove(i);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+                } 
+            }
         }
-        else{
-            System.out.println("the attacker lost a troop");
-            a_troops--;
+        for(int j=attackers.size(); j>0; j--){
+            Army attacker = attackers.get(j);
+            Troop battler_1 = defender.getWeakest();
+            Troop battler_2 = attacker.getStrongest();
+            if(battler_1.battle() > battler_2.battle()){
+                defender.deleteTroop(battler_1.getType());
+                if(defender.getSize()==0){
+                    defender = attacker;
+                    attackers.remove(j);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+
+                }                
+            }
+            else{
+                attacker.deleteTroop(battler_2.getType());
+                if(attacker.getSize()==0){
+                    attackers.remove(j);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+                } 
+            }
         }
-    }   
-    if(a_troops > 0){
-        winnerStrength[0] = attacker;
-        System.out.println("the attacker won " + attacker);
-        winnerStrength[1] = a_troops;
     }
-    else{
-        winnerStrength[0] = defender;
-        System.out.println("the defender won " + defender);
-        winnerStrength[1] = d_troops;
-    }
-    return winnerStrength;
+
 }
+
 
  public void saveState() throws UnknownHostException{
     MongoConnection connection = new MongoConnection();

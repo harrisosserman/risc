@@ -5,12 +5,12 @@ import java.util.*;
 
 public class Attacker{
 
-	private int myOwner;
-	private int myStrength;
+	private Player myOwner;
+	private Army myStrength;
 	private int myLocation;
 	private int myHome;
 
-	public Attacker(int owner, int size, int territory, int home){
+	public Attacker(Player owner, Army size, int territory, int home){
 		myStrength = size;
 		myOwner = owner; 
 		myHome = home;
@@ -25,19 +25,19 @@ public class Attacker{
 		return myLocation;
 	}
 
-	public int getStrength(){
+	public Army getStrength(){
 		return myStrength;
 	}
 
-	public void setStrength(int size){
+	public void setStrength(Army size){
 		myStrength = size;
 	}
 
-	public void setOwner(int owner){
+	public void setOwner(Player owner){
 		myOwner = owner;
 	}
 
-	public int getOwner(){
+	public Player getOwner(){
 		return myOwner;
 	}
 
@@ -50,4 +50,4 @@ public class Attacker{
 		return myHome;
 	}
 
-}
+	}
