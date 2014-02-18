@@ -6,6 +6,7 @@
         initialization.playerList = ko.observableArray([]);
         initialization.playerList.additionalTroops = ko.observable();
         initialization.displayInstructions = ko.observable(false);
+        initialization.displaySubmitTurn = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
             var playerObject = initialization.playerList()[playerNumber - 1];
@@ -17,6 +18,9 @@
             };
             initialization.playerList.remove(playerObject);
             initialization.playerList.splice(playerNumber - 1, 0, newPlayerObject);
+        };
+        globalFunctions.setDisplaySubmitTurn = function(input) {
+            initialization.displaySubmitTurn(input);
         };
         /*          END GLOBAL FUNCTIONS                    */
 
@@ -53,6 +57,7 @@
 
         new Player(globalFunctions);
         new Lobby(globalFunctions);
+        new Board(globalFunctions);
     }
     $('.initializationKnockout').each(function() {
         ko.applyBindings(new initializationViewModel(), $(this).get(0));

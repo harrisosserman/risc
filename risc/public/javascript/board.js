@@ -2,7 +2,7 @@
 (function(ko) {
     function boardViewModel(globals) {
         var globalFunctions = globals;
-        var board = {};
+        var board = this;
         board.territoryInfo = {};
         board.territoryOwner = [];
         board.territoryDOMElements = [];
@@ -10,9 +10,12 @@
         board.attackingTroops = [];
         board.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
         board.additionalTroops = [];
+        board.displayMap = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
-        globalFunctions.createMap = function() {
+        board.createMap = function() {
             //function to build map out of table
+            board.displayMap(true);
+            globalFunctions.setDisplaySubmitTurn(true);
             var map = $("#map");
             var count = 1;
             for(var k=0; k<5; k++) {
@@ -24,7 +27,11 @@
                 map.append("</tr>");
             }
         };
-
+        globalFunctions.createAndLoadMap = function() {
+            board.createMap();
+            globalFunctions.getMap();
+            board.playerWatching();
+        };
         globalFunctions.getTerritoryOwner = function() {
             return board.territoryOwner;
         };
@@ -33,6 +40,9 @@
         };
         globalFunctions.getAttackingTroops = function() {
             return board.attackingTroops;
+        };
+        globalFunctions.setDisplayMap = function(input) {
+            board.displayMap(input);
         };
         /*          END GLOBAL FUNCTIONS                    */
         globalFunctions.getMap = function(mapReady) {
@@ -351,7 +361,7 @@
             board.troops = [];
             board.attackingTroops = [];
             $("#map").empty();
-            globalFunctions.createMap();
+            board.createMap();
             var callMapReady = true;
             globalFunctions.getMap(callMapReady);
         };
@@ -369,12 +379,8 @@
             });
             setTimeout(board.playerWatching, 10000);
         };
-        globalFunctions.getMap();
-        board.playerWatching();
 
-        // $('.boardKnockout').each(function() {
-        //     ko.applyBindings(new boardViewModel(), $(this).get(0));
-        // });
+        ko.applyBindings(this, document.getElementById('boardKnockout'));
     }
     window.Board = boardViewModel;
 })(window.ko);

@@ -130,8 +130,7 @@
                 if(allPlayersReady === true) {
                     lobby.displayGameLobby(false);
                     // initialization.displayMap(true);
-                    new Board(globalFunctions);
-                    globalFunctions.createMap();
+                    globalFunctions.createAndLoadMap();
                 } else {
                     setTimeout(lobby.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                 }
@@ -149,7 +148,7 @@
                         globalFunctions.setPlayerNumber(-1);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === false) allPlayersReady = false;
-                            if(players.players[k] === globalFunctions.getUsername()) {
+                            if(players.players[k].name === globalFunctions.getUsername()) {
                                 globalFunctions.setPlayerNumber(k + 1);
                             }
                         }
