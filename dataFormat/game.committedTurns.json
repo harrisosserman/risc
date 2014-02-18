@@ -1,33 +1,66 @@
 {
-    "gameID": 2,
-    "player": 1,
-    "turn": 1,
+    "gameID": "gameID",
+    "username": "playerID",
+//    "turn": 1,
+    "food": 100,
+    "technology":100,
+    "technology_level": 1,
     "territories": [
         {
             "position" :1,
-            "troops": 5,
+            "INFANTRY": 4,
+            "AUTOMATIC": 2,
+            "ROCKETS": 1,
+            "TANKS": 4,
+            "IMPROVEDTANKS": 3,
+            "PLANES": 3,
             "attacking": [
                 {
                     "territory": 2,
-                    "troops": 4
+                    "INFANTRY": 4,
+                    "AUTOMATIC": 2,
+                    "ROCKETS": 1,
+                    "TANKS": 4,
+                    "IMPROVEDTANKS": 3,
+                    "PLANES": 3,
                 },
                 {
                     "territory": 5,
-                    "troops": 1
+                    "INFANTRY": 4,
+                    "AUTOMATIC": 2,
+                    "ROCKETS": 1,
+                    "TANKS": 4,
+                    "IMPROVEDTANKS": 3,
+                    "PLANES": 3,
                 }
             ]   
         },
         {
             "position" :2,
-            "troops": 10,
+            "INFANTRY": 4,
+            "AUTOMATIC": 2,
+            "ROCKETS": 1,
+            "TANKS": 4,
+            "IMPROVEDTANKS": 3,
+            "PLANES": 3,
             "attacking": [
                 {
                     "territory": 4,
-                    "troops": 5
+                    "INFANTRY": 4,
+                    "AUTOMATIC": 2,
+                    "ROCKETS": 1,
+                    "TANKS": 4,
+                    "IMPROVEDTANKS": 3,
+                    "PLANES": 3,
                 },
                 {
                     "territory": 1,
-                    "troops": 3
+                    "INFANTRY": 4,
+                    "AUTOMATIC": 2,
+                    "ROCKETS": 1,
+                    "TANKS": 4,
+                    "IMPROVEDTANKS": 3,
+                    "PLANES": 3,
                 }
             ]   
         }

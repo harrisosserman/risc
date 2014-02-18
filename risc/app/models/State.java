@@ -113,7 +113,17 @@ public Army battle(ArrayList<Army> attackers, Army defender){
             Army attacker = attackers.get(i);
             Troop battler_1 = defender.getStrongest();
             Troop battler_2 = attacker.getWeakest();
-            if(battler_1.battle() > battler_2.battle()){
+            double batt_1 = battler_1.battle();
+            double batt_2 = battler_2.battle();
+            if(batt_1 == batt_2){
+                if(battler_1.getStrength() >= battler_2.getStrength){
+                    batt_1++;
+                }
+                else{
+                    batt_2++;
+                }
+            }
+            if(batt_1 < batt_2){
                 defender.deleteTroop(battler_1.getType());
                 if(defender.getSize()==0){
                     defender = attacker;
@@ -138,7 +148,10 @@ public Army battle(ArrayList<Army> attackers, Army defender){
             Army attacker = attackers.get(j);
             Troop battler_1 = defender.getWeakest();
             Troop battler_2 = attacker.getStrongest();
-            if(battler_1.battle() > battler_2.battle()){
+            double batt_1 = battler_1.battle();
+            double batt_2 = battler_2.battle();
+
+            if(battler_1.battle() < battler_2.battle()){
                 defender.deleteTroop(battler_1.getType());
                 if(defender.getSize()==0){
                     defender = attacker;
