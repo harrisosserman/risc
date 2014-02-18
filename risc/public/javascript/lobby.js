@@ -3,9 +3,13 @@
         var globalFunctions = globals;
         var lobby = this;
         lobby.displayGameLobby = ko.observable(false);
+        lobby.displayJoinOrCreateGame = ko.observable(true);
+        lobby.displayGameWaitingRoom = ko.observable(false);
         lobby.myGamesList = ko.observableArray();
         lobby.lobbyGamesList = ko.observableArray();
+        lobby.playerList = ko.observableArray();
         lobby.gameID = -1;
+        lobby.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
 
         globalFunctions.setDisplayGameLobby = function(input) {
             lobby.displayGameLobby(input);
@@ -21,7 +25,22 @@
             }
             return "game over";
         };
-        lobby.enterGame = function() {
+        lobby.enterGame = function(data) {
+            lobby.gameID = data.gameID;
+            if(data.state === 0) {
+                //game hasn't started yet
+                lobby.displayJoinOrCreateGame(false);
+                lobby.displayGameWaitingRoom(true);
+                lobby.pollGameWaitingRoom();
+            } else if(data.state === 1) {
+                //game is in progress
+
+            } else {
+                //game is over
+
+            }
+        };
+        lobby.startGame = function() {
 
         };
         lobby.createNewGame = function() {
@@ -67,50 +86,71 @@
             });
         };
         lobby.loadGamesHelper = function(dataStructure, game) {
-                    var gameID = game.gameID;
-                    var playerNames = "";
-                    for(var m=0; m<game.players.length; m++) {
-                        playerNames = playerNames + game.players[m].player;
-                        if(m < (game.players.length - 1)) {
-                            playerNames = playerNames + ", ";
-                        }
-                    }
-                    var gameState = lobby.getGameState(game.state);
-                    dataStructure.push({
-                        players: playerNames,
-                        state: gameState
-                    });
+            var gameID = game.gameID;
+            var playerNames = "";
+            for(var m=0; m<game.players.length; m++) {
+                playerNames = playerNames + game.players[m].name;
+                if(m < (game.players.length - 1)) {
+                    playerNames = playerNames + ", ";
+                }
+            }
+            var gameState = lobby.getGameState(game.state);
+            dataStructure.push({
+                players: playerNames,
+                stateDescription: gameState,
+                state: game.state,
+                gameID: gameID
+            });
 
         };
-
+        lobby.createPlayerList = function(data) {
+            for(var k = 0; k<data.length; k++) {
+                lobby.playerList.push({
+                    'name': data[k].name,
+                    'ready': data[k].ready,
+                    'color': lobby.colorList[k],
+                    'additionalTroops': 0
+                });
+            }
+        };
+        lobby.pollGameWaitingRoom = function() {
+            var deferred = $.Deferred();
+            var result = lobby.loadWaitingPlayers(deferred);
+            deferred.done(function(allPlayersReady) {
+                if(allPlayersReady === true) {
+                    lobby.displayGameLobby(false);
+                    // initialization.displayMap(true);
+                    new Board(globalFunctions);
+                } else {
+                    setTimeout(lobby.pollGameWaitingRoom, 1000); //wait 1 second before polling again
+                }
+            });
+        };
+        lobby.loadWaitingPlayers = function(deferredObject) {
+           $.ajax('/test/game/' + lobby.gameID, {
+                        method: 'GET',
+                    }).done(function(result) {
+                        var players = $.parseJSON(result);
+                        lobby.playerList.removeAll();
+                        var allPlayersReady = true;
+                        var k=0;
+                        lobby.createPlayerList(players.players);
+                        for(k=0; k<players.players.length; k++) {
+                            if(players.players[k].ready === false) allPlayersReady = false;
+                        }
+                        if(allPlayersReady === true && k > 1) {
+                            //Can start the game if everyone is ready and there are at least 2 players
+                            deferredObject.resolve(true);
+                        } else {
+                            deferredObject.resolve(false);
+                        }
+                    });
+        };
         ko.applyBindings(this, document.getElementById('lobbyKnockout'));
     }
     window.Lobby = lobbyViewModel;
 
 })(window.ko);
-
-
-
-        // initialization.loadWaitingPlayers = function(deferredObject) {
-        //     $.ajax('/game/' + initialization.gameID, {
-        //                 method: 'GET',
-        //             }).done(function(result) {
-        //                 var players = $.parseJSON(result);
-        //                 initialization.playerList.removeAll();
-        //                 var allPlayersReady = true;
-        //                 var k=0;
-        //                 initialization.createPlayerList(players.players);
-        //                 for(k=0; k<players.players.length; k++) {
-        //                     if(players.players[k].ready === false) allPlayersReady = false;
-        //                 }
-        //                 if(allPlayersReady === true && k > 1) {
-        //                     //Can start the game if everyone is ready and there are at least 2 players
-        //                     deferredObject.resolve(true);
-        //                 } else {
-        //                     deferredObject.resolve(false);
-        //                 }
-        //             });
-        // };
 
 
 

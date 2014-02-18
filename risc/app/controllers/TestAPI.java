@@ -56,8 +56,8 @@ public class TestAPI extends Controller {
         result.put("gameID", "asdfadsfas");
         result.put("state", 0);
         JSONArray list = new JSONArray();
-        list.put(new JSONObject().put("player", "billybob").put("ready", false));
-        list.put(new JSONObject().put("player", "juliant").put("ready", true));
+        list.put(new JSONObject().put("name", "billybob").put("ready", false));
+        list.put(new JSONObject().put("name", "juliant").put("ready", true));
         result.put("players", list);
         returnList.put(result);
 
@@ -65,8 +65,8 @@ public class TestAPI extends Controller {
         result.put("gameID", "asdfasfas");
         result.put("state", 0);
         list = new JSONArray();
-        list.put(new JSONObject().put("player", "kkrieger").put("ready", false));
-        list.put(new JSONObject().put("player", "rickybobby").put("ready", true));
+        list.put(new JSONObject().put("name", "kkrieger").put("ready", false));
+        list.put(new JSONObject().put("name", "rickybobby").put("ready", true));
         result.put("players", list);
         returnList.put(result);
 
@@ -79,8 +79,8 @@ public class TestAPI extends Controller {
             result.put("gameID", "asdfadsfas");
             result.put("state", 1);
             JSONArray list = new JSONArray();
-            list.put(new JSONObject().put("player", "harriso").put("ready", false));
-            list.put(new JSONObject().put("player", "juliant").put("ready", true));
+            list.put(new JSONObject().put("name", "harriso").put("ready", false));
+            list.put(new JSONObject().put("name", "juliant").put("ready", true));
             result.put("players", list);
             return ok(result.toString());
         }
@@ -88,10 +88,10 @@ public class TestAPI extends Controller {
         result.put("gameID", "asdfasfasasdf");
         result.put("state", 0);
         JSONArray list = new JSONArray();
-        list.put(new JSONObject().put("player", "harriso").put("ready", false));
-        list.put(new JSONObject().put("player", "rickybobby").put("ready", true));
-        list.put(new JSONObject().put("player", "magicman").put("ready", false));
-        list.put(new JSONObject().put("player", "bladesofglory").put("ready", true));
+        list.put(new JSONObject().put("name", "harriso").put("ready", false));
+        list.put(new JSONObject().put("name", "rickybobby").put("ready", true));
+        list.put(new JSONObject().put("name", "magicman").put("ready", false));
+        list.put(new JSONObject().put("name", "bladesofglory").put("ready", true));
         result.put("players", list);
         return ok(result.toString());
     }

@@ -63,7 +63,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title">Play Risc!</h4>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" data-bind="visible: displayJoinOrCreateGame">
                             <div class="control-group">
                                 <!-- MY GAMES -->
                                 <h4 class="centerAlign">My Games</h4>
@@ -77,7 +77,7 @@
                                         <tbody data-bind="foreach: myGamesList">
                                             <tr>
                                                 <td data-bind="text: players"></td>
-                                                <td data-bind="text: state"></td>
+                                                <td data-bind="text: stateDescription"></td>
                                                 <td><button data-bind="click: $parent.enterGame">Join</button></td>
                                             </tr>
                                     </thead>
@@ -96,7 +96,7 @@
                                         <tbody data-bind="foreach: lobbyGamesList">
                                             <tr>
                                                 <td data-bind="text: players"></td>
-                                                <td data-bind="text: state"></td>
+                                                <td data-bind="text: stateDescription"></td>
                                                 <td><button data-bind="click: $parent.enterGame">Join</button></td>
                                             </tr>
                                     </thead>
@@ -110,35 +110,34 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="modal-body" data-bind="visible: displayGameWaitingRoom">
+                            <h3>Players in the game are:</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td><strong>Player Name</strong></td>
+                                        <td><strong>Is Ready?</strong></td>
+                                </thead>
+                                <tbody data-bind="foreach: playerList">
+                                    <tr>
+                                        <td>
+                                            <span data-bind="text: ($index() + 1)"></span>:
+                                            <span data-bind="text: name"></span>
+                                        </td>
+                                        <td data-bind="text: ready"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button data-bind="click: startGame">I'm ready</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
 
                     <!-- <div data-bind="visible: displayGameWaitingRoom">
-                        <h3>Players in the game are:</h3>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <td><strong>Player Name</strong></td>
-                                    <td><strong>Is Ready?</strong></td>
-                            </thead>
-                            <tbody data-bind="foreach: playerList">
-                                <tr>
-                                    <td>
-                                        <span data-bind="text: ($index() + 1)"></span>:
-                                        <span data-bind="text: name"></span>
-                                    </td>
-                                    <td data-bind="text: ready"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <button data-bind="click: startGame">I'm ready</button>
+
                     </div> -->
-                  </div>
-                </div>
-              </div>
-            </div>
             <div class="initializationKnockout">
                 <div class="modal" data-bind="visible: displayInstructions">
                     <div class="modal-dialog">
