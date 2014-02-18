@@ -2,26 +2,11 @@
     function initializationViewModel() {
         var initialization = this;
         var globalFunctions = {};
-        initialization.playerName = ko.observable();
-        initialization.playerNumber = -1;
         initialization.displayMap = ko.observable(false);
         initialization.playerList = ko.observableArray([]);
         initialization.playerList.additionalTroops = ko.observable();
-        initialization.gameID = -1;
         initialization.displayInstructions = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
-        globalFunctions.setDisplayMap = function(input) {
-            initialization.displayMap(input);
-        };
-        globalFunctions.getGameID = function() {
-            return initialization.gameID;
-        };
-        globalFunctions.getPlayerNumber = function() {
-            return initialization.playerNumber;
-        };
-        globalFunctions.setPlayerNumber = function(newPlayerNumber) {
-            initialization.playerNumber = newPlayerNumber;
-        };
         globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
             var playerObject = initialization.playerList()[playerNumber - 1];
             var newPlayerObject = {
