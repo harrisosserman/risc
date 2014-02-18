@@ -8,7 +8,6 @@
         initialization.playerList = ko.observableArray([]);
         initialization.playerList.additionalTroops = ko.observable();
         initialization.gameID = -1;
-        initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         initialization.displayInstructions = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.setDisplayMap = function(input) {

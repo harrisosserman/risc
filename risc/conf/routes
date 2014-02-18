@@ -21,7 +21,7 @@ GET     /test/game/:id                  controllers.TestAPI.getTestGame(id: Stri
 
 
 POST    /test/game                  controllers.TestAPI.createTestGame()
-POST    /test/game/:id/start        controllers.TestAPI.startTestGame(id: Long)
+POST    /test/game/:id/start        controllers.TestAPI.startTestGame(id: String)
 
 GET     /test/game/:id/map          controllers.TestAPI.getTestMap(id: Long)
 POST    /test/game/:id              controllers.TestAPI.commitTestTurn(id: Long)

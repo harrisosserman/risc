@@ -41,13 +41,19 @@
             }
         };
         lobby.startGame = function() {
-
+            $.ajax('/test/game/' + lobby.gameID + '/start', {
+                method: 'POST',
+                data: JSON.stringify({
+                    'name': globalFunctions.getUsername()
+                }),
+                contentType: "application/json"
+            });
         };
         lobby.createNewGame = function() {
             $.ajax('/test/game', {
                 method: 'POST',
                 data: JSON.stringify({
-                    'username': globalFunctions.getUsername()
+                    'name': globalFunctions.getUsername()
                 }),
                 contentType: "application/json"
             }).done(function(data) {
