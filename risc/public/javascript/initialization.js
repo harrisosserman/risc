@@ -2,23 +2,9 @@
     function initializationViewModel() {
         var initialization = this;
         var globalFunctions = {};
-        initialization.displayMap = ko.observable(false);
-        initialization.playerList = ko.observableArray([]);
-        initialization.playerList.additionalTroops = ko.observable();
         initialization.displayInstructions = ko.observable(false);
         initialization.displaySubmitTurn = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
-        globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
-            var playerObject = initialization.playerList()[playerNumber - 1];
-            var newPlayerObject = {
-                "name": playerObject.name,
-                "ready": playerObject.ready,
-                "color": playerObject.color,
-                "additionalTroops": additionalTroops
-            };
-            initialization.playerList.remove(playerObject);
-            initialization.playerList.splice(playerNumber - 1, 0, newPlayerObject);
-        };
         globalFunctions.setDisplaySubmitTurn = function(input) {
             initialization.displaySubmitTurn(input);
         };

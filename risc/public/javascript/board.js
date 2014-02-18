@@ -1,4 +1,3 @@
-// This code inside of the boardViewModel function is only loaded once the game is fully initialized
 (function(ko) {
     function boardViewModel(globals) {
         var globalFunctions = globals;
@@ -11,6 +10,7 @@
         board.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
         board.additionalTroops = [];
         board.displayMap = ko.observable(false);
+        board.playerList = ko.observableArray();
         /*          GLOBAL FUNCTIONS                        */
         board.createMap = function() {
             //function to build map out of table
@@ -140,6 +140,30 @@
                             $(this).append("<p class='troopTotals'>troops: <span>" + board.territoryInfo.territories[index].troops + "</span></p>");
                         });
                 });
+        };
+        globalFunctions.createPlayerList = function(data) {
+            for(var k = 0; k<data.length; k++) {
+                board.playerList.push({
+                    'name': data[k].name,
+                    'ready': data[k].ready,
+                    'color': globalFunctions.getElementOfColorList(k),
+                    'additionalInfantry': 0,
+                    'food': 0,
+                    'tech': 0,
+                    'techLevel': 0
+                });
+            }
+        };
+        board.updateAdditionalTroops = function(playerNumber, additionalTroops) {
+            var playerObject = board.playerList()[playerNumber - 1];
+            var newPlayerObject = {
+                "name": playerObject.name,
+                "ready": playerObject.ready,
+                "color": playerObject.color,
+                "additionalTroops": additionalTroops
+            };
+            board.playerList.remove(playerObject);
+            board.playerList.splice(playerNumber - 1, 0, newPlayerObject);
         };
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;

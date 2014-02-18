@@ -19,6 +19,9 @@
         globalFunctions.getGameID = function() {
             return lobby.gameID;
         };
+        globalFunctions.getElementOfColorList = function(index) {
+            return lobby.colorList[index];
+        };
 
         lobby.getGameState = function(state) {
             if(state === 0) {
@@ -111,6 +114,7 @@
                 state: game.state,
                 gameID: gameID
             });
+            // globalFunctions.createPlayerList(game);
 
         };
         lobby.createPlayerList = function(data) {
