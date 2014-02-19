@@ -63,7 +63,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title">Play Risc!</h4>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" data-bind="visible: displayJoinOrCreateGame">
                             <div class="control-group">
                                 <!-- MY GAMES -->
                                 <h4 class="centerAlign">My Games</h4>
@@ -77,7 +77,7 @@
                                         <tbody data-bind="foreach: myGamesList">
                                             <tr>
                                                 <td data-bind="text: players"></td>
-                                                <td data-bind="text: state"></td>
+                                                <td data-bind="text: stateDescription"></td>
                                                 <td><button data-bind="click: $parent.enterGame">Join</button></td>
                                             </tr>
                                     </thead>
@@ -96,7 +96,7 @@
                                         <tbody data-bind="foreach: lobbyGamesList">
                                             <tr>
                                                 <td data-bind="text: players"></td>
-                                                <td data-bind="text: state"></td>
+                                                <td data-bind="text: stateDescription"></td>
                                                 <td><button data-bind="click: $parent.enterGame">Join</button></td>
                                             </tr>
                                     </thead>
@@ -105,7 +105,30 @@
                             <div class="control-group">
                                 <h4 class="centerAlign">Start New Game</h4>
                                 <!-- START A NEW GAME -->
+                                <div class="centerAlign">
+                                    <button data-bind="click: createNewGame">Create Game</button>
+                                </div>
                             </div>
+                        </div>
+                        <div class="modal-body" data-bind="visible: displayGameWaitingRoom">
+                            <h3>Players in the game are:</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td><strong>Player Name</strong></td>
+                                        <td><strong>Is Ready?</strong></td>
+                                </thead>
+                                <tbody data-bind="foreach: playerList">
+                                    <tr>
+                                        <td>
+                                            <span data-bind="text: ($index() + 1)"></span>:
+                                            <span data-bind="text: name"></span>
+                                        </td>
+                                        <td data-bind="text: ready"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button data-bind="click: startGame">I'm ready</button>
                         </div>
                     </div>
                 </div>
@@ -113,29 +136,8 @@
 
 
                     <!-- <div data-bind="visible: displayGameWaitingRoom">
-                        <h3>Players in the game are:</h3>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <td><strong>Player Name</strong></td>
-                                    <td><strong>Is Ready?</strong></td>
-                            </thead>
-                            <tbody data-bind="foreach: playerList">
-                                <tr>
-                                    <td>
-                                        <span data-bind="text: ($index() + 1)"></span>:
-                                        <span data-bind="text: name"></span>
-                                    </td>
-                                    <td data-bind="text: ready"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <button data-bind="click: startGame">I'm ready</button>
+
                     </div> -->
-                  </div>
-                </div>
-              </div>
-            </div>
             <div class="initializationKnockout">
                 <div class="modal" data-bind="visible: displayInstructions">
                     <div class="modal-dialog">
@@ -168,15 +170,15 @@
                     </div>
                 </div>
             </div>
-<!--             <div data-bind="visible: displayMap" class="initializationKnockout">
+<!--             <div data-bind="visible: displayMap" class="initializationKnockout"> -->
                 <div class="row-fluid">
                     <table class="table table-bordered">
-                        <tbody id="map"> -->
+                        <tbody id="map">
                             <!-- The table cells are created with JavaScript in the index.js file -->
-<!--                         </tbody>
+                        </tbody>
                     </table>
                 </div>
-                <div class="row-fluid">
+                <!-- <div class="row-fluid">
                     <div class = "well well-sm">
                         <table class="playerInfoTable">
                             <thead>
@@ -197,8 +199,8 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div> -->
+                </div> -->
+            </div>
         </div>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>

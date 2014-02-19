@@ -2,27 +2,11 @@
     function initializationViewModel() {
         var initialization = this;
         var globalFunctions = {};
-        initialization.playerName = ko.observable();
-        initialization.playerNumber = -1;
         initialization.displayMap = ko.observable(false);
         initialization.playerList = ko.observableArray([]);
         initialization.playerList.additionalTroops = ko.observable();
-        initialization.gameID = -1;
-        initialization.colorList = ['Purple', 'Salmon', 'Yellow', 'Light Blue', 'Dark Blue'];
         initialization.displayInstructions = ko.observable(false);
         /*          GLOBAL FUNCTIONS                        */
-        globalFunctions.setDisplayMap = function(input) {
-            initialization.displayMap(input);
-        };
-        globalFunctions.getGameID = function() {
-            return initialization.gameID;
-        };
-        globalFunctions.getPlayerNumber = function() {
-            return initialization.playerNumber;
-        };
-        globalFunctions.setPlayerNumber = function(newPlayerNumber) {
-            initialization.playerNumber = newPlayerNumber;
-        };
         globalFunctions.updateAdditionalTroops = function(playerNumber, additionalTroops) {
             var playerObject = initialization.playerList()[playerNumber - 1];
             var newPlayerObject = {
@@ -33,19 +17,6 @@
             };
             initialization.playerList.remove(playerObject);
             initialization.playerList.splice(playerNumber - 1, 0, newPlayerObject);
-        };
-        globalFunctions.createMap = function() {
-                //function to build map out of table
-                var map = $("#map");
-                var count = 1;
-                for(var k=0; k<5; k++) {
-                    map.append("<tr>");
-                    for(var m=0; m<5; m++) {
-                        map.append("<td>" + count + "</td>");
-                        count++;
-                    }
-                    map.append("</tr>");
-                }
         };
         /*          END GLOBAL FUNCTIONS                    */
 
@@ -59,7 +30,6 @@
         initialization.closeInstructions = function() {
             initialization.displayInstructions(false);
         };
-        globalFunctions.createMap();
 
 
         //code to listen for user trying to exit or refresh page

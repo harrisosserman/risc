@@ -21,11 +21,12 @@ GET     /test/game/:id                  controllers.TestAPI.getTestGame(id: Stri
 
 
 POST    /test/game                  controllers.TestAPI.createTestGame()
-POST    /test/game/:id/start        controllers.TestAPI.startTestGame(id: Long)
+POST    /test/game/:id/start        controllers.TestAPI.startTestGame(id: String)
 
-GET     /test/game/:id/map          controllers.TestAPI.getTestMap(id: Long)
-POST    /test/game/:id              controllers.TestAPI.commitTestTurn(id: Long)
-GET     /test/game/:id/polling      controllers.TestAPI.getTestMapPolling(id: Long)
+GET     /test/game/:id/map          controllers.TestAPI.getTestMap(id: String)
+GET     /test/game/:id/mapReady     controllers.TestAPI.getTestMapReady(id: String)
+POST    /test/game/:id              controllers.TestAPI.commitTestTurn(id: String)
+GET     /test/game/:id/polling      controllers.TestAPI.getTestMapPolling(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /public/*file               controllers.Assets.at(path="/public", file)
