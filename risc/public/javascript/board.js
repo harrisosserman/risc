@@ -57,12 +57,10 @@
                             $('.submitTurnButton').remove();
                         }
                         board.territoryInfo = $.parseJSON(result);
-                        if(typeof board.territoryInfo.additionalTroops !== 'undefined') {
-                            for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
-                                // globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
-                                //     board.territoryInfo.additionalTroops[m].troops);
-                                board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
-                            }
+                        for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
+                            // globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
+                            //     board.territoryInfo.additionalTroops[m].troops);
+                            board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo);
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
@@ -154,16 +152,18 @@
                 });
             }
         };
-        board.updateAdditionalTroops = function(playerNumber, additionalTroops) {
-            var playerObject = board.playerList()[playerNumber - 1];
+        board.updatePlayerInfoTable = function(index, playerInfo) {
+            var playerObject = board.playerList()[index];
             var newPlayerObject = {
-                "name": playerObject.name,
-                "ready": playerObject.ready,
-                "color": playerObject.color,
-                "additionalTroops": additionalTroops
+                "name": playerInfo.name,
+                "color": globalFunctions.getElementOfColorList(index),
+                "additionalInfantry": playerInfo.additionalInfantry,
+                "food": playerInfo.food,
+                "tech": playerInfo.tech,
+                "techLevel": playerInfo.level
             };
             board.playerList.remove(playerObject);
-            board.playerList.splice(playerNumber - 1, 0, newPlayerObject);
+            board.playerList.splice(index, 0, newPlayerObject);
         };
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;

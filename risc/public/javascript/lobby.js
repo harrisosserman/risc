@@ -22,6 +22,9 @@
         globalFunctions.getElementOfColorList = function(index) {
             return lobby.colorList[index];
         };
+        globalFunctions.getPlayerList = function() {
+            return lobby.playerList;
+        };
 
         lobby.getGameState = function(state) {
             if(state === 0) {
