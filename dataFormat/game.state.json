@@ -5,8 +5,8 @@
     "territories": [
                 {
                     "owner": "playerID",
-                    "infantry": 5,
-                    "auto": 6,
+                    "INFANTRY": 5,
+                    "AUTOMATIC": 6,
                     ...
                 }
     ],
