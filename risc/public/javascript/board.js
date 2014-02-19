@@ -11,6 +11,20 @@
         board.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
         board.additionalTroops = [];
         /*          GLOBAL FUNCTIONS                        */
+        globalFunctions.createMap = function() {
+            //function to build map out of table
+            var map = $("#map");
+            var count = 1;
+            for(var k=0; k<5; k++) {
+                map.append("<tr>");
+                for(var m=0; m<5; m++) {
+                    map.append("<td>" + count + "</td>");
+                    count++;
+                }
+                map.append("</tr>");
+            }
+        };
+
         globalFunctions.getTerritoryOwner = function() {
             return board.territoryOwner;
         };
@@ -26,7 +40,7 @@
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
             }
-            $.ajax('/game/' + globalFunctions.getGameID() + appendUrl, {
+            $.ajax('/test/game/' + globalFunctions.getGameID() + appendUrl, {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -35,8 +49,8 @@
                         board.territoryInfo = $.parseJSON(result);
                         if(typeof board.territoryInfo.additionalTroops !== 'undefined') {
                             for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
-                                globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
-                                    board.territoryInfo.additionalTroops[m].troops);
+                                // globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
+                                //     board.territoryInfo.additionalTroops[m].troops);
                                 board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
                             }
                         }
@@ -348,7 +362,7 @@
                 return;
             }
 
-            $.ajax('/game/' + globalFunctions.getGameID() + '/mapReady', {
+            $.ajax('/test/game/' + globalFunctions.getGameID() + '/mapReady', {
                 method: 'GET',
             }).done(function() {
                 globalFunctions.destroyAndRebuildMap();
@@ -357,6 +371,10 @@
         };
         globalFunctions.getMap();
         board.playerWatching();
+
+        // $('.boardKnockout').each(function() {
+        //     ko.applyBindings(new boardViewModel(), $(this).get(0));
+        // });
     }
     window.Board = boardViewModel;
 })(window.ko);
