@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import models.Turn;
 import models.State;
 import libraries.DBHelper;
+import models.UserManager;
 
 public class API extends Controller {
 
@@ -119,5 +120,23 @@ public class API extends Controller {
     public static Result reset(String id) throws UnknownHostException{
         DBHelper.reset(id);
         return ok("Reset DB for gameID:" + id);
+    }
+
+    //-------- Player API Methods ----------
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result createPlayer() {
+        RequestBody body = request().body();
+        String username = body.asJson().get(UserManager.NAME_KEY).toString();
+        String usernameWithoutQuotes = removeQuotes(username);
+        String password = body.asJson().get(UserManager.PASSWORD_KEY).toString();
+        String passwordWithoutQuotes = removeQuotes(password);
+
+        UserManager um = new UserManager();
+        boolean wasSuccessful = um.createUser(usernameWithoutQuotes, passwordWithoutQuotes);
+        if (wasSuccessful) {
+            return ok("Successfully created user: " + usernameWithoutQuotes);
+        }else{
+            return badRequest("Username already taken");
+        }
     }
 }

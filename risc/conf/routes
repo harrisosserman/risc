@@ -12,6 +12,8 @@ POST	/game/:id/exit				controllers.API.exit(id: String)
 GET 	/game/:id/mapReady			controllers.API.isMapReady(id: String)
 DELETE	/game/:id/reset				controllers.API.reset(id: String)
 
+POST	/player 					controllers.API.createPlayer()
+
 #   API calls that Harris made for testing the front end
 GET     /test/player/:username          controllers.TestAPI.getTestUsername(username: String)
 POST    /test/player/:username/login    controllers.TestAPI.loginTest(username: String)
