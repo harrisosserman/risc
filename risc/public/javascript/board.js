@@ -21,18 +21,24 @@
             return board.attackingTroops;
         };
         /*          END GLOBAL FUNCTIONS                    */
-        globalFunctions.getMap = function() {
-            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
+        globalFunctions.getMap = function(mapReady) {
+            var appendUrl = "/map";
+            if(typeof mapReady !== 'undefined' && mapReady === true) {
+                appendUrl = "/mapReady";
+            }
+            $.ajax('/game/' + globalFunctions.getGameID() + appendUrl, {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
                             $('.submitTurnButton').remove();
                         }
                         board.territoryInfo = $.parseJSON(result);
-                        for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
-                            globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
-                                board.territoryInfo.additionalTroops[m].troops);
-                            board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
+                        if(typeof board.territoryInfo.additionalTroops !== 'undefined') {
+                            for(var m = 0; m<board.territoryInfo.additionalTroops.length; m++) {
+                                globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
+                                    board.territoryInfo.additionalTroops[m].troops);
+                                board.additionalTroops[board.territoryInfo.additionalTroops[m].owner] = board.territoryInfo.additionalTroops[m].troops;
+                            }
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
@@ -130,8 +136,9 @@
             }
         };
         board.listenForAdditionalTroops = function(index) {
+            $("body").unbind("keydown");
+            if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
                 $("body").keydown(function(input) {
-                    if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
                         if(input.keyCode === 38) {
                             //up arrow
                             board.calculateAdditionalTroops(1, index, input);
@@ -139,9 +146,12 @@
                             //down arrow
                             board.calculateAdditionalTroops(-1, index, input);
                         }
-                    }
                 });
+            }
         };
+
+
+
         board.calculateAdditionalTroops = function(troopDelta, index, key) {
             key.preventDefault();
             var currentTroops = board.troops[index];
@@ -326,14 +336,10 @@
             board.territoryDOMElements = [];
             board.troops = [];
             board.attackingTroops = [];
-            $('.troopTotals').each(function() {
-                $(this).remove();
-            });
-            $("#map td").each(function() {
-                $(this).off('click');
-            });
-            board.removeAllPreviousAdjacencies($('#map'));
-            globalFunctions.getMap();
+            $("#map").empty();
+            globalFunctions.createMap();
+            var callMapReady = true;
+            globalFunctions.getMap(callMapReady);
         };
 
         board.playerWatching = function() {
@@ -341,7 +347,12 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-            globalFunctions.destroyAndRebuildMap();
+
+            $.ajax('/game/' + globalFunctions.getGameID() + '/mapReady', {
+                method: 'GET',
+            }).done(function() {
+                globalFunctions.destroyAndRebuildMap();
+            });
             setTimeout(board.playerWatching, 10000);
         };
         globalFunctions.getMap();

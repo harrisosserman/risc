@@ -1,0 +1,9 @@
+{
+    "_id": "an automatically generated player id by mongo",
+    "username": "harris",
+    "password": "A HASHED PASSWORD",
+    "games": [
+        {"game" : "SOME MONGO GAME ID"},
+        {"game": "ANOTHER MONGO GAME ID"}
+        ]
+}

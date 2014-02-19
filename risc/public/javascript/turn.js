@@ -20,7 +20,7 @@
                 else {
                     result.push({
                         "territory": attack[troopDirections[k]].destination,
-                        "troops": attack[troopDirections[k]].troops
+                        "troops": parseInt(attack[troopDirections[k]].troops, 10)
                     });
                 }
             }
@@ -32,7 +32,7 @@
             var result = turn.loadGameMap(deferred);
             deferred.done(function(data) {
                     $(pollingNextTurnDOM).remove();
-                    var gameMap = data.map;
+                    var gameMap = data.territories;
                     //handling when player loses or when player wins
                     var playerNumber = globalFunctions.getPlayerNumber();
                     var playerNumberFound = false;
@@ -47,10 +47,23 @@
                         }
                     }
                     if(playerNumberFound === false) {
+                        $.ajax('/game/' + globalFunctions.getGameID() + '/exit', {
+                            method: 'POST',
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                'playerNumber': globalFunctions.getPlayerNumber()
+                            })
+                        });
                         globalFunctions.setPlayerNumber(-1);
                     }
                     if(otherPlayersFound === false) {
                         alert("Player " + owner + " wins!!!");
+                        //Note: This is a terrible security vulnerability, but will be removed in evolution 2
+                        //We needed it because the backend uses the same GameID (12345) for every game
+                        $.ajax('/game/' + globalFunctions.getGameID() + '/reset', {
+                            method: 'DELETE',
+                            contentType: "application/json"
+                        });
                         location.reload(true);
                     }
                     globalFunctions.destroyAndRebuildMap();
@@ -63,7 +76,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/test/game/' + gameID + '/polling', {
+            $.ajax('/game/' + gameID + '/mapReady', {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
@@ -79,6 +92,9 @@
             returnData['player'] = playerNumber;
             var territories = [];
             for(var k=0; k<territoryOwner.length; k++) {
+                if(territoryOwner[k] !== playerNumber) {
+                    continue;
+                }
                 var territoryInfo = {};
                 var attacking = turn.constructAttackingTroops(k);
                 territoryInfo = {
@@ -89,14 +105,10 @@
                 territories.push(territoryInfo);
             }
             returnData['territories'] = territories;
-            $.ajax('/test/game/' + gameID, {
+            $.ajax('/game/' + gameID, {
                 method: 'POST',
-                data: returnData,
-                settings: [
-                    {
-                        contentType: "application/json"
-                    }
-                ]
+                data: JSON.stringify(returnData),
+                contentType: "application/json"
             }).done(function() {
                 globalFunctions.setDisplayMap(false);
                 $('.attackComponent').each(function() {

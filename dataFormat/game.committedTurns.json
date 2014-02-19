@@ -1,70 +1,39 @@
 {
     "gameID": "gameID",
     "username": "playerID",
-//    "turn": 1,
+    "turn": 4, 
+    //note harris sends the time stamp"
+    "timeStamp": "",
     "food": 100,
     "technology":100,
     "technology_level": 1,
-    "territories": [
-        {
-            "position" :1,
-            "INFANTRY": 4,
-            "AUTOMATIC": 2,
-            "ROCKETS": 1,
-            "TANKS": 4,
-            "IMPROVEDTANKS": 3,
-            "PLANES": 3,
-            "attacking": [
-                {
-                    "territory": 2,
-                    "INFANTRY": 4,
-                    "AUTOMATIC": 2,
-                    "ROCKETS": 1,
-                    "TANKS": 4,
-                    "IMPROVEDTANKS": 3,
-                    "PLANES": 3,
-                },
-                {
-                    "territory": 5,
-                    "INFANTRY": 4,
-                    "AUTOMATIC": 2,
-                    "ROCKETS": 1,
-                    "TANKS": 4,
-                    "IMPROVEDTANKS": 3,
-                    "PLANES": 3,
-                }
-            ]   
+    "moves":[
+ 
+        { 
+            "moveType": 0, // choices are 0 = upgrade,  1= move and 2=attack. 
+            "position": 4,
+            "troopType": "INFANTRY",
+            "upgradeType": "AUTOMATIC"
+            
         },
-        {
-            "position" :2,
-            "INFANTRY": 4,
-            "AUTOMATIC": 2,
-            "ROCKETS": 1,
-            "TANKS": 4,
-            "IMPROVEDTANKS": 3,
-            "PLANES": 3,
-            "attacking": [
-                {
-                    "territory": 4,
-                    "INFANTRY": 4,
-                    "AUTOMATIC": 2,
-                    "ROCKETS": 1,
-                    "TANKS": 4,
-                    "IMPROVEDTANKS": 3,
-                    "PLANES": 3,
-                },
-                {
-                    "territory": 1,
-                    "INFANTRY": 4,
-                    "AUTOMATIC": 2,
-                    "ROCKETS": 1,
-                    "TANKS": 4,
-                    "IMPROVEDTANKS": 3,
-                    "PLANES": 3,
-                }
-            ]   
+        {            
+            "moveType": 1, // choices are 0 = upgrade,  1= move and 2=attack. 
+            "troopType": "AUTOMATIC",
+            "start": 4,
+            "end": 4
+        },
+        {            
+            "moveType": 2, // choices are 0 = upgrade,  1= move and 2=attack. 
+            "troopType": "AUTOMATIC",
+            "start": 4,
+            "end": 4
         }
+
+
     ]
+
+   
+    
 }
 
 NOTE: There will be n documents in the committedTurns collection per game, where n is the number of players in the game
