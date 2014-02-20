@@ -10,6 +10,10 @@
         board.additionalTroops = [];
         board.displayMap = ko.observable(false);
         board.playerList = ko.observableArray();
+        board.territoryClickTerritoryNumber = ko.observable("-");
+        board.territoryClickInfo = ko.observableArray();
+        board.territoryClickAttackInfo = ko.observableArray();
+
         board.editing = new BoardEditing(globalFunctions);
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.createAndLoadMap = function() {
@@ -28,6 +32,9 @@
         };
         globalFunctions.setDisplayMap = function(input) {
             board.displayMap(input);
+        };
+        globalFunctions.setTerritoryClickTerritoryNumber = function(input) {
+            board.territoryClickTerritoryNumber(input);
         };
         globalFunctions.destroyAndRebuildMap = function() {
             globalFunctions.setDisplayMap(true);
