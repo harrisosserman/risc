@@ -66,20 +66,27 @@ public class UserManager{
 		return false;
 	}
 
-	public void addGameToUser(String gameID, String username){
+	private void addOrRemoveGameForUser(String gameID, String username, boolean shouldAdd){
 		username = username.toLowerCase();
 
 		if (doesUserExist(username)) {
 			DBObject player = DBHelper.getPlayer(username);
-			
-			ArrayList<DBObject> games = (ArrayList<DBObject>)player.get(GAMES_KEY);
 			DBObject gameToAdd = new BasicDBObject(GAME_KEY, gameID);
-			DBObject updatedGames = new BasicDBObject(GAMES_KEY, gameToAdd);
-			DBObject updateCommand = new BasicDBObject("$push", updatedGames);
-
 			DBCollection playerCollection = DBHelper.getPlayerCollection();
-			playerCollection.update(player, updateCommand);
+			if (shouldAdd) {
+				DBHelper.addObjectToListAndUpdateCollection(player, gameToAdd, GAMES_KEY, playerCollection);
+			}else{
+				DBHelper.removeObjectFromListAndUpdateCollection(player, gameToAdd, GAMES_KEY, playerCollection);
+			}
 		}
+	}
+
+	public void addGameToUser(String gameID, String username){
+		addOrRemoveGameForUser(gameID, username, true);
+	}
+
+	public void removeGameFromUser(String gameID, String username){
+		addOrRemoveGameForUser(gameID, username, false);
 	}
 
 }

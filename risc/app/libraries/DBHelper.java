@@ -155,4 +155,24 @@ public class DBHelper{
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		return stateCollection.find(gameQuery);
 	}
+
+	//Modifiers
+	private static void performOperatorOnListAndUpdateCollection(String operator, DBObject documentIdentifier, DBObject objectToAffect, String listKey, DBCollection collection){
+		DBObject document = collection.findOne(documentIdentifier);
+
+		if (document != null) {
+			ArrayList<DBObject> list = (ArrayList<DBObject>)document.get(listKey);
+			DBObject updatedList = new BasicDBObject(listKey, objectToAffect);
+			DBObject updateCommand = new BasicDBObject(operator, updatedList);
+			collection.update(document, updateCommand);
+		}
+	}
+
+	public static void addObjectToListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPush, String listKey, DBCollection collection){
+		performOperatorOnListAndUpdateCollection("$push", documentIdentifier, objectToPush, listKey, collection);
+	}
+
+	public static void removeObjectFromListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPull, String listKey, DBCollection collection){
+		performOperatorOnListAndUpdateCollection("$pull", documentIdentifier, objectToPull, listKey, collection);
+	}
 }
