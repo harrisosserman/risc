@@ -8,6 +8,7 @@ public class UserManager{
 	public static final String NAME_KEY = "name";
 	public static final String PASSWORD_KEY = "password";
 	public static final String GAMES_KEY = "games";
+	public static final String GAME_KEY = "game";
 
 	public boolean createUser(String username, String password){
 		username = username.toLowerCase();
@@ -65,5 +66,27 @@ public class UserManager{
 		return false;
 	}
 
+	private void addOrRemoveGameForUser(String gameID, String username, boolean shouldAdd){
+		username = username.toLowerCase();
+
+		if (doesUserExist(username)) {
+			DBObject player = DBHelper.getPlayer(username);
+			DBObject gameToAdd = new BasicDBObject(GAME_KEY, gameID);
+			DBCollection playerCollection = DBHelper.getPlayerCollection();
+			if (shouldAdd) {
+				DBHelper.addObjectToListAndUpdateCollection(player, gameToAdd, GAMES_KEY, playerCollection);
+			}else{
+				DBHelper.removeObjectFromListAndUpdateCollection(player, gameToAdd, GAMES_KEY, playerCollection);
+			}
+		}
+	}
+
+	public void addGameToUser(String gameID, String username){
+		addOrRemoveGameForUser(gameID, username, true);
+	}
+
+	public void removeGameFromUser(String gameID, String username){
+		addOrRemoveGameForUser(gameID, username, false);
+	}
 
 }
