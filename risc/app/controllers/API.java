@@ -149,4 +149,21 @@ public class API extends Controller {
             return badRequest("User: " + username + " does not exist");
         }
     }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result logUserIn(String username){
+        RequestBody body = request().body();
+        String jsonUsername = body.asJson().get(UserManager.NAME_KEY).toString();
+        String usernameWithoutQuotes = removeQuotes(jsonUsername);
+        String password = body.asJson().get(UserManager.PASSWORD_KEY).toString();
+        String passwordWithoutQuotes = removeQuotes(password);
+
+        UserManager um = new UserManager();
+        if (um.doesUsernameMatchPassword(usernameWithoutQuotes, passwordWithoutQuotes)) {
+            String playerJson = um.getPublicPlayerInfoJson(username);
+            return ok(playerJson.toString());
+        }else{
+            return badRequest("The username/password combination was invalid.");
+        }
+    }
 }
