@@ -17,7 +17,8 @@
             plane: []
         };
         board.attackInfo = [];
-
+        board.inputNumberAttackOrMove = ko.observable();
+        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes']);
         board.displayMap = ko.observable(false);
         board.playerList = ko.observableArray();
         board.territoryClickTerritoryNumber = ko.observable("-");
@@ -283,10 +284,15 @@
                 board.editing.removeAllPreviousAdjacencies();
                 $(map[index]).addClass('territoryClick');   //need to add territoryClick class again because it will be toggled off in the click function
             } else if($(map[index]).hasClass('territoryMoveTroops')) {
+                $("#dialog").dialog();
                 board.editing.moveTroops(index, map, board.territoryDOMElements, board.troops);
             } else if($(map[index]).hasClass('territoryAttack')){
+                $("#dialog").dialog();
                 board.editing.attack(index, map, board.territoryDOMElements, board.troops, board.attackingTroops);
             }
+        };
+        board.submitMove = function() {
+            $("#dialog").hide();
         };
         board.playerWatching = function() {
             //reloads the map every 10 seconds for any players watching game
