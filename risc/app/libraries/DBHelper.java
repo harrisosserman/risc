@@ -9,12 +9,14 @@ public class DBHelper{
 
 	private static final String GAME_DB = "game";
 	private static final String INITIALIZATION_DB = "initialization";
+	private static final String PLAYERS_DB = "players";
 
 	private static final String STATE_COLLECTION = "state";
 	private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
 	private static final String MAP_COLLECTION = "map";
 	private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
 	private static final String INFO_COLLECTION = "info";
+	private static final String PLAYER_COLLECTION = "player";
 
 	public static final String GAME_ID_KEY = "gameID";
 	public static final String NAME_KEY = "name";
@@ -31,6 +33,7 @@ public class DBHelper{
     public static final String ACTIVE_PLAYERS_KEY = "activePlayers";
     public static final String PLAYER_NUMBER_KEY = "playerNumber";
     public static final String PLAYER_ID_KEY = "playerId";
+    public static final String PLAYER_NAME_KEY = "name";
 
 	private static MongoConnection myConnection;
 
@@ -77,6 +80,10 @@ public class DBHelper{
 		return DBHelper.getDB(GAME_DB);
 	}
 
+	public static DB getPlayersDB(){
+		return DBHelper.getDB(PLAYERS_DB);
+	}
+
 	//Get Collections
 
 	private static DBCollection getCollection(String dbName, String collectionName){
@@ -105,6 +112,10 @@ public class DBHelper{
 		return DBHelper.getCollection(GAME_DB, INFO_COLLECTION);
 	}
 
+	public static DBCollection getPlayerCollection(){
+		return DBHelper.getCollection(PLAYERS_DB, PLAYER_COLLECTION);
+	}
+
 	//Get Objects
 
 	public static DBObject getWaitingPlayersForGame(String gameID){
@@ -131,6 +142,12 @@ public class DBHelper{
 		return highestTurnCursor.next();
 	}
 
+	public static DBObject getPlayer(String name){
+		DBCollection playersCollection = DBHelper.getPlayerCollection();
+		BasicDBObject playerQuery = new BasicDBObject(PLAYER_NAME_KEY, name);
+		return playersCollection.findOne(playerQuery);
+	}
+
 	//Get Cursors
 
 	public static DBCursor getStateCursorForGame(String gameID){
@@ -138,6 +155,4 @@ public class DBHelper{
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		return stateCollection.find(gameQuery);
 	}
-
-
 }
