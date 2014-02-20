@@ -12,21 +12,6 @@
         board.displayMap = ko.observable(false);
         board.playerList = ko.observableArray();
         /*          GLOBAL FUNCTIONS                        */
-        board.createMap = function() {
-            //function to build map out of table
-            board.displayMap(true);
-            globalFunctions.setDisplaySubmitTurn(true);
-            var map = $("#map");
-            var count = 1;
-            for(var k=0; k<5; k++) {
-                map.append("<tr>");
-                for(var m=0; m<5; m++) {
-                    map.append("<td>" + count + "</td>");
-                    count++;
-                }
-                map.append("</tr>");
-            }
-        };
         globalFunctions.createAndLoadMap = function() {
             board.createMap();
             globalFunctions.getMap();
@@ -44,8 +29,35 @@
         globalFunctions.setDisplayMap = function(input) {
             board.displayMap(input);
         };
+        globalFunctions.destroyAndRebuildMap = function() {
+            globalFunctions.setDisplayMap(true);
+            board.territoryInfo = {};
+            board.territoryOwner = [];
+            board.territoryDOMElements = [];
+            board.troops = [];
+            board.attackingTroops = [];
+            $("#map").empty();
+            board.createMap();
+            var callMapReady = true;
+            board.getMap(callMapReady);
+        };
         /*          END GLOBAL FUNCTIONS                    */
-        globalFunctions.getMap = function(mapReady) {
+        board.createMap = function() {
+            //function to build map out of table
+            board.displayMap(true);
+            globalFunctions.setDisplaySubmitTurn(true);
+            var map = $("#map");
+            var count = 1;
+            for(var k=0; k<5; k++) {
+                map.append("<tr>");
+                for(var m=0; m<5; m++) {
+                    map.append("<td>" + count + "</td>");
+                    count++;
+                }
+                map.append("</tr>");
+            }
+        };
+        board.getMap = function(mapReady) {
             var appendUrl = "/map";
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
@@ -377,19 +389,6 @@
             }
             return result;
         };
-        globalFunctions.destroyAndRebuildMap = function() {
-            globalFunctions.setDisplayMap(true);
-            board.territoryInfo = {};
-            board.territoryOwner = [];
-            board.territoryDOMElements = [];
-            board.troops = [];
-            board.attackingTroops = [];
-            $("#map").empty();
-            board.createMap();
-            var callMapReady = true;
-            globalFunctions.getMap(callMapReady);
-        };
-
         board.playerWatching = function() {
             //reloads the map every 10 seconds for any players watching game
             if(globalFunctions.getPlayerNumber() !== -1) {
