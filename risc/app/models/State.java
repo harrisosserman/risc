@@ -94,7 +94,7 @@ public void assembleState(int turn_number) throws UnknownHostException{
     query.put(TURN, turn);
     DBCursor cursor = committedTurns.find(query);
     for(int i=0; i<NUM_TERRITORIES; i++){
-        Territory territory_empty = new Territory(i, -1, -1);
+        Territory territory_empty = new Territory(i, -1, -1, 0, 0);
         territories.add(territory_empty);
    }
     while(cursor.hasNext()) {
@@ -178,7 +178,7 @@ public Army battle(ArrayList<Army> attackers, Army defender){
             double batt_1 = battler_1.battle();
             double batt_2 = battler_2.battle();
             if(batt_1 == batt_2){
-                if(battler_1.getStrength() >= battler_2.getStrength){
+                if(battler_1.getStrength() >= battler_2.getStrength()){
                     batt_1++;
                 }
                 else{
@@ -234,6 +234,7 @@ public Army battle(ArrayList<Army> attackers, Army defender){
             }
         }
     }
+    return null;
 }
 
 

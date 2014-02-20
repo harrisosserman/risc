@@ -7,6 +7,7 @@ public class Player {
 	private String myName;
 	private int myFood;
 	private int myTechnology;
+	private int myTechnologyLevel;
 
 	public Player(String name){
 		this.myName = name;
@@ -35,4 +36,13 @@ public class Player {
 	public void setFood(int food){
 		myFood = food;
 	}
+
+	public int getTechnologyLevel(){
+		return myTechnologyLevel;
+	}
+
+	public void setTechnologyLevel(int tech){
+		myTechnologyLevel = tech;
+	}
+
 }

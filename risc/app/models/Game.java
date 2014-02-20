@@ -77,11 +77,7 @@ public class Game {
         ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
         int readyCount = 0;
         for (DBObject player : players) {
-<<<<<<< HEAD
-            if ((Boolean)player.get(READY)) {
-=======
            if ((Boolean)player.get(DBHelper.READY_KEY)) {
->>>>>>> c24fc03d455130f4317d60ef61be2b709bdbb30a
                 readyCount++;
            }
         }
@@ -335,4 +331,5 @@ public class Game {
         DBCollection stateCollection = DBHelper.getStateCollection();
         stateCollection.update(gameQuery, updatedCurrentTurn);
     }
+
 }
