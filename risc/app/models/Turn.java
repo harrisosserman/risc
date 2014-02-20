@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import models.Territory;
 import models.Troop;
 import controllers.API;
+import models.*;
 import libraries.DBHelper;
 
 /*
@@ -32,6 +33,7 @@ public class Turn {
     private static final String GAME_DB = "game";
     private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
     private static final String PLAYER = "player";
+    private static final String USERNAME = "username";
     private static final String ATTACKING = "attacking";
     private static final String TROOPS = "troops";
     private static final String STATE = "state";
@@ -41,9 +43,19 @@ public class Turn {
     private static final String GAME_ID = "gameID";
     private static final String POSITION = "position";
     private static final String COUNT = "count";
+    private static final String FOOD = "food";
+    private static final String TECHNOLOGY = "technology";
+    private static final String TECHNOLOGY_LEVEL = "technology_level";
+    private static final String MOVES = "moves";
+    private static final String TROOPTYPE = "troopType";
+    private static final String MOVETYPE = "moveType";
+    private static final String START = "start";
+    private static final String END = "end";
+    private static final String UPGRADETYPE = "upgradeType";
+    private static final String TIMESTAMP = "timeStamp";
 
     private ArrayList<Territory> territories;
-    private int playerID;
+    private String playerID;
     private String myGameID;
     private ArrayList<Attacker> attackers;
     private int turn;
@@ -53,8 +65,6 @@ public class Turn {
         attackers = new ArrayList<Attacker>();
         territories = new ArrayList<Territory>();
 	}
-
-
 
     /* Create turn is called directly from the API call and is responsible
      * for manually parsing the data into the data structures the model
@@ -79,36 +89,52 @@ public class Turn {
 
     public int createTurn(RequestBody jsonObject) throws UnknownHostException{
         myGameID = API.removeQuotes(jsonObject.asJson().get(GAME_ID).toString());
-        String _playerID = (String)jsonObject.asJson().get(PLAYER).toString();
-        playerID = Integer.parseInt(_playerID);
-
-        for(Integer i=0; i<25; i++){
-            if(jsonObject.asJson().get(TERRITORIES).get(i)!=null){
-                JsonNode territoryData = jsonObject.asJson().get(TERRITORIES).get(i);
-                String troops_str = territoryData.get(TROOPS).toString();
-                int troops = Integer.parseInt(troops_str);
-                String position_str = territoryData.get(POSITION).toString();
-                int position = Integer.parseInt(position_str);
-                Territory territory = new Territory(position, playerID, troops);
-                territories.add(territory);
-                Iterator<JsonNode> attackerData = territoryData.get(ATTACKING).elements();
-                while(attackerData.hasNext()){
-                    JsonNode n = attackerData.next();
-                    int attacker_territory = Integer.parseInt(n.get(TERRITORY).toString());
-                   /// change this to a front end change soon!!!
-                    if(!n.get(TROOPS).toString().equals("null")){
-                    int attacker_number = Integer.parseInt(n.get(TROOPS).toString());
-                    Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
-                    attackers.add(a);
-                    }
+        String username = (String)jsonObject.asJson().get(USERNAME).toString();
+        Player player_ = new Player(username);
+        String food_ = jsonObject.asJson().get(FOOD).toString();
+        int food = Integer.parseInt(food_);
+        String technology_ = jsonObject.asJson().get(TECHNOLOGY).toString();
+        int technology = Integer.parseInt(technology_);
+        String technology_level_ = jsonObject.asJson().get(TECHNOLOGY_LEVEL).toString();
+        int technology_level = Integer.parseInt(technology_level_);
+        player_.setFood(food);
+        player_.setTechnology(technology);
+        player_.setTechnologyLevel(technology_level);
+        Integer nodes = jsonObject.asJson().get(MOVES).size();
+        System.out.println(nodes);
+        ArrayList<MoveType> moves = new ArrayList<MoveType>();
+        Iterator<JsonNode> movesData = jsonObject.asJson().get(MOVES).elements();
+        while(movesData.hasNext()){
+                JsonNode moveData = movesData.next();
+                String moveType = moveData.get(MOVETYPE).toString();
+                System.out.println(moveType);
+                String troopType = moveData.get(TROOPTYPE).toString();
+                System.out.println(troopType);
+                if(moveType.equals("upgrade")){
+                    String upgradeType = moveData.get(UPGRADETYPE).toString();
+                    System.out.println(upgradeType);
+                    int position = Integer.parseInt(moveData.get(POSITION).toString());
+                    System.out.println(position);
+                    Upgrade newMove = new Upgrade(moveType, troopType, upgradeType, position);
+                    moves.add(newMove);
                 }
-            }
+                else if(moveType.equals("move")){
+                    int start = Integer.parseInt(moveData.get(START).toString());
+                    int end = Integer.parseInt(moveData.get(END).toString());
+                    Move newMove = new Move(moveType, troopType, start, end);
+                    moves.add(newMove);
+                }
+                else if(moveType.equals("attack")){
+                    int start = Integer.parseInt(moveData.get(START).toString());
+                    int end = Integer.parseInt(moveData.get(END).toString());
+                    Attack newMove = new Attack(moveType, troopType, start, end);
+                    moves.add(newMove);
+                }
+                
         }
+//        int result = commitTurn();
 
-
-        int result = commitTurn();
-
-        return result;
+        return food;
 	}
 
     /*
@@ -177,7 +203,7 @@ public class Turn {
      *
      */
 
-    public int commitTurn() throws UnknownHostException{
+    public int commitTurn(ArrayList<MoveType> moves, Player player1) throws UnknownHostException{
         DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
         DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
         BasicDBObject query = new BasicDBObject();
@@ -190,7 +216,7 @@ public class Turn {
             DBCursor highestTurn = waitingPlayers.find().sort( new BasicDBObject(TURN, -1));
             turn = (Integer) highestTurn.next().get(TURN);
             turn ++;
-    }
+        }
         BasicDBObject turn_doc = new BasicDBObject();
         turn_doc.append(GAME_ID, myGameID);
         turn_doc.append(PLAYER, playerID);
@@ -237,5 +263,4 @@ public class Turn {
         myGameID = API.removeQuotes(jsonObject.asJson().get(GAME_ID).toString());
         return myGameID;
     }
-
 }

@@ -19,6 +19,12 @@
         globalFunctions.getGameID = function() {
             return lobby.gameID;
         };
+        globalFunctions.getElementOfColorList = function(index) {
+            return lobby.colorList[index];
+        };
+        globalFunctions.getPlayerList = function() {
+            return lobby.playerList;
+        };
 
         lobby.getGameState = function(state) {
             if(state === 0) {
@@ -38,11 +44,28 @@
                 lobby.pollGameWaitingRoom();
             } else if(data.state === 1) {
                 //game is in progress
-
+                lobby.displayJoinOrCreateGame(false);
+                lobby.displayGameWaitingRoom(false);
+                lobby.displayGameLobby(false);
+                lobby.setPlayerNumber();
+                globalFunctions.createAndLoadMap();
             } else {
                 //game is over
 
             }
+        };
+        lobby.setPlayerNumber = function() {
+            $.ajax('/test/game/' + lobby.gameID, {
+                        method: 'GET',
+                    }).done(function(result) {
+                        var players = $.parseJSON(result);
+                        for(k=0; k<players.players.length; k++) {
+                            if(players.players[k].name === globalFunctions.getUsername()) {
+                                globalFunctions.setPlayerNumber(k + 1);
+                                return;
+                            }
+                        }
+                    });
         };
         lobby.startGame = function() {
             $.ajax('/test/game/' + lobby.gameID + '/start', {
@@ -111,6 +134,7 @@
                 state: game.state,
                 gameID: gameID
             });
+            // globalFunctions.createPlayerList(game);
 
         };
         lobby.createPlayerList = function(data) {
@@ -130,8 +154,7 @@
                 if(allPlayersReady === true) {
                     lobby.displayGameLobby(false);
                     // initialization.displayMap(true);
-                    new Board(globalFunctions);
-                    globalFunctions.createMap();
+                    globalFunctions.createAndLoadMap();
                 } else {
                     setTimeout(lobby.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                 }
@@ -149,7 +172,7 @@
                         globalFunctions.setPlayerNumber(-1);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === false) allPlayersReady = false;
-                            if(players.players[k] === globalFunctions.getUsername()) {
+                            if(players.players[k].name === globalFunctions.getUsername()) {
                                 globalFunctions.setPlayerNumber(k + 1);
                             }
                         }

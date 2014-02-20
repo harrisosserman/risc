@@ -66,7 +66,7 @@
             $.ajax('/test/player', {
                 method: 'POST',
                 data: JSON.stringify({
-                    'username': player.username(),
+                    'name': player.username(),
                     'password': CryptoJS.SHA512(player.password().toString())
                 }),
                 contentType: "application/json"

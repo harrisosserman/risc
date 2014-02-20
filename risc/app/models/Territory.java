@@ -8,14 +8,26 @@ public class Territory{
 	private int myOwner;
 	private int myTroops;
 	private int myPosition;
+	private int myFood;
+	private int myTechnology;
 	private ArrayList<Attacker> attackers;
+	
 
-	public Territory(int position, int owner, int troops){
+	public Territory(int position, int owner, int troops, int food, int technology){
 		myPosition = position;
 		myOwner = owner;
 		myTroops = troops;
+		myTechnology = technology;
+		myFood = food;
 		attackers = new ArrayList<Attacker>();
 
+	}
+	public int getFood(){
+		return myFood;
+	}
+
+	public int getTechnology(){
+		return myTechnology;
 	}
 
 	public int getPosition(){

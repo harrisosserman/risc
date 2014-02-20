@@ -331,4 +331,5 @@ public class Game {
         DBCollection stateCollection = DBHelper.getStateCollection();
         stateCollection.update(gameQuery, updatedCurrentTurn);
     }
+
 }
