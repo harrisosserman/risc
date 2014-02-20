@@ -44,11 +44,28 @@
                 lobby.pollGameWaitingRoom();
             } else if(data.state === 1) {
                 //game is in progress
-
+                lobby.displayJoinOrCreateGame(false);
+                lobby.displayGameWaitingRoom(false);
+                lobby.displayGameLobby(false);
+                lobby.setPlayerNumber();
+                globalFunctions.createAndLoadMap();
             } else {
                 //game is over
 
             }
+        };
+        lobby.setPlayerNumber = function() {
+            $.ajax('/test/game/' + lobby.gameID, {
+                        method: 'GET',
+                    }).done(function(result) {
+                        var players = $.parseJSON(result);
+                        for(k=0; k<players.players.length; k++) {
+                            if(players.players[k].name === globalFunctions.getUsername()) {
+                                globalFunctions.setPlayerNumber(k + 1);
+                                return;
+                            }
+                        }
+                    });
         };
         lobby.startGame = function() {
             $.ajax('/test/game/' + lobby.gameID + '/start', {

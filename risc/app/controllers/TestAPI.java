@@ -85,8 +85,8 @@ public class TestAPI extends Controller {
             result.put("gameID", "gameID1");
             result.put("state", 1);
             JSONArray list = new JSONArray();
-            list.put(new JSONObject().put("name", "harriso").put("ready", false));
-            list.put(new JSONObject().put("name", "juliant").put("ready", true));
+            list.put(new JSONObject().put("name", "harriso").put("ready", isHarrisReady));
+            list.put(new JSONObject().put("name", "juliant").put("ready", isHarrisReady));
             result.put("players", list);
             return ok(result.toString());
         }
@@ -95,10 +95,10 @@ public class TestAPI extends Controller {
             result.put("gameID", "gameID2");
             result.put("state", 0);
             JSONArray list = new JSONArray();
-            list.put(new JSONObject().put("name", "harriso").put("ready", false));
-            list.put(new JSONObject().put("name", "rickybobby").put("ready", true));
-            list.put(new JSONObject().put("name", "magicman").put("ready", false));
-            list.put(new JSONObject().put("name", "bladesofglory").put("ready", true));
+            list.put(new JSONObject().put("name", "harriso").put("ready", isHarrisReady));
+            list.put(new JSONObject().put("name", "rickybobby").put("ready", isHarrisReady));
+            list.put(new JSONObject().put("name", "magicman").put("ready", isHarrisReady));
+            list.put(new JSONObject().put("name", "bladesofglory").put("ready", isHarrisReady));
             result.put("players", list);
             return ok(result.toString());
         }
