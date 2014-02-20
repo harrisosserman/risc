@@ -8,6 +8,7 @@ public class UserManager{
 	public static final String NAME_KEY = "name";
 	public static final String PASSWORD_KEY = "password";
 	public static final String GAMES_KEY = "games";
+	public static final String GAME_KEY = "game";
 
 	public boolean createUser(String username, String password){
 		username = username.toLowerCase();
@@ -65,5 +66,20 @@ public class UserManager{
 		return false;
 	}
 
+	public void addGameToUser(String gameID, String username){
+		username = username.toLowerCase();
+
+		if (doesUserExist(username)) {
+			DBObject player = DBHelper.getPlayer(username);
+			
+			ArrayList<DBObject> games = (ArrayList<DBObject>)player.get(GAMES_KEY);
+			DBObject gameToAdd = new BasicDBObject(GAME_KEY, gameID);
+			DBObject updatedGames = new BasicDBObject(GAMES_KEY, gameToAdd);
+			DBObject updateCommand = new BasicDBObject("$push", updatedGames);
+
+			DBCollection playerCollection = DBHelper.getPlayerCollection();
+			playerCollection.update(player, updateCommand);
+		}
+	}
 
 }
