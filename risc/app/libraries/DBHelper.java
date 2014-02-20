@@ -175,4 +175,14 @@ public class DBHelper{
 	public static void removeObjectFromListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPull, String listKey, DBCollection collection){
 		performOperatorOnListAndUpdateCollection("$pull", documentIdentifier, objectToPull, listKey, collection);
 	}
+
+	//Query Makers
+	public static BasicDBObject andQueriesTogether(DBObject... queries){
+		ArrayList<DBObject> andList = new ArrayList<DBObject>();
+		for (DBObject query : queries) {
+			andList.add(query);
+		}
+		BasicDBObject andQuery = new BasicDBObject("$and", andList);
+		return andQuery;
+	}
 }

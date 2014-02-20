@@ -76,12 +76,13 @@ public class WaitingRoom{
 		BasicDBObject updatedReady = new BasicDBObject(readyPath, true);
 		BasicDBObject updateCommand = new BasicDBObject("$set", updatedReady);
 
-		ArrayList<DBObject> andList = new ArrayList<DBObject>();
+		// ArrayList<DBObject> andList = new ArrayList<DBObject>();
 		BasicDBObject playerQuery = new BasicDBObject(namePath, username);
-		andList.add(playerQuery);
+		// andList.add(playerQuery);
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, myGameID);
-		andList.add(gameQuery);
-		BasicDBObject andQuery = new BasicDBObject("$and", andList);
+		// andList.add(gameQuery);
+		// BasicDBObject andQuery = new BasicDBObject("$and", andList);
+		BasicDBObject andQuery = DBHelper.andQueriesTogether(playerQuery, gameQuery);
 
 		DBCollection infoCollection = DBHelper.getInfoCollection();
 		infoCollection.update(andQuery, updateCommand);
