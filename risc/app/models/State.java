@@ -94,7 +94,7 @@ public void assembleState(int turn_number) throws UnknownHostException{
     query.put(TURN, turn);
     DBCursor cursor = committedTurns.find(query);
     for(int i=0; i<NUM_TERRITORIES; i++){
-        Territory territory_empty = new Territory(i, -1, -1);
+        Territory territory_empty = new Territory(i, -1, -1, 0, 0);
         territories.add(territory_empty);
    }
     while(cursor.hasNext()) {
@@ -115,16 +115,11 @@ public void assembleState(int turn_number) throws UnknownHostException{
             for(BasicDBObject attack : attackerArray){
                 int attacker_territory = Integer.parseInt(attack.get(TERRITORY).toString());
                 int attacker_number = Integer.parseInt(attack.get(TROOPS).toString());
-                ArrayList<Attacker> attackers_inTerritory = territories.get(attacker_territory).getAttackers();
-                for(Attacker _attacker : attackers_inTerritory){
-                    if(_attacker.getOwner() == playerID){
-                        _attacker.setStrength(_attacker.getStrength() + attacker_number);
-                        continue attackerLoop;
-                    }
-                }
-                Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
-                territories.get(attacker_territory).addAttacker(a);
-            }
+           //     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
+           //     territories.get(attacker_territory).addAttacker(a);
+         //       System.out.println("the owner of the attacker is " + a.getOwner());
+            }     
+
         }
     }
     findState();
@@ -161,62 +156,87 @@ public void findState(){
     ArrayList<Attacker> attackers = battlefield.getAttackers();
         for(int j=0; j<attackers.size(); j++){
             Attacker attacker = attackers.get(j);
-            //System.out.println("attacker number " + j + "is " + attacker.getOwner() + " with " + attacker.getStrength() +" troops.");
-            int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
-            defender = winner[0];
-            defender_troops = winner[1];
-            //System.out.println("Territory " + i + " was just won by " + defender + " who now has " + defender_troops + " troops.");
+//            int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
+  //          defender = winner[0];
+    //        defender_troops = winner[1];
+
         }
         battlefield.setOwner(defender);
         battlefield.setDefendingArmy(defender_troops);
     }
 }
 
-/* 
- * Determines the winner of a two person battle. Uses a while loop to
- * make sure both parties have at least one player and then rolls two
- * twenty sided dice, and the lower dice loses a troop. 
- *
- * When the while loop exits, whichever owner has zero troops is the loser,
- * and the method returns the winner's owner id and the number of troops
- * remaining. 
- *
- * 
- *
- *
- * @param attacker is the owner of the attacker
- * @param a_troops is the number of troops the attacker has
- * @param defender is the owner of the defender
- * @param d_troops is the number of troops the defender has
- */
 
-public int[] battle(int attacker, int a_troops, int defender, int d_troops){
-    int[] winnerStrength = new int[2];
-    while(a_troops > 0 && d_troops > 0){
-        double a = Math.random()*19 + 1;
-        double d = Math.random()*19 + 1;
-        if(a > d){
-            d_troops--;
-            //System.out.println("defender " + defender + "lost a troop to " + attacker);
+//add in troops size
+public Army battle(ArrayList<Army> attackers, Army defender){
+    Collections.shuffle(attackers);
+    while(attackers.size()>0){
+        for(int i=attackers.size(); i>0; i--){
+            Army attacker = attackers.get(i);
+            Troop battler_1 = defender.getStrongest();
+            Troop battler_2 = attacker.getWeakest();
+            double batt_1 = battler_1.battle();
+            double batt_2 = battler_2.battle();
+            if(batt_1 == batt_2){
+                if(battler_1.getStrength() >= battler_2.getStrength()){
+                    batt_1++;
+                }
+                else{
+                    batt_2++;
+                }
+            }
+            if(batt_1 < batt_2){
+                defender.deleteTroop(battler_1.getType());
+                if(defender.getSize()==0){
+                    defender = attacker;
+                    attackers.remove(i);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+                }
+            }
+            else{
+                attacker.deleteTroop(battler_2.getType());
+                if(attacker.getSize()==0){
+                    attackers.remove(i);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+                } 
+            }
+        }
+        for(int j=attackers.size(); j>0; j--){
+            Army attacker = attackers.get(j);
+            Troop battler_1 = defender.getWeakest();
+            Troop battler_2 = attacker.getStrongest();
+            double batt_1 = battler_1.battle();
+            double batt_2 = battler_2.battle();
 
+            if(battler_1.battle() < battler_2.battle()){
+                defender.deleteTroop(battler_1.getType());
+                if(defender.getSize()==0){
+                    defender = attacker;
+                    attackers.remove(j);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+
+                }                
+            }
+            else{
+                attacker.deleteTroop(battler_2.getType());
+                if(attacker.getSize()==0){
+                    attackers.remove(j);
+                    if(attackers.size()==0){
+                        return defender;
+                    }
+                } 
+            }
         }
-        else{
-            //System.out.println("the attacker" + attacker + " lost a troop to " + defender);
-            a_troops--;
-        }
     }
-    if(a_troops > 0){
-        winnerStrength[0] = attacker;
-        //System.out.println("the attacker won " + attacker);
-        winnerStrength[1] = a_troops;
-    }
-    else{
-        winnerStrength[0] = defender;
-        //System.out.println("the defender won " + defender);
-        winnerStrength[1] = d_troops;
-    }
-    return winnerStrength;
+    return null;
 }
+
 
 /* 
  * The save state method takes the current ArrayList of territories
@@ -235,6 +255,7 @@ public int[] battle(int attacker, int a_troops, int defender, int d_troops){
  * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
  * be determined.
  */
+
 
  public void saveState() throws UnknownHostException{
     // delete first line?
