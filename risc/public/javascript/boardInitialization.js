@@ -5,9 +5,7 @@
         board.territoryInfo = {};
         board.territoryOwner = [];
         board.territoryDOMElements = [];    //delete
-        board.troops = [];  //delete
-        board.attackingTroops = []; //delete
-        board.additionalTroops = [];    //rename
+        board.additionalInfantry = [];    //rename
         board.boardInfo = {
             food: [],
             technology: [],
@@ -86,62 +84,61 @@
                         }
                         board.territoryInfo = $.parseJSON(result);
                         for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
-                            // globalFunctions.updateAdditionalTroops(board.territoryInfo.additionalTroops[m].owner,
-                            //     board.territoryInfo.additionalTroops[m].troops);
                             board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo);
+                            board.additionalInfantry[m] = board.territoryInfo.playerInfo[m].additionalInfantry;
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
-                            board.attackingTroops.push({
-                                'up': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'down': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'left': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'right': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'up_left': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'up_right': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'down_left': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                },
-                                'down_right': {
-                                    'troops': 0,
-                                    'arrowDOM': ' ',
-                                    'textDOM': ' ',
-                                    'destination': -1
-                                }
-                            });
+                            // board.attackingTroops.push({
+                            //     'up': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'down': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'left': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'right': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'up_left': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'up_right': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'down_left': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     },
+                            //     'down_right': {
+                            //         'troops': 0,
+                            //         'arrowDOM': ' ',
+                            //         'textDOM': ' ',
+                            //         'destination': -1
+                            //     }
+                            // });
                             board.territoryOwner.push(board.territoryInfo.territories[index].owner);
                             board.boardInfo.infantry[index] = board.territoryInfo.territories[index].INFANTRY;
                             board.boardInfo.automatic[index] = board.territoryInfo.territories[index].AUTOMATIC;
@@ -165,7 +162,7 @@
                                     board.updateTerritoryClickTable(index);
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
-                                    board.listenForAdditionalTroops(index);
+                                    board.listenForAdditionalInfantry(index);
                                 });
                             } else {
                                 $(this).click(function() {
@@ -174,7 +171,6 @@
                                     board.userMapAction(index, map);
                                 });
                             }
-                            $(this).append("<p class='troopTotals'>troops: <span>" + board.territoryInfo.territories[index].troops + "</span></p>");
                         });
                 });
         };
@@ -193,14 +189,26 @@
         };
         board.updatePlayerInfoTable = function(index, playerInfo) {
             var playerObject = board.playerList()[index];
-            var newPlayerObject = {
-                name: playerInfo[index].owner,
-                color: globalFunctions.getElementOfColorList(index),
-                additionalInfantry: playerInfo[index].additionalInfantry,
-                food: playerInfo[index].food,
-                tech: playerInfo[index].technology,
-                techLevel: playerInfo[index].level
-            };
+            var newPlayerObject = {};
+            if(typeof playerInfo !== 'undefined') {
+                newPlayerObject = {
+                    name: playerInfo[index].owner,
+                    color: globalFunctions.getElementOfColorList(index),
+                    additionalInfantry: playerInfo[index].additionalInfantry,
+                    food: playerInfo[index].food,
+                    tech: playerInfo[index].technology,
+                    techLevel: playerInfo[index].level
+                };
+            } else {
+                newPlayerObject = {
+                    name: playerObject.name,
+                    color: playerObject.color,
+                    additionalInfantry: board.additionalInfantry[index],
+                    food: playerObject.food,
+                    tech: playerObject.tech,
+                    techLevel: playerObject.techLevel
+                };
+            }
             board.playerList.remove(playerObject);
             board.playerList.splice(index, 0, newPlayerObject);
         };
@@ -222,16 +230,20 @@
                 }
             }
         };
-        board.listenForAdditionalTroops = function(index) {
+        board.listenForAdditionalInfantry = function(index) {
             $("body").unbind("keydown");
             if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
                 $("body").keydown(function(input) {
                         if(input.keyCode === 38) {
                             //up arrow
-                            board.editing.calculateAdditionalTroops(1, index, input, board.troops, board.additionalTroops);
+                            board.editing.calculateAdditionalTroops(1, index, input, board.boardInfo.infantry, board.additionalInfantry);
+                            board.updateTerritoryClickTable(index);
+                            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
                         } else if(input.keyCode === 40) {
                             //down arrow
-                            board.editing.calculateAdditionalTroops(-1, index, input, board.troops, board.additionalTroops);
+                            board.editing.calculateAdditionalTroops(-1, index, input, board.boardInfo.infantry, board.additionalInfantry);
+                            board.updateTerritoryClickTable(index);
+                            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
                         }
                 });
             }
