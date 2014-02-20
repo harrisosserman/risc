@@ -13,6 +13,7 @@ public class WaitingRoom{
 	public static final String GAME_ID_KEY = "gameID";
 
 	private DBObject myInfo;
+	private String myGameID;
 
 	public WaitingRoom(){
 
@@ -42,12 +43,14 @@ public class WaitingRoom{
 		infoCollection.update(info, updateCommand);
 
 		myInfo = infoCollection.findOne(infoWithID);
+		myGameID = id;
 	}
 
 	public static WaitingRoom getWaitingRoom(String gameID){
 		DBObject info = DBHelper.getInfoForGame(gameID);
 		WaitingRoom wr = new WaitingRoom();
 		wr.setInfo(info);
+		wr.setGameID(gameID);
 		return wr;
 	}
 
@@ -62,17 +65,47 @@ public class WaitingRoom{
 		DBCollection infoCollection = DBHelper.getInfoCollection();
 		BasicDBObject player = createPlayer(username);
 		DBHelper.addObjectToListAndUpdateCollection(myInfo, player, PLAYERS_KEY, infoCollection);
+
+		myInfo = DBHelper.getInfoForGame(myGameID);
 	}
 
 	public void markPlayerAsReady(String username){
-		//TODO: Start here.
+		String readyPath = PLAYERS_KEY + ".$." + READY_KEY;
+		String namePath = PLAYERS_KEY + "." + PLAYER_KEY;
+
+		BasicDBObject updatedReady = new BasicDBObject(readyPath, true);
+		BasicDBObject updateCommand = new BasicDBObject("$set", updatedReady);
+
+		ArrayList<DBObject> andList = new ArrayList<DBObject>();
+		BasicDBObject playerQuery = new BasicDBObject(namePath, username);
+		andList.add(playerQuery);
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, myGameID);
+		andList.add(gameQuery);
+		BasicDBObject andQuery = new BasicDBObject("$and", andList);
+
+		DBCollection infoCollection = DBHelper.getInfoCollection();
+		infoCollection.update(andQuery, updateCommand);
+
+		myInfo = DBHelper.getInfoForGame(myGameID);
 	}
 
 	public void setInfo(DBObject info){
 		myInfo = info;
 	}
 
+	public void setGameID(String gameID){
+		myGameID = gameID;
+	}
+
+	public String getGameID(){
+		return myGameID;
+	}
+
 	public String toString(){
-		return myInfo.toString();
+		if (myInfo != null) {
+			return myInfo.toString();
+		}else{
+			return "myInfo is null";
+		}
 	}
 }
