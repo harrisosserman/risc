@@ -14,6 +14,7 @@ DELETE	/game/:id/reset				controllers.API.reset(id: String)
 
 POST	/player 					controllers.API.createPlayer()
 GET 	/player/:username			controllers.API.getPublicUserInfo(username: String)
+POST 	/player/:username/login 	controllers.API.logUserIn(username: String)
 
 #   API calls that Harris made for testing the front end
 GET     /test/player/:username          controllers.TestAPI.getTestUsername(username: String)

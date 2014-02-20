@@ -51,5 +51,19 @@ public class UserManager{
 		}
 	}
 
+	public boolean doesUsernameMatchPassword(String username, String password){
+		username = username.toLowerCase();
+
+		if (doesUserExist(username)) {
+			DBObject player = DBHelper.getPlayer(username);
+			String playerPassword = player.get(PASSWORD_KEY).toString();
+			if (playerPassword.equals(password)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 }
