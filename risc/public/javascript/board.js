@@ -155,12 +155,12 @@
         board.updatePlayerInfoTable = function(index, playerInfo) {
             var playerObject = board.playerList()[index];
             var newPlayerObject = {
-                "name": playerInfo.name,
-                "color": globalFunctions.getElementOfColorList(index),
-                "additionalInfantry": playerInfo.additionalInfantry,
-                "food": playerInfo.food,
-                "tech": playerInfo.tech,
-                "techLevel": playerInfo.level
+                name: playerInfo[index].owner,
+                color: globalFunctions.getElementOfColorList(index),
+                additionalInfantry: playerInfo[index].additionalInfantry,
+                food: playerInfo[index].food,
+                tech: playerInfo[index].technology,
+                techLevel: playerInfo[index].level
             };
             board.playerList.remove(playerObject);
             board.playerList.splice(index, 0, newPlayerObject);
