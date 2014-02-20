@@ -10,8 +10,7 @@ public class UserManager{
 	public static final String GAMES_KEY = "games";
 
 	public boolean createUser(String username, String password){
-		System.out.println("username: " + username);
-		System.out.println("pass: " + password);
+		username = username.toLowerCase();
 
 		DBCollection playerCollection = DBHelper.getPlayerCollection();
 
@@ -32,5 +31,25 @@ public class UserManager{
 			return false;
 		}
 	}
+
+	private boolean doesUserExist(String username){
+		DBObject player = DBHelper.getPlayer(username);
+		return (player != null);
+	}
+
+	//Returns the player info without the password if it exists.
+	//Returns null otherwise.
+	public String getPublicPlayerInfoJson(String username){
+		username = username.toLowerCase(); 
+
+		if (doesUserExist(username)) {
+			DBObject player = DBHelper.getPlayer(username);
+			player.removeField(PASSWORD_KEY);
+			return player.toString();
+		}else{
+			return null;
+		}
+	}
+
 
 }

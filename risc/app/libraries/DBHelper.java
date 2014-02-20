@@ -33,6 +33,7 @@ public class DBHelper{
     public static final String ACTIVE_PLAYERS_KEY = "activePlayers";
     public static final String PLAYER_NUMBER_KEY = "playerNumber";
     public static final String PLAYER_ID_KEY = "playerId";
+    public static final String PLAYER_NAME_KEY = "name";
 
 	private static MongoConnection myConnection;
 
@@ -141,6 +142,12 @@ public class DBHelper{
 		return highestTurnCursor.next();
 	}
 
+	public static DBObject getPlayer(String name){
+		DBCollection playersCollection = DBHelper.getPlayerCollection();
+		BasicDBObject playerQuery = new BasicDBObject(PLAYER_NAME_KEY, name);
+		return playersCollection.findOne(playerQuery);
+	}
+
 	//Get Cursors
 
 	public static DBCursor getStateCursorForGame(String gameID){
@@ -148,6 +155,4 @@ public class DBHelper{
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		return stateCollection.find(gameQuery);
 	}
-
-
 }

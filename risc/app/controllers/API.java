@@ -139,4 +139,14 @@ public class API extends Controller {
             return badRequest("Username already taken");
         }
     }
+
+    public static Result getPublicUserInfo(String username){
+        UserManager um = new UserManager();
+        String playerJson = um.getPublicPlayerInfoJson(username);
+        if (playerJson != null) {
+            return ok(playerJson);
+        }else{
+            return badRequest("User: " + username + " does not exist");
+        }
+    }
 }
