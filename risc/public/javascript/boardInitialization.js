@@ -4,10 +4,10 @@
         var board = this;
         board.territoryInfo = {};
         board.territoryOwner = [];
-        board.territoryDOMElements = [];
-        board.troops = [];
-        board.attackingTroops = [];
-        board.additionalTroops = [];
+        board.territoryDOMElements = [];    //delete
+        board.troops = [];  //delete
+        board.attackingTroops = []; //delete
+        board.additionalTroops = [];    //rename
         board.boardInfo = {
             food: [],
             technology: [],
@@ -18,10 +18,8 @@
             improvedTank: [],
             plane: []
         };
-        // board.attackInfo = {
-        //     origin: [],
-        //     destination: []
-        // };
+        board.attackInfo = [];
+
         board.displayMap = ko.observable(false);
         board.playerList = ko.observableArray();
         board.territoryClickTerritoryNumber = ko.observable("-");
@@ -252,6 +250,21 @@
                 fighter: board.boardInfo.plane[index]
             };
             board.territoryClickInfo.push(data);
+            board.territoryClickAttackInfo.removeAll();
+            if(typeof board.attackInfo[index] != 'undefined') {
+                for(var k=0; k<board.attackInfo[index].length; k++) {
+                    data = {
+                        destination: board.attackInfo[index].destination,
+                        infantry: board.attackInfo.infantry[index],
+                        auto: board.attackInfo.automatic[index],
+                        rocket: board.attackInfo.rocket[index],
+                        tank: board.attackInfo.tank[index],
+                        improved: board.attackInfo.improvedTank[index],
+                        fighter: board.attackInfo.plane[index]
+                    };
+                    board.territoryClickAttackInfo.push(data);
+                }
+            }
         };
         board.userMapAction = function(index, map) {
             if($(map[index]).hasClass('territoryClick')) {
