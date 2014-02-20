@@ -8,6 +8,20 @@
         board.troops = [];
         board.attackingTroops = [];
         board.additionalTroops = [];
+        board.boardInfo = {
+            food: [],
+            technology: [],
+            infantry: [],
+            automatic: [],
+            rocket: [],
+            tank: [],
+            improvedTank: [],
+            plane: []
+        };
+        // board.attackInfo = {
+        //     origin: [],
+        //     destination: []
+        // };
         board.displayMap = ko.observable(false);
         board.playerList = ko.observableArray();
         board.territoryClickTerritoryNumber = ko.observable("-");
@@ -32,9 +46,6 @@
         };
         globalFunctions.setDisplayMap = function(input) {
             board.displayMap(input);
-        };
-        globalFunctions.setTerritoryClickTerritoryNumber = function(input) {
-            board.territoryClickTerritoryNumber(input);
         };
         globalFunctions.destroyAndRebuildMap = function() {
             globalFunctions.setDisplayMap(true);
@@ -134,7 +145,16 @@
                                 }
                             });
                             board.territoryOwner.push(board.territoryInfo.territories[index].owner);
-                            board.troops.push(board.territoryInfo.territories[index].troops);
+                            board.boardInfo.infantry[index] = board.territoryInfo.territories[index].INFANTRY;
+                            board.boardInfo.automatic[index] = board.territoryInfo.territories[index].AUTOMATIC;
+                            board.boardInfo.rocket[index] = board.territoryInfo.territories[index].ROCKETS;
+                            board.boardInfo.tank[index] = board.territoryInfo.territories[index].TANKS;
+                            board.boardInfo.improvedTank[index] = board.territoryInfo.territories[index].IMPROVEDTANKS;
+                            board.boardInfo.plane[index] = board.territoryInfo.territories[index].PLANES;
+                            board.boardInfo.food[index] = -1;
+                            board.boardInfo.technology[index] = -1;
+
+                            // board.troops.push(board.territoryInfo.territories[index].troops);
                             board.territoryDOMElements.push($(this));
                             $(this).addClass("player" + board.territoryInfo.territories[index].owner);
                             if(board.territoryInfo.territories[index].owner === globalFunctions.getPlayerNumber()) {
@@ -144,6 +164,7 @@
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
+                                    board.updateTerritoryClickTable(index);
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
                                     board.listenForAdditionalTroops(index);
@@ -151,6 +172,7 @@
                             } else {
                                 $(this).click(function() {
                                     //click handler for clicking on enemy territory
+                                    board.updateTerritoryClickTable(index);
                                     board.userMapAction(index, map);
                                 });
                             }
@@ -215,6 +237,21 @@
                         }
                 });
             }
+        };
+        board.updateTerritoryClickTable = function(index) {
+            board.territoryClickTerritoryNumber(index + 1);
+            board.territoryClickInfo.removeAll();
+            var data = {
+                food: board.boardInfo.food[index],
+                tech: board.boardInfo.technology[index],
+                infantry: board.boardInfo.infantry[index],
+                auto: board.boardInfo.automatic[index],
+                rocket: board.boardInfo.rocket[index],
+                tank: board.boardInfo.tank[index],
+                improved: board.boardInfo.improvedTank[index],
+                fighter: board.boardInfo.plane[index]
+            };
+            board.territoryClickInfo.push(data);
         };
         board.userMapAction = function(index, map) {
             if($(map[index]).hasClass('territoryClick')) {
