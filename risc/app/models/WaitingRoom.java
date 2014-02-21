@@ -2,6 +2,7 @@ package models;
 
 import java.util.*;
 import com.mongodb.*;
+import com.mongodb.util.JSON;
 import libraries.DBHelper;
 
 public class WaitingRoom{
@@ -11,6 +12,7 @@ public class WaitingRoom{
 	public static final String READY_KEY = "ready";
 	public static final String ID_KEY = "_id";
 	public static final String GAME_ID_KEY = "gameID";
+	public static final int MAX_PLAYERS_PER_GAME = 5;
 
 	private DBObject myInfo;
 	private String myGameID;
@@ -52,6 +54,18 @@ public class WaitingRoom{
 		wr.setInfo(info);
 		wr.setGameID(gameID);
 		return wr;
+	}
+
+	public static String getJoinableWaitingRoomsJson(){
+		DBCollection infoCollection = DBHelper.getInfoCollection();
+
+		BasicDBObject stateQuery = new BasicDBObject(STATE_KEY, 0);
+		BasicDBObject playersLengthQuery = new BasicDBObject("$where", "this." + PLAYERS_KEY + ".length < " + MAX_PLAYERS_PER_GAME);
+		BasicDBObject andQuery = DBHelper.andQueriesTogether(stateQuery, playersLengthQuery);
+
+		DBCursor joinableGamesCursor = infoCollection.find(andQuery);
+		String joinableGamesJson = JSON.serialize(joinableGamesCursor).toString();
+		return joinableGamesJson;
 	}
 
 	private BasicDBObject createPlayer(String username){
