@@ -1,29 +1,29 @@
 {
     "gameID": "gameID",
     "username": "playerID",
-    "turn": 4, 
+    "turn": 4,
     //note harris sends the time stamp"
-    "timeStamp": "",
+    "timeStamp": 2342432432,
     "food": 100,
     "technology":100,
     "technology_level": 1,
     "moves":[
- 
-        { 
-            "moveType": 0, // choices are 0 = upgrade,  1= move and 2=attack. 
+
+        {
+            "moveType": 0, // choices are 0 = upgrade,  1= move and 2=attack.
             "position": 4,
             "troopType": "INFANTRY",
             "upgradeType": "AUTOMATIC"
-            
+
         },
-        {            
-            "moveType": 1, // choices are 0 = upgrade,  1= move and 2=attack. 
+        {
+            "moveType": 1, // choices are 0 = upgrade,  1= move and 2=attack.
             "troopType": "AUTOMATIC",
             "start": 4,
             "end": 4
         },
-        {            
-            "moveType": 2, // choices are 0 = upgrade,  1= move and 2=attack. 
+        {
+            "moveType": 2, // choices are 0 = upgrade,  1= move and 2=attack.
             "troopType": "AUTOMATIC",
             "start": 4,
             "end": 4
@@ -32,8 +32,8 @@
 
     ]
 
-   
-    
+
+
 }
 
 NOTE: There will be n documents in the committedTurns collection per game, where n is the number of players in the game

@@ -3,22 +3,17 @@ function BoardEditing(globals) {
     var editing = this;
     editing.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
 
-    editing.calculateAdditionalTroops = function(troopDelta, index, key, troopsArray, additionalTroopsArray) {
+    editing.calculateAdditionalTroops = function(troopDelta, index, key, infantry, additionalInfantry) {
         key.preventDefault();
-        var currentTroops = troopsArray[index];
-        var currentAdditionalTroops = additionalTroopsArray[globalFunctions.getPlayerNumber()];
-        if(currentTroops === 0 && troopDelta === -1 || currentAdditionalTroops === 0 && troopDelta === 1) {
+        var currentInfantry = infantry[index];
+        var currentAdditionalTroops = additionalInfantry[globalFunctions.getPlayerNumber() - 1];
+        if(currentInfantry === 0 && troopDelta === -1 || currentAdditionalTroops === 0 && troopDelta === 1) {
             return;
         }
-        currentTroops = currentTroops + troopDelta;
+        currentInfantry = currentInfantry + troopDelta;
         currentAdditionalTroops = currentAdditionalTroops - troopDelta;
-        additionalTroopsArray[globalFunctions.getPlayerNumber()] = currentAdditionalTroops;
-        editing.updateTroopsOnTerritory(index, currentTroops, $("#map td"), troopsArray);
-        // globalFunctions.updateAdditionalTroops(globalFunctions.getPlayerNumber(), currentAdditionalTroops);
-    };
-    editing.updateTroopsOnTerritory = function(index, troops, map, troopArray) {
-        troopArray[index] = troops;
-        $(map[index]).children('p').children('span').html(troops);
+        additionalInfantry[globalFunctions.getPlayerNumber() - 1] = currentAdditionalTroops;
+        infantry[index] = currentInfantry;
     };
     editing.findOrigin = function(destination, territoryDOMElements) {
         var adjacencies = editing.findValidAdjacencies(destination);
