@@ -100,6 +100,23 @@ public class WaitingRoom{
 		myInfo = DBHelper.getInfoForGame(myGameID);
 	}
 
+	public int getNumberOfPlayers(){
+		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
+		return players.size();
+	}
+
+	public int getNumberOfReadyPlayers(){
+		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
+		int readyCount = 0;
+		for (DBObject player : players) {
+			boolean isReady = (Boolean)player.get(READY_KEY);
+			if (isReady) {
+				readyCount++;
+			}
+		}
+		return readyCount;
+	}
+
 	public void setInfo(DBObject info){
 		myInfo = info;
 	}
