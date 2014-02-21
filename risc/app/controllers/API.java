@@ -16,6 +16,7 @@ import models.Turn;
 import models.State;
 import libraries.DBHelper;
 import models.UserManager;
+import models.WaitingRoom;
 
 public class API extends Controller {
 
@@ -25,33 +26,20 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result createGame() throws UnknownHostException{
+    public static Result createWaitingRoom(){
         RequestBody body = request().body();
         String playerName = body.asJson().get(DBHelper.NAME_KEY).toString();
         String playerNameWithoutQuotes = removeQuotes(playerName);
 
+        WaitingRoom wr = new WaitingRoom();
+        wr.createNewWaitingRoom(playerNameWithoutQuotes);
+
         Game game = new Game();
 
-        boolean canStillJoin = game.canPlayersStillJoin();
-        String gameID = game.getGameID();
-        int playerID;
-
-        if(canStillJoin){
-            game.addWaitingPlayer(playerNameWithoutQuotes);
-            playerID = game.getWaitingPlayerCount();
-        }else{
-            playerID = 0;
-        }
-
         JSONObject result = new JSONObject();
-        result.put(DBHelper.GAME_ID_KEY, gameID);
-        result.put(DBHelper.PLAYER_ID_KEY, playerID);
+        result.put(DBHelper.GAME_ID_KEY, wr.getGameID());
 
-        if (canStillJoin) {
-            return ok(result.toString());
-        }else{
-            return badRequest(result.toString());
-        }
+        return ok(result.toString());
     }
 
     public static Result getWaitingPlayers(String id) throws UnknownHostException{
