@@ -4,9 +4,9 @@
 
 GET     /                           controllers.MainController.index()
 POST    /game                       controllers.API.createWaitingRoom()
-GET		/game/:id					controllers.API.getWaitingPlayers(id: String)
+GET		/game/:id					controllers.API.getWaitingRoomInfo(id: String)
 POST 	/game/:id 					controllers.API.commitTurn(id: String)
-POST	/game/:id/start				controllers.API.startGame(id: String)
+POST	/game/:gameID/start			controllers.API.markPlayerReadyAndStartGameIfNeeded(gameID: String)
 GET 	/game/:id/map 				controllers.API.getMap(id: String)
 POST	/game/:id/exit				controllers.API.exit(id: String)
 GET 	/game/:id/mapReady			controllers.API.isMapReady(id: String)

@@ -42,10 +42,9 @@ public class API extends Controller {
         return ok(result.toString());
     }
 
-    public static Result getWaitingPlayers(String id) throws UnknownHostException{
-        Game game = new Game();
-        String json = game.getWaitingPlayersJson(id);
-    	return ok(json);
+     public static Result getWaitingRoomInfo(String id){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(id);
+        return ok(wr.toString());
     }
 
 
@@ -66,12 +65,20 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result startGame(String id) throws UnknownHostException{
+    public static Result markPlayerReadyAndStartGameIfNeeded(String gameID){
         RequestBody body = request().body();
-        int startingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
-        String startingPlayerName = body.asJson().get(DBHelper.NAME_KEY).toString();
-        Game game = new Game();
-        game.start(id, startingPlayerNumber, startingPlayerName);
+        String username = body.asJson().get(DBHelper.NAME_KEY).toString();
+        String usernameWithoutQuotes = removeQuotes(username);
+
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.markPlayerAsReady(usernameWithoutQuotes);
+
+        boolean areThereEnoughPlayers = (wr.getNumberOfPlayers() >= wr.MIN_PLAYERS_PER_GAME);
+        boolean isEveryoneReady = (wr.getNumberOfReadyPlayers() == wr.getNumberOfPlayers());
+        if (areThereEnoughPlayers && isEveryoneReady) {
+            //TODO: create new game
+        }
+
         return ok();
     }
 
