@@ -13,6 +13,7 @@ public class WaitingRoom{
 	public static final String ID_KEY = "_id";
 	public static final String GAME_ID_KEY = "gameID";
 	public static final int MAX_PLAYERS_PER_GAME = 5;
+	public static final int MIN_PLAYERS_PER_GAME = 2;
 
 	private DBObject myInfo;
 	private String myGameID;
@@ -76,6 +77,8 @@ public class WaitingRoom{
 	}
 
 	public void addPlayer(String username){
+		username = username.toLowerCase();
+
 		DBCollection infoCollection = DBHelper.getInfoCollection();
 		BasicDBObject player = createPlayer(username);
 		DBHelper.addObjectToListAndUpdateCollection(myInfo, player, PLAYERS_KEY, infoCollection);
@@ -84,6 +87,8 @@ public class WaitingRoom{
 	}
 
 	public void markPlayerAsReady(String username){
+		username = username.toLowerCase();
+
 		String readyPath = PLAYERS_KEY + ".$." + READY_KEY;
 		String namePath = PLAYERS_KEY + "." + PLAYER_KEY;
 
