@@ -73,10 +73,11 @@ public class API extends Controller {
         WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
-        boolean areThereEnoughPlayers = (wr.getNumberOfPlayers() >= wr.MIN_PLAYERS_PER_GAME);
-        boolean isEveryoneReady = (wr.getNumberOfReadyPlayers() == wr.getNumberOfPlayers());
-        if (areThereEnoughPlayers && isEveryoneReady) {
-            //TODO: create new game
+        if (wr.shouldGameBegin()) {
+            //Initalize the new game
+            new Game(wr.getGameID());
+            
+            wr.markRoomAsNotJoinable();
         }
 
         return ok();

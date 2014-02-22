@@ -14,12 +14,29 @@ public class Game {
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
 
     private String myGameID;
-    private ArrayList<Player> myPlayers;
     private Territory[] myTerritories;
 
     public Game(){
-        this.myGameID = DEFAULT_GAME_ID;
-        this.myPlayers = new ArrayList<Player>();
+        myGameID = DEFAULT_GAME_ID;
+    }
+
+    public Game(String gameID){
+        myGameID = gameID;
+
+        DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
+        if (!stateCursor.hasNext()) {
+            //TODO: Create game
+        }
+    }
+
+    private DBCursor getStateCursor(){
+        DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
+        return stateCursor;
+    }
+
+    private DBObject getMostRecentTurn(){
+        DBObject mostRecentTurn = DBHelper.getCurrentTurnForGame(myGameID);
+        return  mostRecentTurn;
     }
 
     public boolean areAllPlayersCommitted() throws UnknownHostException{
@@ -51,11 +68,6 @@ public class Game {
 
         return true;
     }
-
-	private boolean gameMapHasBeenCreated(String gameID){
-        DBObject map = DBHelper.getMapForGame(gameID);
-        return (map != null);
-	}
 
     private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
         DBCollection mapCollection = DBHelper.getMapCollection();
@@ -118,7 +130,7 @@ public class Game {
     }
 
     public String getGameID(){
-        return this.myGameID;
+        return myGameID;
     }
 
     public Integer getWaitingPlayerCount() throws UnknownHostException{
