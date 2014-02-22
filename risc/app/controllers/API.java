@@ -42,10 +42,9 @@ public class API extends Controller {
         return ok(result.toString());
     }
 
-    public static Result getWaitingPlayers(String id) throws UnknownHostException{
-        Game game = new Game();
-        String json = game.getWaitingPlayersJson(id);
-    	return ok(json);
+     public static Result getWaitingRoomInfo(String id){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(id);
+        return ok(wr.toString());
     }
 
 
