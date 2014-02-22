@@ -22,68 +22,6 @@ public class Game {
         this.myPlayers = new ArrayList<Player>();
     }
 
-    public void addWaitingPlayer(String playerName) throws UnknownHostException{
-        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);      
-
-        if (waitingPlayers == null) {
-            BasicDBObject doc = new BasicDBObject();
-
-            BasicDBObject firstPlayer = new BasicDBObject(DBHelper.NAME_KEY, playerName).append(DBHelper.READY_KEY, false);
-            ArrayList<BasicDBObject> playersList = new ArrayList<BasicDBObject>();
-            playersList.add(firstPlayer);
-            doc.append(DBHelper.PLAYERS_KEY, playersList);
-            doc.append(DBHelper.COUNT_KEY, 1);
-            doc.append(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
-
-            waitingPlayersCollection.insert(doc);
-        }else{
-            BasicDBObject joiningPlayer = new BasicDBObject(DBHelper.PLAYERS_KEY, new BasicDBObject(DBHelper.NAME_KEY, playerName).append(DBHelper.READY_KEY, false));
-            DBObject updateQuery = new BasicDBObject("$push", joiningPlayer);
-            waitingPlayersCollection.update(new BasicDBObject(), updateQuery);
-
-            BasicDBObject query = new BasicDBObject(DBHelper.COUNT_KEY,  new BasicDBObject("$gte", 0));
-            BasicDBObject incValue = new BasicDBObject(DBHelper.COUNT_KEY, 1);
-            BasicDBObject intModifier = new BasicDBObject("$inc", incValue);
-            waitingPlayersCollection.update(query, intModifier);
-        }
-    }
-
-    public String getWaitingPlayersJson(String gameID) throws UnknownHostException{
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
-        return waitingPlayers.toString();
-    }
-
-    public void start(String gameID, int startingPlayerNumber, String startingPlayerName) throws UnknownHostException{
-        //update initialization.waitingPlayers to show that someone is ready
-        markWaitingPlayerReady(gameID, startingPlayerNumber, startingPlayerName);
-
-		if (areAllPlayersReady(gameID) && getWaitingPlayerCount() >= 2) {
-			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
-			makeInitialGameMap(territoryOwners, gameID);
-            makeInitialInfo();
-		}
-	}
-
-    private boolean areAllPlayersReady(String gameID) throws UnknownHostException{
-        int waitingPlayerCount = getWaitingPlayerCount();
-
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(gameID);
-        if (waitingPlayers == null) {
-            return false;
-        }
-
-        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
-        int readyCount = 0;
-        for (DBObject player : players) {
-           if ((Boolean)player.get(DBHelper.READY_KEY)) {
-                readyCount++;
-           }
-        }
-        return readyCount == waitingPlayerCount;
-    }
-
     public boolean areAllPlayersCommitted() throws UnknownHostException{
         DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
         BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
@@ -119,33 +57,6 @@ public class Game {
         return (map != null);
 	}
 
-	public boolean canPlayersStillJoin() throws UnknownHostException{
-		if (getWaitingPlayerCount() >= 5) {
-			return false;
-		}
-
-		if (gameMapHasBeenCreated(myGameID)) {
-			return false;
-		}
-
-		return true;
-	}
-
-    private void markWaitingPlayerReady(String gameID, int playerNumber, String playerName) throws UnknownHostException{
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(gameID);
-
-        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
-        int playerIndex = playerNumber - 1; // - 1 because 1-indexed instead of 0-indexed
-        BasicDBObject startingPlayer = players.get(playerIndex);
-
-        BasicDBObject newDocument = new BasicDBObject("$set", waitingPlayers);
-        String readyPath = DBHelper.PLAYERS_KEY + "." + playerIndex + "." + DBHelper.READY_KEY;
-        newDocument.append("$set", new BasicDBObject().append(readyPath, true));
-
-        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-        waitingPlayersCollection.update(new BasicDBObject(), newDocument);
-    }
-
     private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
         DBCollection mapCollection = DBHelper.getMapCollection();
 
@@ -178,24 +89,6 @@ public class Game {
         doc.append(DBHelper.ADDITIONAL_TROOPS_KEY, additionalTroops);
 
         mapCollection.insert(doc);
-    }
-
-    private void makeInitialInfo(){
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
-        int activePlayerCount = (Integer)waitingPlayers.get(DBHelper.COUNT_KEY);
-
-        ArrayList<DBObject> activePlayers = new ArrayList<DBObject>();
-        for (int i = 1; i <= activePlayerCount; i++) {
-            DBObject activePlayer = new BasicDBObject(DBHelper.PLAYER_NUMBER_KEY, i);
-            activePlayers.add(activePlayer);
-        }
-
-        DBCollection infoCollection = DBHelper.getInfoCollection();
-
-        BasicDBObject info = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        info.append(DBHelper.ACTIVE_PLAYERS_KEY, activePlayers);
-
-        infoCollection.insert(info);
     }
 
     private int[] assignCountryOwners(int playerCount) {
