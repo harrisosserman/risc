@@ -1,29 +1,28 @@
 package controllers;
 
-import play.mvc.Result;
-import play.mvc.Controller;
+import com.mongodb.*;
+
 import controllers.routes;
+
 import java.util.*;
+
 import libraries.JSONLibrary.JSONObject;
 import libraries.JSONLibrary.JSONArray;
-import models.Game;
-import play.mvc.Http.RequestBody;
-import play.mvc.BodyParser;
 import libraries.MongoConnection;
-import com.mongodb.*;
-import java.net.UnknownHostException;
+import libraries.DBHelper;
+
+import models.Game;
 import models.Turn;
 import models.State;
-import libraries.DBHelper;
 import models.UserManager;
 import models.WaitingRoom;
 
-public class API extends Controller {
+import play.mvc.Result;
+import play.mvc.Controller;
+import play.mvc.Http.RequestBody;
+import play.mvc.BodyParser;
 
-    public static MongoConnection initDB() throws UnknownHostException{
-        MongoConnection mongoConnection = new MongoConnection();
-        return mongoConnection;
-    }
+public class API extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createWaitingRoom(){
@@ -42,8 +41,8 @@ public class API extends Controller {
         return ok(result.toString());
     }
 
-     public static Result getWaitingRoomInfo(String id){
-        WaitingRoom wr = WaitingRoom.getWaitingRoom(id);
+     public static Result getWaitingRoomInfo(String gameID){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
         return ok(wr.toString());
     }
 
@@ -52,7 +51,7 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result commitTurn(String id) throws UnknownHostException {
+    public static Result commitTurn(String gameID) {
 
         RequestBody body = request().body();
         Turn turn = new Turn();
@@ -86,14 +85,14 @@ public class API extends Controller {
         return ok();
     }
 
-    public static Result getMap(String id) throws UnknownHostException{
+    public static Result getMap(String gameID){
         Game game = new Game();
-        String mapJson = game.getMapJson(id);
+        String mapJson = game.getMapJson(gameID);
         return ok(mapJson);
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result exit(String id) throws UnknownHostException{
+    public static Result exit(String gameID){
         RequestBody body = request().body();
         int exitingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
 
@@ -102,10 +101,10 @@ public class API extends Controller {
         return ok("Exiting for player:" + exitingPlayerNumber);
     }
 
-    public static Result isMapReady(String id) throws UnknownHostException{
+    public static Result isMapReady(String gameID){
         Game game = new Game();
         if (game.areAllPlayersCommitted()) {
-            String gameStateJson = game.getCurrentGameStateJson(id);
+            String gameStateJson = game.getCurrentGameStateJson(gameID);
             return ok(gameStateJson);
         }else{
             return badRequest("all players havent committed yet");
@@ -116,9 +115,9 @@ public class API extends Controller {
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
     
-    public static Result reset(String id) throws UnknownHostException{
-        DBHelper.reset(id);
-        return ok("Reset DB for gameID:" + id);
+    public static Result reset(String gameID){
+        DBHelper.reset(gameID);
+        return ok("Reset DB for gameID:" + gameID);
     }
 
     //-------- Player API Methods ----------

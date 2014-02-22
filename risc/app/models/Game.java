@@ -4,7 +4,6 @@ import java.util.*;
 import libraries.MongoConnection;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import java.net.UnknownHostException;
 import libraries.DBHelper;
 
 public class Game {
@@ -46,7 +45,7 @@ public class Game {
         return  mostRecentTurn;
     }
 
-    public boolean areAllPlayersCommitted() throws UnknownHostException{
+    public boolean areAllPlayersCommitted(){
         DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
         BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
         DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
@@ -76,7 +75,7 @@ public class Game {
         return true;
     }
 
-    private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
+    private void makeInitialGameMap(int[] territoryOwners, String gameID){
         DBCollection mapCollection = DBHelper.getMapCollection();
 
         BasicDBObject doc = new BasicDBObject();
@@ -126,12 +125,12 @@ public class Game {
         return owners;
     }
 
-    public String getMapJson(String gameID) throws UnknownHostException{
+    public String getMapJson(String gameID){
         DBObject map = DBHelper.getMapForGame(gameID);
         return map.toString();
     }
 
-    public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
+    public String getCurrentGameStateJson(String gameID){
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(gameID);
         return currentTurn.toString();
     }
@@ -140,7 +139,7 @@ public class Game {
         return myGameID;
     }
 
-    public Integer getWaitingPlayerCount() throws UnknownHostException{
+    public Integer getWaitingPlayerCount(){
         DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
         if (waitingPlayers == null) {
             return 0;
@@ -170,7 +169,7 @@ public class Game {
         return count;
     }
 
-    public void removePlayer(int pid) throws UnknownHostException{
+    public void removePlayer(int pid){
         System.out.println("------- Remove called");
         //First update info collection
         //decrement game.state.activePlayerCount
