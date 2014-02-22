@@ -47,6 +47,9 @@ public class API extends Controller {
         return ok(wr.toString());
     }
 
+    public static Result getAllJoinableGames(){
+        return ok(WaitingRoom.getJoinableWaitingRoomsJson());
+    }
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result commitTurn(String id) throws UnknownHostException {
@@ -76,7 +79,7 @@ public class API extends Controller {
         if (wr.shouldGameBegin()) {
             //Initalize the new game
             new Game(wr.getGameID());
-            
+
             wr.markRoomAsNotJoinable();
         }
 

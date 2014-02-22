@@ -3,6 +3,7 @@
 # ~~~~
 
 GET     /                           controllers.MainController.index()
+GET 	/game 						controllers.API.getAllJoinableGames()
 POST    /game                       controllers.API.createWaitingRoom()
 GET		/game/:id					controllers.API.getWaitingRoomInfo(id: String)
 POST 	/game/:id 					controllers.API.commitTurn(id: String)

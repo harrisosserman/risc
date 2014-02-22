@@ -26,6 +26,13 @@ public class Game {
         DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
         if (!stateCursor.hasNext()) {
             //TODO: Create game
+
+            //Divy territories between players
+
+            //Divy 2*TOTAL_TROOP_COUNT food resource gens fairly among territories
+            //and store in game.info
+
+            //make game map and store in game.state
         }
     }
 
