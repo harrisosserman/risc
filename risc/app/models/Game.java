@@ -4,7 +4,6 @@ import java.util.*;
 import libraries.MongoConnection;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import java.net.UnknownHostException;
 import libraries.DBHelper;
 
 public class Game {
@@ -14,15 +13,39 @@ public class Game {
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
 
     private String myGameID;
-    private ArrayList<Player> myPlayers;
     private Territory[] myTerritories;
 
     public Game(){
-        this.myGameID = DEFAULT_GAME_ID;
-        this.myPlayers = new ArrayList<Player>();
+        myGameID = DEFAULT_GAME_ID;
     }
 
-    public boolean areAllPlayersCommitted() throws UnknownHostException{
+    public Game(String gameID){
+        myGameID = gameID;
+
+        DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
+        if (!stateCursor.hasNext()) {
+            //TODO: Create game
+
+            //Divy territories between players
+
+            //Divy 2*TOTAL_TROOP_COUNT food resource gens fairly among territories
+            //and store in game.info
+
+            //make game map and store in game.state
+        }
+    }
+
+    private DBCursor getStateCursor(){
+        DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
+        return stateCursor;
+    }
+
+    private DBObject getMostRecentTurn(){
+        DBObject mostRecentTurn = DBHelper.getCurrentTurnForGame(myGameID);
+        return  mostRecentTurn;
+    }
+
+    public boolean areAllPlayersCommitted(){
         DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
         BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
         DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
@@ -52,12 +75,7 @@ public class Game {
         return true;
     }
 
-	private boolean gameMapHasBeenCreated(String gameID){
-        DBObject map = DBHelper.getMapForGame(gameID);
-        return (map != null);
-	}
-
-    private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
+    private void makeInitialGameMap(int[] territoryOwners, String gameID){
         DBCollection mapCollection = DBHelper.getMapCollection();
 
         BasicDBObject doc = new BasicDBObject();
@@ -107,21 +125,21 @@ public class Game {
         return owners;
     }
 
-    public String getMapJson(String gameID) throws UnknownHostException{
+    public String getMapJson(String gameID){
         DBObject map = DBHelper.getMapForGame(gameID);
         return map.toString();
     }
 
-    public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
+    public String getCurrentGameStateJson(String gameID){
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(gameID);
         return currentTurn.toString();
     }
 
     public String getGameID(){
-        return this.myGameID;
+        return myGameID;
     }
 
-    public Integer getWaitingPlayerCount() throws UnknownHostException{
+    public Integer getWaitingPlayerCount(){
         DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
         if (waitingPlayers == null) {
             return 0;
@@ -151,7 +169,7 @@ public class Game {
         return count;
     }
 
-    public void removePlayer(int pid) throws UnknownHostException{
+    public void removePlayer(int pid){
         System.out.println("------- Remove called");
         //First update info collection
         //decrement game.state.activePlayerCount

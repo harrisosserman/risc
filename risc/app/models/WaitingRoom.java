@@ -14,6 +14,9 @@ public class WaitingRoom{
 	public static final String GAME_ID_KEY = "gameID";
 	public static final int MAX_PLAYERS_PER_GAME = 5;
 	public static final int MIN_PLAYERS_PER_GAME = 2;
+	public static final int GAME_STATE_NOT_YET_STARTED = 0;
+	public static final int GAME_STATE_STARTED = 1;
+	public static final int GAME_STATE_FINISHED = 2;
 
 	private DBObject myInfo;
 	private String myGameID;
@@ -29,7 +32,7 @@ public class WaitingRoom{
 
 		BasicDBObject info = new BasicDBObject();
 		
-		info.append(STATE_KEY, 0);
+		info.append(STATE_KEY, GAME_STATE_NOT_YET_STARTED);
 
 		ArrayList<DBObject> players = new ArrayList<DBObject>();
 		BasicDBObject firstPlayer = createPlayer(username);
@@ -60,7 +63,7 @@ public class WaitingRoom{
 	public static String getJoinableWaitingRoomsJson(){
 		DBCollection infoCollection = DBHelper.getInfoCollection();
 
-		BasicDBObject stateQuery = new BasicDBObject(STATE_KEY, 0);
+		BasicDBObject stateQuery = new BasicDBObject(STATE_KEY, GAME_STATE_NOT_YET_STARTED);
 		BasicDBObject playersLengthQuery = new BasicDBObject("$where", "this." + PLAYERS_KEY + ".length < " + MAX_PLAYERS_PER_GAME);
 		BasicDBObject andQuery = DBHelper.andQueriesTogether(stateQuery, playersLengthQuery);
 
@@ -105,12 +108,32 @@ public class WaitingRoom{
 		myInfo = DBHelper.getInfoForGame(myGameID);
 	}
 
-	public int getNumberOfPlayers(){
+	public boolean shouldGameBegin(){
+		boolean areThereEnoughPlayers = (getNumberOfPlayers() >= MIN_PLAYERS_PER_GAME);
+        boolean isEveryoneReady = (getNumberOfReadyPlayers() == getNumberOfPlayers());
+        return (areThereEnoughPlayers && isEveryoneReady);
+	}
+
+	//This must be called after the game has been created for the first time.
+	//Ensures that no other players can join the game.
+	public void markRoomAsNotJoinable(){
+		BasicDBObject updatedGameState = new BasicDBObject(STATE_KEY, GAME_STATE_STARTED);
+		BasicDBObject updateCommand = new BasicDBObject("$set", updatedGameState);
+
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, myGameID);
+
+		DBCollection infoCollection = DBHelper.getInfoCollection();
+		infoCollection.update(gameQuery, updateCommand);
+
+		myInfo = DBHelper.getInfoForGame(myGameID);
+	}
+
+	private int getNumberOfPlayers(){
 		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
 		return players.size();
 	}
 
-	public int getNumberOfReadyPlayers(){
+	private int getNumberOfReadyPlayers(){
 		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
 		int readyCount = 0;
 		for (DBObject player : players) {
