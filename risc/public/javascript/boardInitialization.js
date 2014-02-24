@@ -5,7 +5,7 @@
         board.territoryInfo = {};
         board.destinationTerritory = 0;
         board.territoryOwner = [];
-        board.territoryDOMElements = [];    //delete
+        board.territoryDOMElements = [];
         board.additionalInfantry = [];    //rename
         board.boardInfo = {
             food: [],
@@ -265,24 +265,24 @@
                 food: board.boardInfo.food[index],
                 tech: board.boardInfo.technology[index],
                 infantry: board.boardInfo.infantry[index],
-                auto: board.boardInfo.automatic[index],
+                automatic: board.boardInfo.automatic[index],
                 rocket: board.boardInfo.rocket[index],
                 tank: board.boardInfo.tank[index],
-                improved: board.boardInfo.improvedTank[index],
-                fighter: board.boardInfo.plane[index]
+                improvedTank: board.boardInfo.improvedTank[index],
+                plane: board.boardInfo.plane[index]
             };
             board.territoryClickInfo.push(data);
             board.territoryClickAttackInfo.removeAll();
             if(typeof board.attackInfo[index] != 'undefined') {
                 for(var k=0; k<board.attackInfo[index].length; k++) {
                     data = {
-                        destination: board.attackInfo[index].destination,
-                        infantry: board.attackInfo.infantry[index],
-                        auto: board.attackInfo.automatic[index],
-                        rocket: board.attackInfo.rocket[index],
-                        tank: board.attackInfo.tank[index],
-                        improved: board.attackInfo.improvedTank[index],
-                        fighter: board.attackInfo.plane[index]
+                        destination: board.attackInfo[index][k].destination,
+                        infantry: board.attackInfo[index][k].infantry,
+                        automatic: board.attackInfo[index][k].automatic,
+                        rocket: board.attackInfo[index][k].rocket,
+                        tank: board.attackInfo[index][k].tank,
+                        improvedTank: board.attackInfo[index][k].improvedTank,
+                        plane: board.attackInfo[index][k].plane
                     };
                     board.territoryClickAttackInfo.push(data);
                 }
@@ -329,7 +329,7 @@
             if(board.moveTroops === true) {
                 board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType], board.inputNumberAttackOrMove());
             } else if(board.attackTroops === true) {
-                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.troops, board.attackInfo[troopType]);
+                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType], board.attackInfo, board.inputNumberAttackOrMove(), troopType);
             }
             board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
         };

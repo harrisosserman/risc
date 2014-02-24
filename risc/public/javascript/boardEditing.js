@@ -28,7 +28,7 @@ function BoardEditing(globals) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         var destinationTroops = troopArray[destination];
-        if(originTroops - numberOfTroopsMoved > 0) {
+        if(originTroops - numberOfTroopsMoved > 0 || numberOfTroopsMoved < 0) {
             originTroops = originTroops - numberOfTroopsMoved;
             destinationTroops = parseInt(destinationTroops, 10) + parseInt(numberOfTroopsMoved, 10);
         troopArray[origin] = originTroops;
@@ -58,36 +58,64 @@ function BoardEditing(globals) {
         }
         return adjacentTerritories;
     };
-    editing.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM, destination, attackingTroops) {
-        var result = attackingTroops[origin][direction];
-        var troopsPreviouslyAttacking = result.troops;
-        attackingTroops[origin][direction]["destination"] = destination;
-        if(result.troops !== 0) {
-            $(attackingTroops[origin][direction].arrowDOM).remove();
-            $(attackingTroops[origin][direction].textDOM).remove();
+    // editing.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM, destination, attackingTroops) {
+    //     var result = attackingTroops[origin][direction];
+    //     var troopsPreviouslyAttacking = result.troops;
+    //     attackingTroops[origin][direction]["destination"] = destination;
+    //     if(result.troops !== 0) {
+    //         $(attackingTroops[origin][direction].arrowDOM).remove();
+    //         $(attackingTroops[origin][direction].textDOM).remove();
+    //     }
+    //     attackingTroops[origin][direction].arrowDOM = arrowDOM;
+    //     attackingTroops[origin][direction].textDOM = textDOM;
+    //     attackingTroops[origin][direction].troops = troopsAttacking;
+    //     return troopsPreviouslyAttacking;
+    // };
+    editing.updateAttackingTroops = function(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking) {
+        numberOfTroopsAttacking = parseInt(numberOfTroopsAttacking, 10);
+        var data = {
+                destination: destination,
+                infantry: 0,
+                automatic: 0,
+                rocket: 0,
+                tank: 0,
+                improvedTank: 0,
+                plane: 0
+            };
+        data[troopType] = numberOfTroopsAttacking;
+        if(typeof attackingTroops[origin] != 'undefined') {
+            for(var k=0; k<attackingTroops[origin].length; k++) {
+                if(attackingTroops[origin][k].destination === destination) {
+                    var troopsPreviouslyAttacking = attackingTroops[origin][k][troopType];
+                    troopArray[origin] = troopArray[origin] + troopsPreviouslyAttacking;
+                    attackingTroops[origin][k][troopType] = numberOfTroopsAttacking;
+                    return;
+                }
+            }
+            attackingTroops[origin].push(data);
+        } else {
+            attackingTroops[origin] = [];
+            attackingTroops[origin].push(data);
         }
-        attackingTroops[origin][direction].arrowDOM = arrowDOM;
-        attackingTroops[origin][direction].textDOM = textDOM;
-        attackingTroops[origin][direction].troops = troopsAttacking;
-        return troopsPreviouslyAttacking;
     };
-    editing.attack = function(destination, map, territoryDOMElements, troops, attackingTroops) {
+    editing.attack = function(destination, map, territoryDOMElements, troopArray, attackingTroops, numberOfTroopsAttacking, troopType) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
-        var originTroops = troops[origin];
-        var troopsAttacking = originTroops + 1;
-        while(troopsAttacking > originTroops) {
-            troopsAttacking = prompt("How many troops would you like to attack with?  You have " + originTroops + " available");
+        var originTroops = troopArray[origin];
+        if(originTroops < numberOfTroopsAttacking || numberOfTroopsAttacking < 0) {
+            return;
         }
-        var attackArrowPosition = editing.calculateArrowPosition($(territoryDOMElements[origin]).position(), $(territoryDOMElements[destination]).position());
-        var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
-        var appendImageUrl = "-128.png";
-        var arrowDOM, attackTextDOM;
-        if(troopsAttacking > 0) {
-            arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
-            attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
-        }
-        var troopsPreviouslyAttacking = editing.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM, destination, attackingTroops);
-        editing.updateTroopsOnTerritory(origin, troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map, troops);
+        troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);
+        editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking);
+        // var attackArrowPosition = editing.calculateArrowPosition($(territoryDOMElements[origin]).position(), $(territoryDOMElements[destination]).position());
+        // var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
+        // var appendImageUrl = "-128.png";
+        // var arrowDOM, attackTextDOM;
+        // if(troopsAttacking > 0) {
+        //     arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
+        //     attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
+        // }
+        // var troopsPreviouslyAttacking = editing.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM, destination, attackingTroops);
+        // editing.updateTroopsOnTerritory(origin, troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map, troops);
     };
     editing.calculateArrowPosition = function(origin, destination) {
         var upDownArrowPadding = 60;
