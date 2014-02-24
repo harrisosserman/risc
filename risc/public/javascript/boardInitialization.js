@@ -77,7 +77,7 @@
             }
         };
         board.getMap = function(mapReady) {
-            $("#dialog").hide();
+            $("#dialog").dialog('close');
             var appendUrl = "/map";
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
@@ -324,7 +324,7 @@
         board.submitMove = function() {
             // console.log(board.typeOfTroopSelected());
             // console.log(board.inputNumberAttackOrMove());
-            $("#dialog").hide();
+            $("#dialog").dialog('close');
             var troopType = board.convertReadableText(board.typeOfTroopSelected());
             if(board.moveTroops === true) {
                 board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType], board.inputNumberAttackOrMove());
