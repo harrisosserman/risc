@@ -331,7 +331,7 @@
             } else if(board.attackTroops === true) {
                 board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.troops, board.attackInfo[troopType]);
             }
-            board.updateTerritoryClickTable(board.territoryClickTerritoryNumber());
+            board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
         };
         board.playerWatching = function() {
             //reloads the map every 10 seconds for any players watching game
