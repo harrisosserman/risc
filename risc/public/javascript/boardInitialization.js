@@ -3,6 +3,7 @@
         var globalFunctions = globals;
         var board = this;
         board.territoryInfo = {};
+        board.destinationTerritory = 0;
         board.territoryOwner = [];
         board.territoryDOMElements = [];    //delete
         board.additionalInfantry = [];    //rename
@@ -21,9 +22,12 @@
         board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes']);
         board.displayMap = ko.observable(false);
         board.playerList = ko.observableArray();
+        board.typeOfTroopSelected = ko.observable();
         board.territoryClickTerritoryNumber = ko.observable("-");
         board.territoryClickInfo = ko.observableArray();
         board.territoryClickAttackInfo = ko.observableArray();
+        board.moveTroops = false;
+        board.attackTroops = false;
 
         board.editing = new BoardEditing(globalFunctions);
         /*          GLOBAL FUNCTIONS                        */
@@ -73,6 +77,7 @@
             }
         };
         board.getMap = function(mapReady) {
+            $("#dialog").hide();
             var appendUrl = "/map";
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
@@ -160,16 +165,20 @@
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
-                                    board.updateTerritoryClickTable(index);
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
                                     board.listenForAdditionalInfantry(index);
+                                    if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
+                                        board.updateTerritoryClickTable(index);
+                                    }
                                 });
                             } else {
                                 $(this).click(function() {
                                     //click handler for clicking on enemy territory
-                                    board.updateTerritoryClickTable(index);
                                     board.userMapAction(index, map);
+                                    if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
+                                        board.updateTerritoryClickTable(index);
+                                    }
                                 });
                             }
                         });
@@ -285,14 +294,44 @@
                 $(map[index]).addClass('territoryClick');   //need to add territoryClick class again because it will be toggled off in the click function
             } else if($(map[index]).hasClass('territoryMoveTroops')) {
                 $("#dialog").dialog();
-                board.editing.moveTroops(index, map, board.territoryDOMElements, board.troops);
+                // $(".ui-dialog-titlebar-close").remove();
+                board.moveTroops = true;
+                board.attackTroops = false;
+                board.destinationTerritory = index;
             } else if($(map[index]).hasClass('territoryAttack')){
                 $("#dialog").dialog();
-                board.editing.attack(index, map, board.territoryDOMElements, board.troops, board.attackingTroops);
+                // $(".ui-dialog-titlebar-close").remove();
+                board.attackTroops = true;
+                board.moveTroops = false;
+                board.destinationTerritory = index;
+            }
+        };
+        board.convertReadableText = function(input) {
+            if(input === "Infantry") {
+                return 'infantry';
+            } else if(input === "Automatic Weapons") {
+                return 'automatic';
+            } else if(input === "Rocket Launchers") {
+                return 'rocket';
+            } else if(input === "Tanks") {
+                return 'tank';
+            } else if(input === "Improved Tanks") {
+                return 'improvedTank';
+            } else {
+                return 'plane';
             }
         };
         board.submitMove = function() {
+            // console.log(board.typeOfTroopSelected());
+            // console.log(board.inputNumberAttackOrMove());
             $("#dialog").hide();
+            var troopType = board.convertReadableText(board.typeOfTroopSelected());
+            if(board.moveTroops === true) {
+                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType], board.inputNumberAttackOrMove());
+            } else if(board.attackTroops === true) {
+                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.troops, board.attackInfo[troopType]);
+            }
+            board.updateTerritoryClickTable(board.territoryClickTerritoryNumber());
         };
         board.playerWatching = function() {
             //reloads the map every 10 seconds for any players watching game

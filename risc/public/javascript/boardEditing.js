@@ -24,15 +24,17 @@ function BoardEditing(globals) {
         }
         return -1;
     };
-    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray) {
+    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         var destinationTroops = troopArray[destination];
-        if(originTroops > 0) {
-            originTroops--;
-            destinationTroops++;
-            editing.updateTroopsOnTerritory(origin, originTroops, map, troopArray);
-            editing.updateTroopsOnTerritory(destination, destinationTroops, map, troopArray);
+        if(originTroops - numberOfTroopsMoved > 0) {
+            originTroops = originTroops - numberOfTroopsMoved;
+            destinationTroops = parseInt(destinationTroops, 10) + parseInt(numberOfTroopsMoved, 10);
+        troopArray[origin] = originTroops;
+        troopArray[destination] = destinationTroops;
+            // editing.updateTroopsOnTerritory(origin, originTroops, map, troopArray);
+            // editing.updateTroopsOnTerritory(destination, destinationTroops, map, troopArray);
         }
     };
     editing.removeAllPreviousAdjacencies = function() {

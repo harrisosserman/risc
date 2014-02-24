@@ -182,9 +182,9 @@
                     </div>
                     <div id="dialog">
                         <h5>Enter the number of troops that you would like to use</h5>
-                        <input type="text" data-bind="text: inputNumberAttackOrMove" placeholder="Number of Troops"></input>
+                        <input type="text" data-bind="value: inputNumberAttackOrMove" placeholder="Number of Troops"></input>
                         <h5>Enter the type of troop</h5>
-                        <select data-bind="options: typesOfTroops"></select>
+                        <select data-bind="options: typesOfTroops, value: typeOfTroopSelected"></select>
                         <button data-bind="click: submitMove">Submit</button>
                     </div>
                     <div class="row-fluid">
