@@ -76,6 +76,9 @@
             var callMapReady = true;
             board.getMap(callMapReady);
         };
+        globalFunctions.getPlayerInfo = function() {
+            return board.playerInfo;
+        };
         /*          END GLOBAL FUNCTIONS                    */
         board.createMap = function() {
             //function to build map out of table
@@ -97,7 +100,8 @@
             $("#map td button").hide();
         };
         board.getMap = function(mapReady) {
-            // $("#dialog").dialog('close');
+            $("#dialog").dialog();
+            $("#dialog").dialog('close');
             var appendUrl = "/map";
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
