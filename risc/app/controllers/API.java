@@ -73,7 +73,6 @@ public class API extends Controller {
         String usernameWithoutQuotes = removeQuotes(username);
 
         WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
-        wr.addPlayer(usernameWithoutQuotes);
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
         if (wr.shouldGameBegin()) {

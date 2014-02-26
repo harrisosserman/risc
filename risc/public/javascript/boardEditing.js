@@ -43,10 +43,33 @@ function BoardEditing(globals) {
                 end: end
             };
             editing.moveOrder.push(result);
-            console.log(result);
-        } else if(moveType === 3) {
-            //ARE WE HAVING A THIRD MOVE TYPE
         }
+        console.log("PRINTING THE MOVE ORDER ARRAY");
+        for(var k=0; k<editing.moveOrder.length; k++) {
+            console.log(editing.moveOrder[k]);
+        }
+
+    };
+    editing.removeMove = function(moveType, start, end, troopType, numberOfMoves) {
+        troopType = editing.convertTextForTroopCommit(troopType);
+        var indicesToRemove = [];
+
+        for(var k=editing.moveOrder.length - 1; k>-1; k--) {
+            if(numberOfMoves <= 0) {
+                return;
+            }
+            var move = editing.moveOrder[k];
+            if(move.moveType === moveType && move.start === start && move.end === end && move.troopType === troopType) {
+                // editing.moveOrder.splice(k, 1);
+                indicesToRemove.push(k);
+                numberOfMoves--;
+            }
+        }
+
+        for(var m=0; m<indicesToRemove.length; m++) {
+            editing.moveOrder.splice(indicesToRemove[m], 1);
+        }
+
     };
     editing.calculateAdditionalTroops = function(troopDelta, index, key, infantry, additionalInfantry) {
         key.preventDefault();
@@ -147,13 +170,14 @@ function BoardEditing(globals) {
                 improvedTank: 0,
                 plane: 0
             };
-        data[troopType] = numberOfTroopsAttacking;
+        data[troopType.text] = numberOfTroopsAttacking;
         if(typeof attackingTroops[origin] != 'undefined') {
             for(var k=0; k<attackingTroops[origin].length; k++) {
                 if(attackingTroops[origin][k].destination === destination) {
-                    var troopsPreviouslyAttacking = attackingTroops[origin][k][troopType];
+                    var troopsPreviouslyAttacking = attackingTroops[origin][k][troopType.text];
+                    editing.removeMove(2, origin, destination, troopType.index, troopsPreviouslyAttacking);
                     troopArray[origin] = troopArray[origin] + troopsPreviouslyAttacking;
-                    attackingTroops[origin][k][troopType] = numberOfTroopsAttacking;
+                    attackingTroops[origin][k][troopType.text] = numberOfTroopsAttacking;
                     return;
                 }
             }
@@ -171,88 +195,10 @@ function BoardEditing(globals) {
             return;
         }
         troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);
-        editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType.text, numberOfTroopsAttacking);
+        editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking);
         for(var k=0; k<numberOfTroopsAttacking; k++) {
             editing.addMove(2, origin, destination, troopType.index, -1);
         }
-    };
-    editing.calculateArrowPosition = function(origin, destination) {
-        var upDownArrowPadding = 60;
-        var leftRightArrowPadding = 80;
-        var heightOfTile = 97;
-        var widthOfTile = 188;
-        var result = {
-            top: origin.top,
-            left: origin.left,
-            urlDirection: ' ',
-            textTop: origin.top,
-            textLeft: origin.left
-        };
-        if(origin.top > destination.top && origin.left === destination.left) {
-            //ARROW UP
-            result.top = result.top - upDownArrowPadding;
-            result.left = result.left + (widthOfTile / 4);
-            result.urlDirection = 'up';
-            result.textTop = result.top + upDownArrowPadding;
-            result.textLeft = result.left + widthOfTile/3;
-        }
-        if(origin.top < destination.top && origin.left === destination.left) {
-            //ARROW DOWN
-            result.top = result.top  + heightOfTile - upDownArrowPadding;
-            result.left = result.left + (widthOfTile / 4);
-            result.urlDirection = 'down';
-            result.textTop = result.top + heightOfTile/4;
-            result.textLeft = result.left + widthOfTile/4;
-        }
-        if(origin.top > destination.top && origin.left > destination.left) {
-            //ARROW UP AND LEFT
-            result.top = result.top - upDownArrowPadding;
-            result.left = result.left -  leftRightArrowPadding;
-            result.urlDirection = 'up_left';
-            result.textTop = result.top + upDownArrowPadding;
-            result.textLeft = result.left + leftRightArrowPadding;
-        }
-        if(origin.top < destination.top && origin.left < destination.left) {
-            //ARROW DOWN AND RIGHT
-            result.top = result.top  + heightOfTile - upDownArrowPadding;
-            result.left = result.left +  widthOfTile - leftRightArrowPadding;
-            result.urlDirection = 'down_right';
-            result.textTop = result.top + heightOfTile/4;
-            result.textLeft = result.left + widthOfTile/3;
-        }
-        if(origin.top > destination.top && origin.left < destination.left) {
-            //ARROW UP AND RIGHT
-            result.top = result.top - upDownArrowPadding;
-            result.left = result.left +  widthOfTile - leftRightArrowPadding;
-            result.urlDirection = 'up_right';
-            result.textTop = result.top + upDownArrowPadding;
-            result.textLeft = result.left + widthOfTile/3;
-        }
-        if(origin.top < destination.top && origin.left > destination.left) {
-            //ARROW DOWN AND LEFT
-            result.top = result.top  + heightOfTile - upDownArrowPadding;
-            result.left = result.left -  leftRightArrowPadding;
-            result.urlDirection = 'down_left';
-            result.textTop = result.top + heightOfTile/4;
-            result.textLeft = result.left + leftRightArrowPadding;
-        }
-        if(origin.top === destination.top && origin.left > destination.left) {
-            //ARROW LEFT
-            result.top = result.top  + heightOfTile/12;
-            result.left = result.left -  leftRightArrowPadding;
-            result.textTop = result.top  + heightOfTile/3;
-            result.textLeft = result.left + leftRightArrowPadding;
-            result.urlDirection = 'left';
-        }
-        if(origin.top === destination.top && origin.left < destination.left) {
-            //ARROW RIGHT
-            result.top = result.top  + heightOfTile/12;
-            result.left = result.left +  widthOfTile - leftRightArrowPadding;
-            result.textTop = result.top  + heightOfTile/3;
-            result.textLeft = result.left + widthOfTile/3;
-            result.urlDirection = 'right';
-        }
-        return result;
     };
     return editing;
 
