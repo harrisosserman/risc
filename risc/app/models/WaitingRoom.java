@@ -8,7 +8,7 @@ import libraries.DBHelper;
 public class WaitingRoom{
 	public static final String STATE_KEY = "state";
 	public static final String PLAYERS_KEY = "players";
-	public static final String PLAYER_KEY = "player";
+	public static final String PLAYER_KEY = "name";
 	public static final String READY_KEY = "ready";
 	public static final String ID_KEY = "_id";
 	public static final String GAME_ID_KEY = "gameID";
@@ -31,7 +31,7 @@ public class WaitingRoom{
 		DBCollection infoCollection = DBHelper.getInfoCollection();
 
 		BasicDBObject info = new BasicDBObject();
-		
+
 		info.append(STATE_KEY, GAME_STATE_NOT_YET_STARTED);
 
 		ArrayList<DBObject> players = new ArrayList<DBObject>();

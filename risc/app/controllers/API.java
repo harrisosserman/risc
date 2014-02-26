@@ -73,6 +73,7 @@ public class API extends Controller {
         String usernameWithoutQuotes = removeQuotes(username);
 
         WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.addPlayer(usernameWithoutQuotes);
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
         if (wr.shouldGameBegin()) {
@@ -114,7 +115,7 @@ public class API extends Controller {
     public static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
-    
+
     public static Result reset(String gameID){
         DBHelper.reset(gameID);
         return ok("Reset DB for gameID:" + gameID);

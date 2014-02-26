@@ -24,7 +24,7 @@
             return player.playerNumber;
         };
         player.usernameChanged = function() {
-            $.ajax('/test/player/' + player.username(), {
+            $.ajax('/player/' + player.username(), {
                 method: 'GET'
             }).fail(function() {
                 //there is no username in the db with the username the user tried to use
@@ -36,10 +36,11 @@
         };
 
         player.login = function() {
-            $.ajax('/test/player/' + player.username() + '/login', {
+            $.ajax('/player/' + player.username() + '/login', {
                 method: 'POST',
                 data: JSON.stringify({
-                    'password': CryptoJS.SHA512(player.password().toString())
+                    'name': player.username(),
+                    'password': CryptoJS.SHA512(player.password()).toString()
                 }),
                 contentType: "application/json"
             }).done(function(result) {
@@ -63,11 +64,11 @@
             }
             player.passwordError(false);
 
-            $.ajax('/test/player', {
+            $.ajax('/player', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': player.username(),
-                    'password': CryptoJS.SHA512(player.password().toString())
+                    'password': CryptoJS.SHA512(player.password()).toString()
                 }),
                 contentType: "application/json"
             }).done(function() {
