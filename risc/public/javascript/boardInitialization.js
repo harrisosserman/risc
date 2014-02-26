@@ -120,56 +120,6 @@
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
-                            // board.attackingTroops.push({
-                            //     'up': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'down': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'left': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'right': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'up_left': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'up_right': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'down_left': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     },
-                            //     'down_right': {
-                            //         'troops': 0,
-                            //         'arrowDOM': ' ',
-                            //         'textDOM': ' ',
-                            //         'destination': -1
-                            //     }
-                            // });
                             board.territoryOwner.push(board.territoryInfo.territories[index].owner);
                             board.boardInfo.infantry[index] = board.territoryInfo.territories[index].INFANTRY;
                             board.boardInfo.automatic[index] = board.territoryInfo.territories[index].AUTOMATIC;
@@ -190,12 +140,12 @@
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
-                                    $($("#map td button")[index]).toggle();
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
                                     board.listenForAdditionalInfantry(index);
                                     if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
                                         board.updateTerritoryClickTable(index);
+                                        $($("#map td button")[index]).toggle();
                                     }
                                 });
                             } else {
@@ -397,16 +347,9 @@
             $("#dialog").dialog();
         };
         board.upgradeTechLevel = function() {
-            if(board.playerInfo.maxTechLevel === 5) {
-                alert("You are already on the maximum technology level");
-            } else if(board.playerInfo.technology >= board.technologyLevelCost[board.playerInfo.maxTechLevel + 1]) {
-                //able to issue upgrade request
-                board.playerInfo.maxTechLevel++;
-                board.playerInfo.technology = board.playerInfo.technology - board.technologyLevelCost[board.playerInfo.maxTechLevel];
-                board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
+            if(board.editing.upgradeTechLevel(board.playerInfo) === true) {
                 board.hasNotUpgradedThisTurn(false);
-            } else {
-                alert("Unable to issue upgrade request.  You need " + board.technologyLevelCost[board.playerInfo.maxTechLevel + 1] + " technology and you have " + board.playerInfo.technology);
+                board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
             }
         };
         board.submitMove = function() {
@@ -416,9 +359,9 @@
                 var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());
                 board.editing.upgradeTroops(board.territoryClickTerritoryNumber() - 1, board.boardInfo[troopType.text], board.boardInfo[troopTypeUpgradeTo.text], board.playerInfo, board.inputNumberAttackOrMove(), troopType, troopTypeUpgradeTo);
             } else if(board.moveTroops === true) {
-                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove());
+                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove(), troopType.index);
             } else if(board.attackTroops === true) {
-                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType.text);
+                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType);
             }
             board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
             board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
@@ -428,7 +371,6 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/mapReady', {
                 method: 'GET',
             }).done(function() {
@@ -441,4 +383,3 @@
     }
     window.Board = boardInitializationViewModel;
 })(window.ko, window.BoardEditing);
-

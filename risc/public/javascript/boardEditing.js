@@ -1,8 +1,53 @@
 function BoardEditing(globals) {
     var globalFunctions = globals;
     var editing = this;
+    editing.moveOrder = [];
     editing.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
-
+    // GLOBAL FUNCTIONS
+    globalFunctions.getMoveOrder = function() {
+        return editing.moveOrder;
+    };
+    // END GLOBAL FUNCTIONS
+    editing.convertTextForTroopCommit = function(input) {
+        var result = '';
+        if(input === 0) {
+            return 'INFANTRY';
+        } else if(input === 1) {
+            return 'AUTOMATIC';
+        } else if(input === 2) {
+            return 'ROCKETS';
+        } else if(input === 3) {
+            return 'TANKS';
+        } else if(input === 4) {
+            return 'IMPROVEDTANKS';
+        }
+        return 'PLANES';
+    };
+    editing.addMove = function(moveType, start, end, troopType, upgradeType) {
+        troopType = editing.convertTextForTroopCommit(troopType);
+        upgradeType = editing.convertTextForTroopCommit(upgradeType);
+        var result = {};
+        if(moveType === 0) {
+            result = {
+                moveType: 0,
+                position: start,
+                troopType: troopType,
+                upgradeType: upgradeType
+            };
+            editing.moveOrder.push(result);
+        } else if(moveType === 1 || moveType === 2) {
+            result = {
+                moveType: moveType,
+                troopType: troopType,
+                start: start,
+                end: end
+            };
+            editing.moveOrder.push(result);
+            console.log(result);
+        } else if(moveType === 3) {
+            //ARE WE HAVING A THIRD MOVE TYPE
+        }
+    };
     editing.calculateAdditionalTroops = function(troopDelta, index, key, infantry, additionalInfantry) {
         key.preventDefault();
         var currentInfantry = infantry[index];
@@ -24,17 +69,35 @@ function BoardEditing(globals) {
         }
         return -1;
     };
-    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved) {
+    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         var destinationTroops = troopArray[destination];
         if(originTroops - numberOfTroopsMoved > 0 || numberOfTroopsMoved < 0) {
             originTroops = originTroops - numberOfTroopsMoved;
             destinationTroops = parseInt(destinationTroops, 10) + parseInt(numberOfTroopsMoved, 10);
-        troopArray[origin] = originTroops;
-        troopArray[destination] = destinationTroops;
-            // editing.updateTroopsOnTerritory(origin, originTroops, map, troopArray);
-            // editing.updateTroopsOnTerritory(destination, destinationTroops, map, troopArray);
+            troopArray[origin] = originTroops;
+            troopArray[destination] = destinationTroops;
+            for(var k=0; k<numberOfTroopsMoved; k++) {
+                editing.addMove(1, origin, destination, troopType, -1);
+            }
+        } else {
+            alert("You only have " + originTroops + " and are trying to move " + numberOfTroopsMoved);
+        }
+
+    };
+    editing.upgradeTechLevel = function(playerInfo) {
+        if(playerInfo.maxTechLevel === 5) {
+            alert("You are already on the maximum technology level");
+            return false;
+        } else if(playerInfo.technology >= globalFunctions.getTechnologyLevelCost()[playerInfo.maxTechLevel + 1]) {
+            //able to issue upgrade request
+            playerInfo.maxTechLevel++;
+            playerInfo.technology = playerInfo.technology - globalFunctions.getTechnologyLevelCost()[playerInfo.maxTechLevel];
+            return true;
+        } else {
+            alert("Unable to issue upgrade request.  You need " + board.technologyLevelCost[board.playerInfo.maxTechLevel + 1] + " technology and you have " + board.playerInfo.technology);
+            return false;
         }
     };
     editing.upgradeTroops = function(origin, convertFromTroops, convertToTroops, playerInfo, numberOfTroopsConverting, troopTypeConvertFrom, troopTypeConvertTo) {
@@ -49,6 +112,7 @@ function BoardEditing(globals) {
             playerInfo.technology = playerInfo.technology - cost;
             convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
             convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
+            editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
         }
     };
     editing.removeAllPreviousAdjacencies = function() {
@@ -72,19 +136,6 @@ function BoardEditing(globals) {
         }
         return adjacentTerritories;
     };
-    // editing.updateAttackingTroops = function(origin, troopsAttacking, map, direction, arrowDOM, textDOM, destination, attackingTroops) {
-    //     var result = attackingTroops[origin][direction];
-    //     var troopsPreviouslyAttacking = result.troops;
-    //     attackingTroops[origin][direction]["destination"] = destination;
-    //     if(result.troops !== 0) {
-    //         $(attackingTroops[origin][direction].arrowDOM).remove();
-    //         $(attackingTroops[origin][direction].textDOM).remove();
-    //     }
-    //     attackingTroops[origin][direction].arrowDOM = arrowDOM;
-    //     attackingTroops[origin][direction].textDOM = textDOM;
-    //     attackingTroops[origin][direction].troops = troopsAttacking;
-    //     return troopsPreviouslyAttacking;
-    // };
     editing.updateAttackingTroops = function(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking) {
         numberOfTroopsAttacking = parseInt(numberOfTroopsAttacking, 10);
         var data = {
@@ -116,20 +167,14 @@ function BoardEditing(globals) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         if(originTroops < numberOfTroopsAttacking || numberOfTroopsAttacking < 0) {
+            alert("You don't have enough troops to do that attack.  You have " + originTroops + " and are trying to attack with " + numberOfTroopsAttacking);
             return;
         }
         troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);
-        editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking);
-        // var attackArrowPosition = editing.calculateArrowPosition($(territoryDOMElements[origin]).position(), $(territoryDOMElements[destination]).position());
-        // var preprendImageUrl = "https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/";
-        // var appendImageUrl = "-128.png";
-        // var arrowDOM, attackTextDOM;
-        // if(troopsAttacking > 0) {
-        //     arrowDOM = $("<img class='attackComponent' src='" + preprendImageUrl + attackArrowPosition.urlDirection + appendImageUrl + "'></img>").appendTo("body").css("top", attackArrowPosition.top + "px").css("left", attackArrowPosition.left + "px");
-        //     attackTextDOM = $("<h3 class='attackComponent'></h3>").appendTo("body").html(troopsAttacking).css("top", attackArrowPosition.textTop + "px").css("left", attackArrowPosition.textLeft + "px").css("color", "red");
-        // }
-        // var troopsPreviouslyAttacking = editing.updateAttackingTroops(origin, troopsAttacking, map, attackArrowPosition.urlDirection, arrowDOM, attackTextDOM, destination, attackingTroops);
-        // editing.updateTroopsOnTerritory(origin, troops[origin] - troopsAttacking + parseInt(troopsPreviouslyAttacking,10), map, troops);
+        editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType.text, numberOfTroopsAttacking);
+        for(var k=0; k<numberOfTroopsAttacking; k++) {
+            editing.addMove(2, origin, destination, troopType.index, -1);
+        }
     };
     editing.calculateArrowPosition = function(origin, destination) {
         var upDownArrowPadding = 60;
