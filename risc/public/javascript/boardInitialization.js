@@ -17,10 +17,16 @@
             improvedTank: [],
             plane: []
         };
+        board.playerInfo = {
+            food: -1,
+            technology: -1,
+            maxTechLevel: -1
+        };
         board.attackInfo = [];
         board.inputNumberAttackOrMove = ko.observable();
         board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes']);
         board.displayMap = ko.observable(false);
+        board.hasNotUpgradedThisTurn = ko.observable(true);
         board.playerList = ko.observableArray();
         board.typeOfTroopSelected = ko.observable();
         board.territoryClickTerritoryNumber = ko.observable("-");
@@ -28,6 +34,8 @@
         board.territoryClickAttackInfo = ko.observableArray();
         board.moveTroops = false;
         board.attackTroops = false;
+        board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
+        board.unitUpgradeCost = [0, 3, 8, 19, 25, 35];
 
         board.editing = new BoardEditing(globalFunctions);
         /*          GLOBAL FUNCTIONS                        */
@@ -77,7 +85,7 @@
             }
         };
         board.getMap = function(mapReady) {
-            $("#dialog").dialog('close');
+            // $("#dialog").dialog('close');
             var appendUrl = "/map";
             if(typeof mapReady !== 'undefined' && mapReady === true) {
                 appendUrl = "/mapReady";
@@ -92,6 +100,11 @@
                         for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
                             board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo);
                             board.additionalInfantry[m] = board.territoryInfo.playerInfo[m].additionalInfantry;
+                            if(globalFunctions.getPlayerNumber() - 1 === m) {
+                                board.playerInfo.food = board.territoryInfo.playerInfo[m].food;
+                                board.playerInfo.tech = board.territoryInfo.playerInfo[m].technology;
+                                board.playerInfo.maxTechLevel = board.territoryInfo.playerInfo[m].level;
+                            }
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
@@ -197,17 +210,27 @@
                 });
             }
         };
-        board.updatePlayerInfoTable = function(index, playerInfo) {
+        board.updatePlayerInfoTable = function(index, playerInfo, updateTechnology) {
             var playerObject = board.playerList()[index];
             var newPlayerObject = {};
-            if(typeof playerInfo !== 'undefined') {
+            if(typeof updateTechnology !== 'undefined') {
+                newPlayerObject = {
+                    name: playerObject.name,
+                    color: playerObject.color,
+                    additionalInfantry: board.additionalInfantry[index],
+                    food: board.playerInfo.food,
+                    tech: board.playerInfo.technology,
+                    techLevel: board.convertTechLevelToText(board.playerInfo.maxTechLevel)
+                };
+            }
+            else if(typeof playerInfo !== 'undefined') {
                 newPlayerObject = {
                     name: playerInfo[index].owner,
                     color: globalFunctions.getElementOfColorList(index),
                     additionalInfantry: playerInfo[index].additionalInfantry,
                     food: playerInfo[index].food,
                     tech: playerInfo[index].technology,
-                    techLevel: playerInfo[index].level
+                    techLevel: board.convertTechLevelToText(playerInfo[index].level)
                 };
             } else {
                 newPlayerObject = {
@@ -294,13 +317,11 @@
                 $(map[index]).addClass('territoryClick');   //need to add territoryClick class again because it will be toggled off in the click function
             } else if($(map[index]).hasClass('territoryMoveTroops')) {
                 $("#dialog").dialog();
-                // $(".ui-dialog-titlebar-close").remove();
                 board.moveTroops = true;
                 board.attackTroops = false;
                 board.destinationTerritory = index;
             } else if($(map[index]).hasClass('territoryAttack')){
                 $("#dialog").dialog();
-                // $(".ui-dialog-titlebar-close").remove();
                 board.attackTroops = true;
                 board.moveTroops = false;
                 board.destinationTerritory = index;
@@ -319,6 +340,34 @@
                 return 'improvedTank';
             } else {
                 return 'plane';
+            }
+        };
+        board.convertTechLevelToText = function(input) {
+            if(input === 0) {
+                return 'Infantry';
+            } else if(input === 1) {
+                return 'Automatic Weapons';
+            } else if(input === 2) {
+                return 'Rocket Launchers';
+            } else if(input === 3) {
+                return 'Tanks';
+            } else if(input === 4) {
+                return 'Improved Tanks';
+            } else if(input === 5) {
+                return 'Fighter Planes';
+            }
+        };
+        board.upgradeTechLevel = function() {
+            if(board.playerInfo.maxTechLevel === 5) {
+                alert("You are already on the maximum technology level");
+            } else if(board.playerInfo.food >= board.technologyLevelCost[board.playerInfo.maxTechLevel + 1]) {
+                //able to issue upgrade request
+                board.playerInfo.maxTechLevel++;
+                board.playerInfo.food = board.playerInfo.food - board.technologyLevelCost[board.playerInfo.maxTechLevel];
+                board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
+                board.hasNotUpgradedThisTurn(false);
+            } else {
+                alert("Unable to issue upgrade request.  You need " + board.technologyLevelCost[board.playerInfo.maxTechLevel + 1] + " food and you have " + board.playerInfo.food);
             }
         };
         board.submitMove = function() {

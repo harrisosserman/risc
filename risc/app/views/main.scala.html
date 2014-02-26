@@ -254,6 +254,7 @@
                                         <th>Food</th>
                                         <th>Technology</th>
                                         <th>Maximum Technology Level</th>
+                                        <th><button data-bind="click: upgradeTechLevel, enable: hasNotUpgradedThisTurn">Upgrade Technology Level</button></th>
                                     </tr>
                                 </thead>
                                 <tbody data-bind="foreach: playerList">
