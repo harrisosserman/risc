@@ -37,6 +37,20 @@ function BoardEditing(globals) {
             // editing.updateTroopsOnTerritory(destination, destinationTroops, map, troopArray);
         }
     };
+    editing.upgradeTroops = function(origin, convertFromTroops, convertToTroops, playerInfo, numberOfTroopsConverting, troopTypeConvertFrom, troopTypeConvertTo) {
+        var cost = (globalFunctions.getUnitUpgradeCost()[troopTypeConvertTo.index] - globalFunctions.getUnitUpgradeCost()[troopTypeConvertFrom.index]) * numberOfTroopsConverting;
+        if(playerInfo.maxTechLevel < troopTypeConvertTo.index) {
+            alert("Your technology level is lower than the selected troop upgrade level");
+            return;
+        } else if(cost > playerInfo.technology) {
+            alert("You need " + cost + " technology, but you only have " + playerInfo.technology);
+            return;
+        } else {
+            playerInfo.technology = playerInfo.technology - cost;
+            convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
+            convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
+        }
+    };
     editing.removeAllPreviousAdjacencies = function() {
         $("#map td").each(function(){
             if($(this).hasClass('territoryClick') || $(this).hasClass('territoryAttack') || $(this).hasClass('territoryMoveTroops')) {

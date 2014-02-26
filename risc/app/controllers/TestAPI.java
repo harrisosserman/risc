@@ -187,7 +187,7 @@ public class TestAPI extends Controller {
         JSONArray additionalInfo = new JSONArray();
         additionalInfo.put(new JSONObject().put("owner", "rickybobby").put("level", 2).put("food", 5).put("technology", 10).put("additionalInfantry", 50));
         additionalInfo.put(new JSONObject().put("owner", "magicman").put("level", 3).put("food", 5).put("technology", 10).put("additionalInfantry", 50));
-        additionalInfo.put(new JSONObject().put("owner", "harriso").put("level", 0).put("food", 35).put("technology", 10).put("additionalInfantry", 50));
+        additionalInfo.put(new JSONObject().put("owner", "harriso").put("level", 0).put("food", 35).put("technology", 100).put("additionalInfantry", 50));
         result.put("playerInfo", additionalInfo);
         return ok(result.toString());
     }

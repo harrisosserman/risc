@@ -27,6 +27,8 @@
         board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes']);
         board.displayMap = ko.observable(false);
         board.hasNotUpgradedThisTurn = ko.observable(true);
+        board.displayUpgradeTroopsModal = ko.observable(false);
+        board.typeOfTroopUpgradeSelected = ko.observable();
         board.playerList = ko.observableArray();
         board.typeOfTroopSelected = ko.observable();
         board.territoryClickTerritoryNumber = ko.observable("-");
@@ -35,7 +37,7 @@
         board.moveTroops = false;
         board.attackTroops = false;
         board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
-        board.unitUpgradeCost = [0, 3, 8, 19, 25, 35];
+        board.unitUpgradeCost = [0, 3, 11, 30, 55, 90];
 
         board.editing = new BoardEditing(globalFunctions);
         /*          GLOBAL FUNCTIONS                        */
@@ -55,6 +57,12 @@
         };
         globalFunctions.setDisplayMap = function(input) {
             board.displayMap(input);
+        };
+        globalFunctions.getTechnologyLevelCost = function() {
+            return board.technologyLevelCost;
+        };
+        globalFunctions.getUnitUpgradeCost = function() {
+            return board.unitUpgradeCost;
         };
         globalFunctions.destroyAndRebuildMap = function() {
             globalFunctions.setDisplayMap(true);
@@ -78,11 +86,15 @@
             for(var k=0; k<5; k++) {
                 map.append("<tr>");
                 for(var m=0; m<5; m++) {
-                    map.append("<td>" + count + "</td>");
+                    map.append("<td>" + count + "<button class='upgradeTroopsButton'>Upgrade</button></td>");
                     count++;
                 }
                 map.append("</tr>");
             }
+            $("#map td button").click(function() {
+                board.upgradeTroops();
+            });
+            $("#map td button").hide();
         };
         board.getMap = function(mapReady) {
             // $("#dialog").dialog('close');
@@ -102,7 +114,7 @@
                             board.additionalInfantry[m] = board.territoryInfo.playerInfo[m].additionalInfantry;
                             if(globalFunctions.getPlayerNumber() - 1 === m) {
                                 board.playerInfo.food = board.territoryInfo.playerInfo[m].food;
-                                board.playerInfo.tech = board.territoryInfo.playerInfo[m].technology;
+                                board.playerInfo.technology = board.territoryInfo.playerInfo[m].technology;
                                 board.playerInfo.maxTechLevel = board.territoryInfo.playerInfo[m].level;
                             }
                         }
@@ -178,6 +190,7 @@
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
+                                    $($("#map td button")[index]).toggle();
                                     board.highlightMap(index + 1);
                                     $(this).toggleClass("territoryClick");
                                     board.listenForAdditionalInfantry(index);
@@ -319,28 +332,50 @@
                 $("#dialog").dialog();
                 board.moveTroops = true;
                 board.attackTroops = false;
+                board.displayUpgradeTroopsModal(false);
                 board.destinationTerritory = index;
             } else if($(map[index]).hasClass('territoryAttack')){
                 $("#dialog").dialog();
                 board.attackTroops = true;
                 board.moveTroops = false;
+                board.displayUpgradeTroopsModal(false);
                 board.destinationTerritory = index;
             }
         };
         board.convertReadableText = function(input) {
+            var result = {};
             if(input === "Infantry") {
-                return 'infantry';
+                result = {
+                    text: 'infantry',
+                    index: 0
+                };
             } else if(input === "Automatic Weapons") {
-                return 'automatic';
+                result = {
+                    text: 'automatic',
+                    index: 1
+                };
             } else if(input === "Rocket Launchers") {
-                return 'rocket';
+                result = {
+                    text: 'rocket',
+                    index: 2
+                };
             } else if(input === "Tanks") {
-                return 'tank';
+                result = {
+                    text: 'tank',
+                    index: 3
+                };
             } else if(input === "Improved Tanks") {
-                return 'improvedTank';
+                result = {
+                    text: 'improvedTank',
+                    index: 4
+                };
             } else {
-                return 'plane';
+                result = {
+                    text: 'plane',
+                    index: 5
+                };
             }
+            return result;
         };
         board.convertTechLevelToText = function(input) {
             if(input === 0) {
@@ -357,30 +392,36 @@
                 return 'Fighter Planes';
             }
         };
+        board.upgradeTroops = function() {
+            board.displayUpgradeTroopsModal(true);
+            $("#dialog").dialog();
+        };
         board.upgradeTechLevel = function() {
             if(board.playerInfo.maxTechLevel === 5) {
                 alert("You are already on the maximum technology level");
-            } else if(board.playerInfo.food >= board.technologyLevelCost[board.playerInfo.maxTechLevel + 1]) {
+            } else if(board.playerInfo.technology >= board.technologyLevelCost[board.playerInfo.maxTechLevel + 1]) {
                 //able to issue upgrade request
                 board.playerInfo.maxTechLevel++;
-                board.playerInfo.food = board.playerInfo.food - board.technologyLevelCost[board.playerInfo.maxTechLevel];
+                board.playerInfo.technology = board.playerInfo.technology - board.technologyLevelCost[board.playerInfo.maxTechLevel];
                 board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
                 board.hasNotUpgradedThisTurn(false);
             } else {
-                alert("Unable to issue upgrade request.  You need " + board.technologyLevelCost[board.playerInfo.maxTechLevel + 1] + " food and you have " + board.playerInfo.food);
+                alert("Unable to issue upgrade request.  You need " + board.technologyLevelCost[board.playerInfo.maxTechLevel + 1] + " technology and you have " + board.playerInfo.technology);
             }
         };
         board.submitMove = function() {
-            // console.log(board.typeOfTroopSelected());
-            // console.log(board.inputNumberAttackOrMove());
             $("#dialog").dialog('close');
             var troopType = board.convertReadableText(board.typeOfTroopSelected());
-            if(board.moveTroops === true) {
-                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType], board.inputNumberAttackOrMove());
+            if(board.displayUpgradeTroopsModal() === true) {
+                var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());
+                board.editing.upgradeTroops(board.territoryClickTerritoryNumber() - 1, board.boardInfo[troopType.text], board.boardInfo[troopTypeUpgradeTo.text], board.playerInfo, board.inputNumberAttackOrMove(), troopType, troopTypeUpgradeTo);
+            } else if(board.moveTroops === true) {
+                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove());
             } else if(board.attackTroops === true) {
-                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType], board.attackInfo, board.inputNumberAttackOrMove(), troopType);
+                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType.text);
             }
             board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
+            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
         };
         board.playerWatching = function() {
             //reloads the map every 10 seconds for any players watching game
