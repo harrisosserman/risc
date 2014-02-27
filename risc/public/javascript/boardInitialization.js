@@ -73,8 +73,7 @@
             board.attackingTroops = [];
             $("#map").empty();
             board.createMap();
-            var callMapReady = true;
-            board.getMap(callMapReady);
+            board.getMap();
         };
         globalFunctions.getPlayerInfo = function() {
             return board.playerInfo;
@@ -99,14 +98,11 @@
             });
             $("#map td button").hide();
         };
-        board.getMap = function(mapReady) {
+        board.getMap = function() {
             $("#dialog").dialog();
             $("#dialog").dialog('close');
-            var appendUrl = "/map";
-            if(typeof mapReady !== 'undefined' && mapReady === true) {
-                appendUrl = "/mapReady";
-            }
-            $.ajax('/test/game/' + globalFunctions.getGameID() + appendUrl, {
+
+            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -131,10 +127,9 @@
                             board.boardInfo.tank[index] = board.territoryInfo.territories[index].TANKS;
                             board.boardInfo.improvedTank[index] = board.territoryInfo.territories[index].IMPROVEDTANKS;
                             board.boardInfo.plane[index] = board.territoryInfo.territories[index].PLANES;
-                            board.boardInfo.food[index] = -1;
-                            board.boardInfo.technology[index] = -1;
+                            board.boardInfo.food[index] = board.territoryInfo.territories[index].food;
+                            board.boardInfo.technology[index] = board.territoryInfo.territories[index].technology;
 
-                            // board.troops.push(board.territoryInfo.territories[index].troops);
                             board.territoryDOMElements.push($(this));
                             $(this).addClass("player" + board.territoryInfo.territories[index].owner);
                             if(board.territoryInfo.territories[index].owner === globalFunctions.getPlayerNumber()) {
@@ -375,7 +370,7 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/mapReady', {
+            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
             }).done(function() {
                 globalFunctions.destroyAndRebuildMap();
