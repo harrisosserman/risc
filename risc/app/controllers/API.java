@@ -72,6 +72,10 @@ public class API extends Controller {
 
         WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
         wr.addPlayer(usernameWithoutQuotes);
+
+        UserManager um = new UserManager();
+        um.addGameToUser(wr.getGameID(), usernameWithoutQuotes);
+
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
         if (wr.shouldGameBegin()) {
@@ -94,13 +98,14 @@ public class API extends Controller {
         }
     }
 
-    public static String removeQuotes(String stringWithQuotes){
-        return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
+    public static Result endGame(String gameID){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.markRoomsGameAsEnded();
+        return ok();
     }
 
-    public static Result reset(String gameID){
-        DBHelper.reset(gameID);
-        return ok("Reset DB for gameID:" + gameID);
+    public static String removeQuotes(String stringWithQuotes){
+        return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
 
     //-------- Player API Methods ----------

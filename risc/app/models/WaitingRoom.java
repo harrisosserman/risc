@@ -128,7 +128,15 @@ public class WaitingRoom{
 	//This must be called after the game has been created for the first time.
 	//Ensures that no other players can join the game.
 	public void markRoomAsNotJoinable(){
-		BasicDBObject updatedGameState = new BasicDBObject(STATE_KEY, GAME_STATE_STARTED);
+		updateGameInfoState(GAME_STATE_STARTED);
+	}
+
+	public void markRoomsGameAsEnded(){
+		updateGameInfoState(GAME_STATE_FINISHED);
+	}
+
+	private void updateGameInfoState(int gameState){
+		BasicDBObject updatedGameState = new BasicDBObject(STATE_KEY, gameState);
 		BasicDBObject updateCommand = new BasicDBObject("$set", updatedGameState);
 
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, myGameID);
