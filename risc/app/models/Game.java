@@ -8,7 +8,6 @@ import libraries.DBHelper;
 
 public class Game {
 
-    private static final String DEFAULT_GAME_ID = "12345";
     private static final int NUM_TERRITORIES = 25;
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
     private static final int TOTAL_FOOD_COUNT = TOTAL_TROOP_COUNT;
@@ -16,10 +15,6 @@ public class Game {
 
     private String myGameID;
     private Territory[] myTerritories;
-
-    public Game(){
-        myGameID = DEFAULT_GAME_ID;
-    }
 
     //used for getting an existing game
     public Game(String gameID){
@@ -144,7 +139,7 @@ public class Game {
 
     public boolean areAllPlayersCommitted(){
         DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
-        BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
+        BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
         DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
         int turn = -1;
         int committedTurnsInSameTurn = 0;
@@ -163,7 +158,7 @@ public class Game {
         }
 
         DBCollection stateCollection = DBHelper.getStateCollection();
-        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID).append(DBHelper.TURN_KEY, turn);
+        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID).append(DBHelper.TURN_KEY, turn);
         DBObject state = stateCollection.findOne(stateQuery);
         if(state == null) {
             return false;
