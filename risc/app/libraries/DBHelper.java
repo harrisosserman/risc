@@ -53,29 +53,6 @@ public class DBHelper{
 		return ConnectionManager.getInstance().getConnection();
 	}
 
-	public static void reset(String gameID){
-		MongoConnection connection = DBHelper.getConnection();
-
-		BasicDBObject removalCriteria = new BasicDBObject(GAME_ID_KEY, gameID);
-
-		DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
-		waitingPlayersCollection.remove(removalCriteria);
-
-		DB gameDB = connection.getDB(GAME_DB);
-
-		DBCollection mapCollection = gameDB.getCollection(MAP_COLLECTION);
-		mapCollection.remove(removalCriteria);
-
-		DBCollection committedTurnsCollection = gameDB.getCollection(COMMITTED_TURNS_COLLECTION);
-		committedTurnsCollection.remove(removalCriteria);
-
-		DBCollection stateCollection = gameDB.getCollection(STATE_COLLECTION);
-		stateCollection.remove(removalCriteria);
-
-		DBCollection infoCollection = gameDB.getCollection(INFO_COLLECTION);
-		infoCollection.remove(removalCriteria);
-	}
-
 	//Get DBs
 
 	private static DB getDB(String dbName){

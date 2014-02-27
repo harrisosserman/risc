@@ -108,11 +108,6 @@ public class API extends Controller {
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
 
-    public static Result reset(String gameID){
-        DBHelper.reset(gameID);
-        return ok("Reset DB for gameID:" + gameID);
-    }
-
     //-------- Player API Methods ----------
     @BodyParser.Of(BodyParser.Json.class)
     public static Result createPlayer() {
