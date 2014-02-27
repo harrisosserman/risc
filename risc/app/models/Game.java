@@ -8,7 +8,6 @@ import libraries.DBHelper;
 
 public class Game {
 
-    private static final String DEFAULT_GAME_ID = "12345";
     private static final int NUM_TERRITORIES = 25;
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
     private static final int TOTAL_FOOD_COUNT = TOTAL_TROOP_COUNT;
@@ -16,10 +15,6 @@ public class Game {
 
     private String myGameID;
     private Territory[] myTerritories;
-
-    public Game(){
-        myGameID = DEFAULT_GAME_ID;
-    }
 
     //used for getting an existing game
     public Game(String gameID){
@@ -142,9 +137,9 @@ public class Game {
         return  mostRecentTurn;
     }
 
-    public boolean areAllPlayersCommitted(){
+    public boolean areAllPlayersCommitedForMostRecentTurn(){
         DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
-        BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
+        BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
         DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
         int turn = -1;
         int committedTurnsInSameTurn = 0;
@@ -158,12 +153,14 @@ public class Game {
             }
             committedTurnsInSameTurn++;
         }
+        // if no players have committed yet for this turn, return true 
+        // because every player is still committed for the last turn
         if(turn == -1) {
-            return false;
+            return true;
         }
 
         DBCollection stateCollection = DBHelper.getStateCollection();
-        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID).append(DBHelper.TURN_KEY, turn);
+        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID).append(DBHelper.TURN_KEY, turn);
         DBObject state = stateCollection.findOne(stateQuery);
         if(state == null) {
             return false;
@@ -172,13 +169,8 @@ public class Game {
         return true;
     }
 
-    public String getMapJson(String gameID){
-        DBObject map = DBHelper.getMapForGame(gameID);
-        return map.toString();
-    }
-
-    public String getCurrentGameStateJson(String gameID){
-        DBObject currentTurn = DBHelper.getCurrentTurnForGame(gameID);
+    public String getCurrentGameStateJson(){
+        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         return currentTurn.toString();
     }
 
@@ -215,79 +207,4 @@ public class Game {
         }
         return count;
     }
-
-    public void removePlayer(int pid){
-        System.out.println("------- Remove called");
-        //First update info collection
-        //decrement game.state.activePlayerCount
-        DBCollection infoCollection = DBHelper.getInfoCollection();
-        DBObject info = DBHelper.getInfoForGame(myGameID);
-
-        //info is null while the players are still waiting and the map hasn't yet been created
-        if(info == null){
-            DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-            DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
-            ArrayList<DBObject> players = (ArrayList<DBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
-            players.remove((pid - 1));
-            waitingPlayers.put(DBHelper.COUNT_KEY, players.size());
-
-            BasicDBObject newWaitingPlayers = new BasicDBObject("$set", waitingPlayers);
-            newWaitingPlayers.append("$set", new BasicDBObject(DBHelper.PLAYERS_KEY, players));
-            BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-            waitingPlayersCollection.update(gameQuery, newWaitingPlayers);
-
-            BasicDBObject newWaitingPlayers2 = new BasicDBObject("$set", waitingPlayers);
-            newWaitingPlayers2.append("$set", new BasicDBObject(DBHelper.COUNT_KEY, players.size()));
-            waitingPlayersCollection.update(gameQuery, newWaitingPlayers2);
-
-            if (players.size() == 0) {
-                DBHelper.reset(myGameID);
-                System.out.println("----- Resetting game");
-                return;
-            }
-        }
-
-        //remove player from activePlayers
-        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)info.get(DBHelper.ACTIVE_PLAYERS_KEY);
-        ArrayList<DBObject> updatedActivePlayers = new ArrayList<DBObject>();
-        for (DBObject activePlayer : activePlayers) {
-            if ((Integer)activePlayer.get(DBHelper.PLAYER_NUMBER_KEY) != pid) {
-                updatedActivePlayers.add(activePlayer);
-            }
-        }
-
-        if (updatedActivePlayers.size() == 0) {
-            DBHelper.reset(myGameID);
-            System.out.println("----- Resetting game");
-            return;
-        }
-
-        BasicDBObject newInfo = new BasicDBObject("$set", info);
-        newInfo.append("$set", new BasicDBObject(DBHelper.ACTIVE_PLAYERS_KEY, updatedActivePlayers));
-        BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        infoCollection.update(gameQuery, newInfo);
-
-        //Second update most recent state turn
-        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
-
-        // is null if no turns have yet been committed to state
-        if (currentTurn == null) {
-            return;
-        }
-
-        //Then set all troops in that player's territories to 0
-        ArrayList<DBObject> territories = (ArrayList<DBObject>)currentTurn.get(DBHelper.TERRITORIES_KEY);
-        for (DBObject territory : territories) {
-            boolean isOwnedByPid = ((Integer)territory.get(DBHelper.OWNER_KEY)).equals(pid);
-            if (isOwnedByPid) {
-                territory.put(DBHelper.TROOPS_KEY, 0);
-            }
-        }
-
-        BasicDBObject updatedCurrentTurn = new BasicDBObject("$set", currentTurn);
-        updatedCurrentTurn.append("$set", new BasicDBObject(DBHelper.TERRITORIES_KEY, territories));
-        DBCollection stateCollection = DBHelper.getStateCollection();
-        stateCollection.update(gameQuery, updatedCurrentTurn);
-    }
-
 }
