@@ -9,7 +9,6 @@ GET		/game/:gameID				controllers.API.getWaitingRoomInfo(gameID: String)
 POST 	/game/:gameID				controllers.API.commitTurn(gameID: String)
 POST	/game/:gameID/start			controllers.API.addPlayerMarkPlayerReadyAndStartGameIfNeeded(gameID: String)
 GET 	/game/:gameID/map			controllers.API.getMap(gameID: String)
-GET 	/game/:gameID/mapReady		controllers.API.isMapReady(gameID: String)
 DELETE	/game/:gameID/reset			controllers.API.reset(gameID: String)
 
 POST	/player 					controllers.API.createPlayer()

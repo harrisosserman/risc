@@ -72,6 +72,10 @@ public class API extends Controller {
 
         WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
         wr.addPlayer(usernameWithoutQuotes);
+
+        UserManager um = new UserManager();
+        um.addGameToUser(wr.getGameID(), usernameWithoutQuotes);
+
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
         if (wr.shouldGameBegin()) {
