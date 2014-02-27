@@ -13,7 +13,6 @@ public class DBHelper{
 
 	private static final String STATE_COLLECTION = "state";
 	private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
-	private static final String MAP_COLLECTION = "map";
 	private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
 	private static final String INFO_COLLECTION = "info";
 	private static final String PLAYER_COLLECTION = "player";
@@ -41,9 +40,9 @@ public class DBHelper{
 
     public static final String INFANTRY_KEY = "INFANTRY";
     public static final String AUTOMATIC_WEAPONS_KEY = "AUTOMATIC";
-    public static final String ROCKET_LAUNCHERS_KEY = "ROCKET";
+    public static final String ROCKET_LAUNCHERS_KEY = "ROCKETS";
     public static final String TANKS_KEY = "TANKS";
-    public static final String IMPROVED_TANKS_KEY = "IMPROVED_TANKS";
+    public static final String IMPROVED_TANKS_KEY = "IMPROVEDTANKS";
     public static final String FIGHTER_PLANES_KEY = "PLANES";
 
 
@@ -85,10 +84,6 @@ public class DBHelper{
 		return DBHelper.getCollection(INITIALIZATION_DB, WAITING_PLAYERS_COLLECTION);
 	}
 
-	public static DBCollection getMapCollection(){
-		return DBHelper.getCollection(GAME_DB, MAP_COLLECTION);
-	}
-
 	public static DBCollection getCommittedTurnsCollection(){
 		return DBHelper.getCollection(GAME_DB, COMMITTED_TURNS_COLLECTION);
 	}
@@ -111,12 +106,6 @@ public class DBHelper{
 		DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		return waitingPlayersCollection.findOne(gameQuery);
-	}
-
-	public static DBObject getMapForGame(String gameID){
-		DBCollection mapsCollection = DBHelper.getMapCollection();
-		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
-		return mapsCollection.findOne(gameQuery);
 	}
 
 	public static DBObject getInfoForGame(String gameID){
