@@ -86,17 +86,11 @@ public class API extends Controller {
 
     public static Result getMap(String gameID){
         Game game = new Game(gameID);
-        String mapJson = game.getMapJson(gameID);
-        return ok(mapJson);
-    }
-
-    public static Result isMapReady(String gameID){
-        Game game = new Game(gameID);
-        if (game.areAllPlayersCommitted()) {
-            String gameStateJson = game.getCurrentGameStateJson(gameID);
-            return ok(gameStateJson);
+        if (game.areAllPlayersCommitedForMostRecentTurn()) {
+            String mapJson = game.getCurrentGameStateJson();
+            return ok(mapJson);
         }else{
-            return badRequest("all players havent committed yet");
+            return badRequest("not all players have committed yet");
         }
     }
 

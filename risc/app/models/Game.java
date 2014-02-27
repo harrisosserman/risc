@@ -137,7 +137,7 @@ public class Game {
         return  mostRecentTurn;
     }
 
-    public boolean areAllPlayersCommitted(){
+    public boolean areAllPlayersCommitedForMostRecentTurn(){
         DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
         BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
         DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
@@ -153,8 +153,10 @@ public class Game {
             }
             committedTurnsInSameTurn++;
         }
+        // if no players have committed yet for this turn, return true 
+        // because every player is still committed for the last turn
         if(turn == -1) {
-            return false;
+            return true;
         }
 
         DBCollection stateCollection = DBHelper.getStateCollection();
@@ -167,13 +169,8 @@ public class Game {
         return true;
     }
 
-    public String getMapJson(String gameID){
-        DBObject map = DBHelper.getMapForGame(gameID);
-        return map.toString();
-    }
-
-    public String getCurrentGameStateJson(String gameID){
-        DBObject currentTurn = DBHelper.getCurrentTurnForGame(gameID);
+    public String getCurrentGameStateJson(){
+        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         return currentTurn.toString();
     }
 
