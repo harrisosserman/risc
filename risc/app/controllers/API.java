@@ -65,7 +65,7 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result addPlayerMarkPlayerReadyAndStartGameIfNeeded(String gameID){
+    public static Result addPlayer(String gameID){
         RequestBody body = request().body();
         String username = body.asJson().get(DBHelper.NAME_KEY).toString();
         String usernameWithoutQuotes = removeQuotes(username);
@@ -76,6 +76,16 @@ public class API extends Controller {
         UserManager um = new UserManager();
         um.addGameToUser(wr.getGameID(), usernameWithoutQuotes);
 
+        return ok();
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result markPlayerReadyAndStartGameIfNeeded(String gameID){
+        RequestBody body = request().body();
+        String username = body.asJson().get(DBHelper.NAME_KEY).toString();
+        String usernameWithoutQuotes = removeQuotes(username);
+
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
         if (wr.shouldGameBegin()) {
