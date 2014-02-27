@@ -44,11 +44,6 @@ function BoardEditing(globals) {
             };
             editing.moveOrder.push(result);
         }
-        console.log("PRINTING THE MOVE ORDER ARRAY");
-        for(var k=0; k<editing.moveOrder.length; k++) {
-            console.log(editing.moveOrder[k]);
-        }
-
     };
     editing.removeMove = function(moveType, start, end, troopType, numberOfMoves) {
         troopType = editing.convertTextForTroopCommit(troopType);

@@ -66,15 +66,12 @@
             returnData['technology'] = globalFunctions.getPlayerInfo().technology;
             returnData['technology_level'] = globalFunctions.getPlayerInfo().maxTechLevel;
             returnData['moves'] = globalFunctions.getMoveOrder();
-            $.ajax('/game/' + gameID, {
+            $.ajax('/game/' + globalFunctions.getGameID(), {
                 method: 'POST',
                 data: JSON.stringify(returnData),
                 contentType: "application/json"
             }).done(function() {
                 globalFunctions.setDisplayMap(false);
-                $('.attackComponent').each(function() {
-                    $(this).remove();   //remove all arrows and attack numbers
-                });
                 var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
                 turn.pollForNextTurn(pollingNextTurnDOM);
             }).fail(function() {
@@ -82,6 +79,7 @@
             });
         };
         turn.constructComittedTurn();
+        console.log("PRINTING OUT THE TURN");
     }
     window.Turn = turnViewModel;
 })();
