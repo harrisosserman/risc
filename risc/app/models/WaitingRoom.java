@@ -94,7 +94,6 @@ public class WaitingRoom{
 		if (!isUserAlreadyInGame) {
 			DBCollection infoCollection = DBHelper.getInfoCollection();
 			BasicDBObject player = createPlayer(username);
-			//!!!Start Here. Make sure username isn't in list already2
 			DBHelper.addObjectToListAndUpdateCollection(myInfo, player, PLAYERS_KEY, infoCollection);
 
 			myInfo = DBHelper.getInfoForGame(myGameID);

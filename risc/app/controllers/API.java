@@ -67,7 +67,7 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result addPlayermarkPlayerReadyAndStartGameIfNeeded(String gameID){
+    public static Result addPlayerMarkPlayerReadyAndStartGameIfNeeded(String gameID){
         RequestBody body = request().body();
         String username = body.asJson().get(DBHelper.NAME_KEY).toString();
         String usernameWithoutQuotes = removeQuotes(username);
