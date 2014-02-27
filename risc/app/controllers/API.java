@@ -33,8 +33,6 @@ public class API extends Controller {
         WaitingRoom wr = new WaitingRoom();
         wr.createNewWaitingRoom(playerNameWithoutQuotes);
 
-        Game game = new Game();
-
         JSONObject result = new JSONObject();
         result.put(DBHelper.GAME_ID_KEY, wr.getGameID());
 
@@ -87,28 +85,12 @@ public class API extends Controller {
     }
 
     public static Result getMap(String gameID){
-        Game game = new Game();
-        String mapJson = game.getMapJson(gameID);
-        return ok(mapJson);
-    }
-
-    @BodyParser.Of(BodyParser.Json.class)
-    public static Result exit(String gameID){
-        RequestBody body = request().body();
-        int exitingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
-
-        Game game = new Game();
-        game.removePlayer(exitingPlayerNumber);
-        return ok("Exiting for player:" + exitingPlayerNumber);
-    }
-
-    public static Result isMapReady(String gameID){
-        Game game = new Game();
-        if (game.areAllPlayersCommitted()) {
-            String gameStateJson = game.getCurrentGameStateJson(gameID);
-            return ok(gameStateJson);
+        Game game = new Game(gameID);
+        if (game.areAllPlayersCommitedForMostRecentTurn()) {
+            String mapJson = game.getCurrentGameStateJson();
+            return ok(mapJson);
         }else{
-            return badRequest("all players havent committed yet");
+            return badRequest("not all players have committed yet");
         }
     }
 
