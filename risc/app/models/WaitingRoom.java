@@ -82,11 +82,23 @@ public class WaitingRoom{
 	public void addPlayer(String username){
 		username = username.toLowerCase();
 
-		DBCollection infoCollection = DBHelper.getInfoCollection();
-		BasicDBObject player = createPlayer(username);
-		DBHelper.addObjectToListAndUpdateCollection(myInfo, player, PLAYERS_KEY, infoCollection);
+		boolean isUserAlreadyInGame = false;
+		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
+		for (DBObject player : players) {
+			if (player.get(PLAYER_KEY).toString().equals(username)) {
+				isUserAlreadyInGame = true;
+				break;
+			}
+		}
 
-		myInfo = DBHelper.getInfoForGame(myGameID);
+		if (!isUserAlreadyInGame) {
+			DBCollection infoCollection = DBHelper.getInfoCollection();
+			BasicDBObject player = createPlayer(username);
+			//!!!Start Here. Make sure username isn't in list already2
+			DBHelper.addObjectToListAndUpdateCollection(myInfo, player, PLAYERS_KEY, infoCollection);
+
+			myInfo = DBHelper.getInfoForGame(myGameID);
+		}
 	}
 
 	public void markPlayerAsReady(String username){
