@@ -73,6 +73,19 @@
         globalFunctions.getPlayerInfo = function() {
             return board.playerInfo;
         };
+        globalFunctions.createPlayerList = function(data) {
+            for(var k = 0; k<data.length; k++) {
+                board.playerList.push({
+                    'name': data[k].name,
+                    'ready': data[k].ready,
+                    'color': globalFunctions.getElementOfColorList(k),
+                    'additionalInfantry': 0,
+                    'food': 0,
+                    'tech': 0,
+                    'techLevel': 0
+                });
+            }
+        };
         /*          END GLOBAL FUNCTIONS                    */
         board.createMap = function() {
             //function to build map out of table
@@ -93,11 +106,19 @@
             });
             $("#map td button").hide();
         };
+        board.getPlayerNumberByUsername = function(username) {
+            for(var k=0; k<board.playerList().length; k++) {
+                if(username === board.playerList()[k].name) {
+                    return k + 1;
+                }
+            }
+            return 0;
+        };
         board.getMap = function() {
             $("#dialog").dialog();
             $("#dialog").dialog('close');
 
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -116,18 +137,20 @@
                         var map = $("#map td");
                         $(map).each(function(index) {
                             board.territoryOwner.push(board.territoryInfo.territories[index].owner);
-                            board.boardInfo.infantry[index] = board.territoryInfo.territories[index].INFANTRY;
-                            board.boardInfo.automatic[index] = board.territoryInfo.territories[index].AUTOMATIC;
-                            board.boardInfo.rocket[index] = board.territoryInfo.territories[index].ROCKETS;
-                            board.boardInfo.tank[index] = board.territoryInfo.territories[index].TANKS;
-                            board.boardInfo.improvedTank[index] = board.territoryInfo.territories[index].IMPROVEDTANKS;
-                            board.boardInfo.plane[index] = board.territoryInfo.territories[index].PLANES;
+                            // board.boardInfo.infantry[index] = board.territoryInfo.territories[index].INFANTRY;
+                            // board.boardInfo.automatic[index] = board.territoryInfo.territories[index].AUTOMATIC;
+                            // board.boardInfo.rocket[index] = board.territoryInfo.territories[index].ROCKETS;
+                            // board.boardInfo.tank[index] = board.territoryInfo.territories[index].TANKS;
+                            // board.boardInfo.improvedTank[index] = board.territoryInfo.territories[index].IMPROVEDTANKS;
+                            // board.boardInfo.plane[index] = board.territoryInfo.territories[index].PLANES;
+                            board.updateBoardInfoValues(index);
                             board.boardInfo.food[index] = board.territoryInfo.territories[index].food;
                             board.boardInfo.technology[index] = board.territoryInfo.territories[index].technology;
 
                             board.territoryDOMElements.push($(this));
-                            $(this).addClass("player" + board.territoryInfo.territories[index].owner);
-                            if(board.territoryInfo.territories[index].owner === globalFunctions.getPlayerNumber()) {
+                            var playerNumber = board.getPlayerNumberByUsername(board.territoryInfo.territories[index].owner);
+                            $(this).addClass("player" + playerNumber);
+                            if(playerNumber === globalFunctions.getPlayerNumber()) {
                                 $(this).hover(function() {
                                     $(this).addClass("territoryHover");
                                 }, function() {
@@ -154,17 +177,15 @@
                         });
                 });
         };
-        globalFunctions.createPlayerList = function(data) {
-            for(var k = 0; k<data.length; k++) {
-                board.playerList.push({
-                    'name': data[k].name,
-                    'ready': data[k].ready,
-                    'color': globalFunctions.getElementOfColorList(k),
-                    'additionalInfantry': 0,
-                    'food': 0,
-                    'tech': 0,
-                    'techLevel': 0
-                });
+        board.updateBoardInfoValues = function(index) {
+            for(var k=0; k<6; k++) {
+                var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
+                var troopTypeInBoardInfo = board.convertReadableText(board.convertTechLevelToText(k)).text;
+                if(typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
+                    board.boardInfo[troopTypeInBoardInfo][index] = 0;
+                } else {
+                    board.boardInfo[troopTypeInBoardInfo][index] = board.territoryInfo.territories[index][troopTypeInTerritoryInfo];
+                }
             }
         };
         board.updatePlayerInfoTable = function(index, playerInfo, updateTechnology) {

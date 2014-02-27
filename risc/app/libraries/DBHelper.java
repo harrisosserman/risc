@@ -158,7 +158,7 @@ public class DBHelper{
 	}
 
 	public static void addObjectToListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPush, String listKey, DBCollection collection){
-		performOperatorOnListAndUpdateCollection("$push", documentIdentifier, objectToPush, listKey, collection);
+		performOperatorOnListAndUpdateCollection("$addToSet", documentIdentifier, objectToPush, listKey, collection);
 	}
 
 	public static void removeObjectFromListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPull, String listKey, DBCollection collection){

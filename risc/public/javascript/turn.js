@@ -50,7 +50,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
@@ -62,7 +62,7 @@
 
         turn.commitTurn = function(midturn) {
             var result = turn.constructComittedTurn();
-            $.ajax('/test/game/' + globalFunctions.getGameID(), {
+            $.ajax('/game/' + globalFunctions.getGameID(), {
                 method: 'POST',
                 data: JSON.stringify(result),
                 contentType: "application/json"
