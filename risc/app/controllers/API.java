@@ -90,16 +90,6 @@ public class API extends Controller {
         return ok(mapJson);
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
-    public static Result exit(String gameID){
-        RequestBody body = request().body();
-        int exitingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
-
-        Game game = new Game(gameID);
-        game.removePlayer(exitingPlayerNumber);
-        return ok("Exiting for player:" + exitingPlayerNumber);
-    }
-
     public static Result isMapReady(String gameID){
         Game game = new Game(gameID);
         if (game.areAllPlayersCommitted()) {
