@@ -17,11 +17,13 @@
             "level": 6,
             "food": 5,
             "technology": 10
+            "additionalInfantry": 48
         },
         {
             "owner": "playerID",
             "level": 6,
             "food": 5,
             "technology": 10
+            "additionalInfantry": 48
         }
 }

@@ -139,9 +139,19 @@ public class WaitingRoom{
 		myInfo = DBHelper.getInfoForGame(myGameID);
 	}
 
-	private int getNumberOfPlayers(){
+	public int getNumberOfPlayers(){
 		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
 		return players.size();
+	}
+
+	public ArrayList<String> getUsernames(){
+		ArrayList<DBObject> players = (ArrayList<DBObject>)myInfo.get(PLAYERS_KEY);
+		ArrayList<String> usernames = new ArrayList<String>();
+		for (DBObject player : players) {
+			String username = (String)player.get(PLAYER_KEY);
+			usernames.add(username);
+		}
+		return usernames;
 	}
 
 	private int getNumberOfReadyPlayers(){

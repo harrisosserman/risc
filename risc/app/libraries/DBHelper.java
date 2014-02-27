@@ -27,13 +27,25 @@ public class DBHelper{
     public static final String TERRITORIES_KEY = "territories";
     public static final String OWNER_KEY = "owner";
     public static final String TROOPS_KEY = "troops";
-    public static final String ADDITIONAL_TROOPS_KEY = "additionalTroops";
+    public static final String ADDITIONAL_INFANTRY_KEY = "additionalInfantry";
     public static final String TURN_KEY = "turn";
     public static final String ACTIVE_PLAYER_COUNT_KEY = "activePlayerCount";
     public static final String ACTIVE_PLAYERS_KEY = "activePlayers";
     public static final String PLAYER_NUMBER_KEY = "playerNumber";
     public static final String PLAYER_ID_KEY = "playerId";
     public static final String PLAYER_NAME_KEY = "name";
+    public static final String FOOD_KEY = "food";
+    public static final String TECHNOLOGY_KEY = "technology";
+    public static final String LEVEL_KEY = "level";
+    public static final String PLAYER_INFO_KEY = "playerInfo";
+
+    public static final String INFANTRY_KEY = "INFANTRY";
+    public static final String AUTOMATIC_WEAPONS_KEY = "AUTOMATIC";
+    public static final String ROCKET_LAUNCHERS_KEY = "ROCKET";
+    public static final String TANKS_KEY = "TANKS";
+    public static final String IMPROVED_TANKS_KEY = "IMPROVED_TANKS";
+    public static final String FIGHTER_PLANES_KEY = "PLANES";
+
 
 	private static MongoConnection myConnection;
 
