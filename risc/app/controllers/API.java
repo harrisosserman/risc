@@ -98,6 +98,12 @@ public class API extends Controller {
         }
     }
 
+    public static Result endGame(String gameID){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.markRoomsGameAsEnded();
+        return ok();
+    }
+
     public static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
     }
