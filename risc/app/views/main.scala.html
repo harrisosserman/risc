@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     </head>
     <body>
-        <div class="navbar" class="initializationKnockout">
+        <div class="navbar" id="initializationKnockout1">
             <div class="navbar-inner">
                 <div class="container">
                     <div class="brand">
@@ -75,13 +75,14 @@
                                             <th>Game State</th>
                                             <th>Join Game</th>
                                         </tr>
-                                        <tbody data-bind="foreach: myGamesList">
-                                            <tr>
-                                                <td data-bind="text: players"></td>
-                                                <td data-bind="text: stateDescription"></td>
-                                                <td><button data-bind="click: $parent.enterGame">Join</button></td>
-                                            </tr>
                                     </thead>
+                                    <tbody data-bind="foreach: myGamesList">
+                                        <tr>
+                                            <td data-bind="text: players"></td>
+                                            <td data-bind="text: stateDescription"></td>
+                                            <td><button data-bind="click: $parent.enterGame">Join</button></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             <div class="control-group">
@@ -94,13 +95,14 @@
                                             <th>Game State</th>
                                             <th>Join Game</th>
                                         </tr>
-                                        <tbody data-bind="foreach: lobbyGamesList">
-                                            <tr>
-                                                <td data-bind="text: players"></td>
-                                                <td data-bind="text: stateDescription"></td>
-                                                <td><button data-bind="click: $parent.enterGame">Join</button></td>
-                                            </tr>
                                     </thead>
+                                    <tbody data-bind="foreach: lobbyGamesList">
+                                        <tr>
+                                            <td data-bind="text: players"></td>
+                                            <td data-bind="text: stateDescription"></td>
+                                            <td><button data-bind="click: $parent.enterGame">Join</button></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             <div class="control-group">
@@ -135,11 +137,7 @@
                 </div>
             </div>
 
-
-                    <!-- <div data-bind="visible: displayGameWaitingRoom">
-
-                    </div> -->
-            <div class="initializationKnockout">
+            <div id="instructionsKnockout">
                 <div class="modal" data-bind="visible: displayInstructions">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -290,6 +288,7 @@
         <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha512.js"></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/player.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/lobby.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/instructions.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/initialization.js")'></script>
     </body>
 </html>

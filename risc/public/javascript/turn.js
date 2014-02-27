@@ -3,29 +3,6 @@
     function turnViewModel(globals) {
         var globalFunctions = globals;
         var turn = {};
-        var territoryOwner = globalFunctions.getTerritoryOwner();
-        var troops = globalFunctions.getTroops();
-        var attackingTroops = globalFunctions.getAttackingTroops();
-        var gameID = globalFunctions.getGameID();
-        var playerNumber = globalFunctions.getPlayerNumber();
-        var troopDirections = ['up', 'down', 'left', 'right', 'up_left', 'up_right', 'down_left', 'down_right'];
-
-        turn.constructAttackingTroops = function(index) {
-            var attack = attackingTroops[index];
-            var result = [];
-            for(var k=0; k<troopDirections.length; k++) {
-                if(attack[troopDirections[k]].troops === 0) {
-                    continue;
-                }
-                else {
-                    result.push({
-                        "territory": attack[troopDirections[k]].destination,
-                        "troops": parseInt(attack[troopDirections[k]].troops, 10)
-                    });
-                }
-            }
-            return result;
-        };
 
         turn.pollForNextTurn = function(pollingNextTurnDOM) {
             var deferred = $.Deferred();
@@ -58,12 +35,6 @@
                     }
                     if(otherPlayersFound === false) {
                         alert("Player " + owner + " wins!!!");
-                        //Note: This is a terrible security vulnerability, but will be removed in evolution 2
-                        //We needed it because the backend uses the same GameID (12345) for every game
-                        $.ajax('/game/' + globalFunctions.getGameID() + '/reset', {
-                            method: 'DELETE',
-                            contentType: "application/json"
-                        });
                         location.reload(true);
                     }
                     globalFunctions.destroyAndRebuildMap();
@@ -88,32 +59,19 @@
 
         turn.constructComittedTurn = function() {
             var returnData = {};
-            returnData['gameID'] = gameID;
-            returnData['player'] = playerNumber;
-            var territories = [];
-            for(var k=0; k<territoryOwner.length; k++) {
-                if(territoryOwner[k] !== playerNumber) {
-                    continue;
-                }
-                var territoryInfo = {};
-                var attacking = turn.constructAttackingTroops(k);
-                territoryInfo = {
-                    "position": k,
-                    "troops": troops[k],
-                    "attacking": attacking
-                };
-                territories.push(territoryInfo);
-            }
-            returnData['territories'] = territories;
-            $.ajax('/game/' + gameID, {
+            returnData['gameID'] = globalFunctions.getGameID();
+            returnData['username'] = globalFunctions.getUsername();
+            returnData['timeStamp'] = new Date().getTime();
+            returnData['food'] = globalFunctions.getPlayerInfo().food;
+            returnData['technology'] = globalFunctions.getPlayerInfo().technology;
+            returnData['technology_level'] = globalFunctions.getPlayerInfo().maxTechLevel;
+            returnData['moves'] = globalFunctions.getMoveOrder();
+            $.ajax('/game/' + globalFunctions.getGameID(), {
                 method: 'POST',
                 data: JSON.stringify(returnData),
                 contentType: "application/json"
             }).done(function() {
                 globalFunctions.setDisplayMap(false);
-                $('.attackComponent').each(function() {
-                    $(this).remove();   //remove all arrows and attack numbers
-                });
                 var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
                 turn.pollForNextTurn(pollingNextTurnDOM);
             }).fail(function() {
@@ -121,6 +79,7 @@
             });
         };
         turn.constructComittedTurn();
+        console.log("PRINTING OUT THE TURN");
     }
     window.Turn = turnViewModel;
 })();
