@@ -67,17 +67,18 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result markPlayerReadyAndStartGameIfNeeded(String gameID){
+    public static Result addPlayerMarkPlayerReadyAndStartGameIfNeeded(String gameID){
         RequestBody body = request().body();
         String username = body.asJson().get(DBHelper.NAME_KEY).toString();
         String usernameWithoutQuotes = removeQuotes(username);
 
         WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.addPlayer(usernameWithoutQuotes);
         wr.markPlayerAsReady(usernameWithoutQuotes);
 
         if (wr.shouldGameBegin()) {
             //Initalize the new game
-            new Game(wr.getGameID());
+            new Game(wr.getGameID(), wr.getUsernames());
 
             wr.markRoomAsNotJoinable();
         }

@@ -9,8 +9,10 @@ import libraries.DBHelper;
 public class Game {
 
     private static final String DEFAULT_GAME_ID = "12345";
-    private static final int NUM_TERRITORIES = 50;
+    private static final int NUM_TERRITORIES = 25;
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
+    private static final int TOTAL_FOOD_COUNT = TOTAL_TROOP_COUNT;
+    private static final int TOTAL_TECHNOLOGY_COUNT = TOTAL_TROOP_COUNT / 2;
 
     private String myGameID;
     private Territory[] myTerritories;
@@ -19,20 +21,115 @@ public class Game {
         myGameID = DEFAULT_GAME_ID;
     }
 
+    //used for getting an existing game
     public Game(String gameID){
         myGameID = gameID;
+    }
 
-        DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
+    //used for creating a new game.
+    public Game(String gameID, ArrayList<String> usernames){
+        myGameID = gameID;
+
+        DBCursor stateCursor = getStateCursor();
         if (!stateCursor.hasNext()) {
-            //TODO: Create game
+            int numPlayers = usernames.size();
 
-            //Divy territories between players
+            int[] countryOwners = assignCountryOwners(numPlayers);
 
-            //Divy 2*TOTAL_TROOP_COUNT food resource gens fairly among territories
-            //and store in game.info
+            int[] foodProductions = assignResourceForTerritoryOwners(numPlayers, countryOwners, TOTAL_FOOD_COUNT);
+            int[] techProductions = assignResourceForTerritoryOwners(numPlayers, countryOwners, TOTAL_TECHNOLOGY_COUNT);
 
-            //make game map and store in game.state
+            DBObject initialState = makeInitialState(usernames, countryOwners, foodProductions, techProductions);
+            DBCollection stateCollection = DBHelper.getStateCollection();
+            stateCollection.insert(initialState);
         }
+    }
+
+        private int[] assignCountryOwners(int playerCount) {
+        ArrayList<Integer> indices = new ArrayList<Integer>();
+        for(int i = 0; i < NUM_TERRITORIES; i++){
+            indices.add(i);
+        }
+        Collections.shuffle(indices);
+
+        int[] owners = new int[NUM_TERRITORIES];
+        for (int i = 0; i < NUM_TERRITORIES; i++) {
+            int index = indices.indexOf(i);
+            int ownerIndex = index % playerCount;
+            owners[i] = ownerIndex;
+        }
+        return owners;
+    }
+
+    private int[] assignResourceForTerritoryOwners(int numPlayers, int[] countryOwners, int totalResourceCount){
+        ArrayList<int[]> resourceArraysForPlayers = new ArrayList<int[]>();
+        int resourcesPerPlayer = totalResourceCount / numPlayers;
+        int numPlayersWithAdditionalTerritories = NUM_TERRITORIES % numPlayers;
+        for (int i = 0; i < numPlayers; i++) {
+            int numTerritories = (NUM_TERRITORIES / numPlayers) + ((i < numPlayersWithAdditionalTerritories) ? 1 : 0);
+            int[] resourceArr = getRandomArray(numTerritories, resourcesPerPlayer);
+            resourceArraysForPlayers.add(resourceArr);
+        }
+
+        int[] resourceAssignments = new int[countryOwners.length];
+        int[] currentCountryIndexForPlayer = new int[numPlayers];
+        for (int i = 0; i < countryOwners.length; i++) {
+            int countryOwner = countryOwners[i];
+            int[] resourceArr = resourceArraysForPlayers.get(countryOwner);
+            resourceAssignments[i] = resourceArr[currentCountryIndexForPlayer[countryOwner]];
+            currentCountryIndexForPlayer[countryOwner]++;
+        }
+        return resourceAssignments;
+    }
+
+    //Not very efficient. Only use for reasonably small numbers
+    private int[] getRandomArray(int length, int sum){
+        int[] array = new int[length];
+        Random generator = new Random(); 
+        for (int i = 0; i < sum; i++) {
+            int index = generator.nextInt(length);
+            array[index]++;
+        }
+        return array;
+    }
+
+    private DBObject makeInitialState(ArrayList<String> usernames, int[] countryOwners, int[] foodProductions, int[] techProductions){
+        BasicDBObject state = new BasicDBObject();
+        state.append(DBHelper.GAME_ID_KEY, myGameID);
+        state.append(DBHelper.NUM_PLAYERS_KEY, usernames.size());
+        state.append(DBHelper.TURN_KEY, 0);
+
+        ArrayList<DBObject> territories = new ArrayList<DBObject>();
+        for (int i = 0; i < countryOwners.length; i++) {
+            BasicDBObject territory = new BasicDBObject();
+
+            String countryOwner = usernames.get(countryOwners[i]);
+            territory.append(DBHelper.OWNER_KEY, countryOwner);
+
+            territory.append(DBHelper.FOOD_KEY, foodProductions[i]);
+            territory.append(DBHelper.TECHNOLOGY_KEY, techProductions[i]);
+
+            territories.add(territory);
+        }
+        state.append(DBHelper.TERRITORIES_KEY, territories);
+
+        int foodPerPlayer = TOTAL_FOOD_COUNT / usernames.size();
+        int techPerPlayer = TOTAL_TECHNOLOGY_COUNT / usernames.size();
+        int infantryPerPlayer = TOTAL_TROOP_COUNT / usernames.size();
+        ArrayList<DBObject> playerInfo = new ArrayList<DBObject>();
+        for (String username : usernames) {
+            BasicDBObject info = new BasicDBObject();
+            info.append(DBHelper.OWNER_KEY, username);
+            info.append(DBHelper.LEVEL_KEY, 0);
+            info.append(DBHelper.FOOD_KEY, foodPerPlayer);
+            info.append(DBHelper.TECHNOLOGY_KEY, techPerPlayer);
+            info.append(DBHelper.ADDITIONAL_INFANTRY_KEY, infantryPerPlayer);
+
+            playerInfo.add(info);
+        }
+        state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
+
+        return state;
     }
 
     private DBCursor getStateCursor(){
@@ -73,56 +170,6 @@ public class Game {
         }
 
         return true;
-    }
-
-    private void makeInitialGameMap(int[] territoryOwners, String gameID){
-        DBCollection mapCollection = DBHelper.getMapCollection();
-
-        BasicDBObject doc = new BasicDBObject();
-
-        doc.append(DBHelper.GAME_ID_KEY, gameID);
-
-        int waitingPlayerCount = getWaitingPlayerCount();
-        doc.append(DBHelper.NUM_PLAYERS_KEY, waitingPlayerCount);
-
-        ArrayList<BasicDBObject> territories = new ArrayList<BasicDBObject>();
-        for (int ownerIndex : territoryOwners) {
-            BasicDBObject territory = new BasicDBObject();
-            int ownerNumber = ownerIndex + 1; //beacuse 1-indexed instead of 0-indexed
-            territory.append(DBHelper.OWNER_KEY, ownerNumber);
-            territory.append(DBHelper.TROOPS_KEY, 0);
-
-            territories.add(territory);
-        }
-        doc.append(DBHelper.TERRITORIES_KEY, territories);
-
-        ArrayList<BasicDBObject> additionalTroops = new ArrayList<BasicDBObject>();
-        for (int i = 0; i < waitingPlayerCount; i++) {
-        	BasicDBObject additionalTroop = new BasicDBObject();
-        	int ownerNumber = i + 1;
-        	additionalTroop.append(DBHelper.OWNER_KEY, ownerNumber);
-        	additionalTroop.append(DBHelper.TROOPS_KEY, (TOTAL_TROOP_COUNT/waitingPlayerCount));
-            additionalTroops.add(additionalTroop);
-        }
-        doc.append(DBHelper.ADDITIONAL_TROOPS_KEY, additionalTroops);
-
-        mapCollection.insert(doc);
-    }
-
-    private int[] assignCountryOwners(int playerCount) {
-        ArrayList<Integer> indices = new ArrayList<Integer>();
-        for(int i = 0; i < NUM_TERRITORIES; i++){
-            indices.add(i);
-        }
-        Collections.shuffle(indices);
-
-        int[] owners = new int[NUM_TERRITORIES];
-        for (int i = 0; i < NUM_TERRITORIES; i++) {
-            int index = indices.indexOf(i);
-            int ownerIndex = index % playerCount;
-            owners[i] = ownerIndex;
-        }
-        return owners;
     }
 
     public String getMapJson(String gameID){
