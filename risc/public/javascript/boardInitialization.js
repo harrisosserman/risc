@@ -46,15 +46,6 @@
             board.getMap();
             board.playerWatching();
         };
-        globalFunctions.getTerritoryOwner = function() {
-            return board.territoryOwner;
-        };
-        globalFunctions.getTroops = function() {
-            return board.troops;
-        };
-        globalFunctions.getAttackingTroops = function() {
-            return board.attackingTroops;
-        };
         globalFunctions.setDisplayMap = function(input) {
             board.displayMap(input);
         };
@@ -64,13 +55,17 @@
         globalFunctions.getUnitUpgradeCost = function() {
             return board.unitUpgradeCost;
         };
+        globalFunctions.getAdditionalInfantry = function() {
+            return board.additionalInfantry;
+        };
         globalFunctions.destroyAndRebuildMap = function() {
             globalFunctions.setDisplayMap(true);
             board.territoryInfo = {};
             board.territoryOwner = [];
             board.territoryDOMElements = [];
-            board.troops = [];
-            board.attackingTroops = [];
+            board.additionalInfantry = [];
+            board.attackInfo = [];
+            board.editing.removeAllMoves();
             $("#map").empty();
             board.createMap();
             board.getMap();
@@ -353,6 +348,11 @@
         };
         board.submitMove = function() {
             $("#dialog").dialog('close');
+            //regex found here: http://stackoverflow.com/questions/1019515/javascript-test-for-an-integer
+            var intRegex = /^\d+$/;
+            if(!(intRegex.test(board.inputNumberAttackOrMove()))) {
+               alert('You must enter a nonnegative integer');
+            }
             var troopType = board.convertReadableText(board.typeOfTroopSelected());
             if(board.displayUpgradeTroopsModal() === true) {
                 var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());

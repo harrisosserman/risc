@@ -13,7 +13,9 @@
         };
 
         initialization.submitTurnClick = function() {
-            globalFunctions.submitTurn(midTurn=false);
+            globalFunctions.getAdditionalInfantry()[globalFunctions.getPlayerNumber() - 1] = 0;
+            console.log(globalFunctions.getAdditionalInfantry());
+            globalFunctions.commitTurn(midTurn=false);
         };
 
         new Player(globalFunctions);

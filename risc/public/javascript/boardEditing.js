@@ -8,6 +8,9 @@ function BoardEditing(globals) {
         return editing.moveOrder;
     };
     // END GLOBAL FUNCTIONS
+    editing.removeAllMoves = function() {
+        editing.moveOrder = [];
+    };
     editing.convertTextForTroopCommit = function(input) {
         var result = '';
         if(input === 0) {

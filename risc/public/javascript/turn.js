@@ -27,13 +27,13 @@
                         }
                     }
                     if(playerNumberFound === false) {
-                        $.ajax('/game/' + globalFunctions.getGameID() + '/exit', {
-                            method: 'POST',
-                            contentType: "application/json",
-                            data: JSON.stringify({
-                                'playerNumber': globalFunctions.getPlayerNumber()
-                            })
-                        });
+                        // $.ajax('/game/' + globalFunctions.getGameID() + '/exit', {
+                        //     method: 'POST',
+                        //     contentType: "application/json",
+                        //     data: JSON.stringify({
+                        //         'playerNumber': globalFunctions.getPlayerNumber()
+                        //     })
+                        // });
                         globalFunctions.setPlayerNumber(-1);
                     }
                     if(otherPlayersFound === false) {
@@ -50,7 +50,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/game/' + gameID + '/mapReady', {
+            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
@@ -62,7 +62,7 @@
 
         turn.commitTurn = function(midturn) {
             var result = turn.constructComittedTurn();
-            $.ajax('/game/' + globalFunctions.getGameID(), {
+            $.ajax('/test/game/' + globalFunctions.getGameID(), {
                 method: 'POST',
                 data: JSON.stringify(result),
                 contentType: "application/json"
