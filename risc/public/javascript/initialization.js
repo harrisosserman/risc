@@ -13,14 +13,14 @@
         };
 
         initialization.submitTurnClick = function() {
-            console.log("clicking submit turn");
-            new Turn(globalFunctions);
+            globalFunctions.submitTurn(midTurn=false);
         };
 
         new Player(globalFunctions);
         new Lobby(globalFunctions);
         new Board(globalFunctions);
         new Instructions(globalFunctions);
+        new Turn(globalFunctions);
     }
     ko.applyBindings(new initializationViewModel(), document.getElementById('initializationKnockout1'));
 

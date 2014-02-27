@@ -2,6 +2,9 @@
 (function() {
     function turnViewModel(globals) {
         var globalFunctions = globals;
+        globalFunctions.commitTurn = function(midTurn) {
+            turn.commitTurn(midTurn);
+        };
         var turn = {};
 
         turn.pollForNextTurn = function(pollingNextTurnDOM) {
@@ -57,6 +60,23 @@
             });
         };
 
+        turn.commitTurn = function(midturn) {
+            var result = turn.constructComittedTurn();
+            $.ajax('/game/' + globalFunctions.getGameID(), {
+                method: 'POST',
+                data: JSON.stringify(result),
+                contentType: "application/json"
+            }).done(function() {
+                if(typeof midturn === 'undefined' || midturn === false) {
+                    globalFunctions.setDisplayMap(false);
+                    var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
+                    turn.pollForNextTurn(pollingNextTurnDOM);
+                }
+            }).fail(function() {
+                //FILL THIS IN FOR WHEN TURN VALIDATION FAILS
+            });
+        };
+
         turn.constructComittedTurn = function() {
             var returnData = {};
             returnData['gameID'] = globalFunctions.getGameID();
@@ -66,20 +86,8 @@
             returnData['technology'] = globalFunctions.getPlayerInfo().technology;
             returnData['technology_level'] = globalFunctions.getPlayerInfo().maxTechLevel;
             returnData['moves'] = globalFunctions.getMoveOrder();
-            $.ajax('/game/' + globalFunctions.getGameID(), {
-                method: 'POST',
-                data: JSON.stringify(returnData),
-                contentType: "application/json"
-            }).done(function() {
-                globalFunctions.setDisplayMap(false);
-                var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
-                turn.pollForNextTurn(pollingNextTurnDOM);
-            }).fail(function() {
-                //FILL THIS IN FOR WHEN TURN VALIDATION FAILS
-            });
+            return returnData;
         };
-        turn.constructComittedTurn();
-        console.log("PRINTING OUT THE TURN");
     }
     window.Turn = turnViewModel;
 })();

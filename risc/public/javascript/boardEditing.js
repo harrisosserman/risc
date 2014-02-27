@@ -44,6 +44,7 @@ function BoardEditing(globals) {
             };
             editing.moveOrder.push(result);
         }
+        globalFunctions.commitTurn(midTurn=true);
     };
     editing.removeMove = function(moveType, start, end, troopType, numberOfMoves) {
         troopType = editing.convertTextForTroopCommit(troopType);
@@ -130,7 +131,9 @@ function BoardEditing(globals) {
             playerInfo.technology = playerInfo.technology - cost;
             convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
             convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
-            editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
+            for(var k=0; k<numberOfTroopsConverting; k++) {
+                editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
+            }
         }
     };
     editing.removeAllPreviousAdjacencies = function() {
