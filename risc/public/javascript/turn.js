@@ -38,6 +38,9 @@
                     }
                     if(otherPlayersFound === false) {
                         alert("Player " + owner + " wins!!!");
+                        $.ajax('/game/' + globalFunctions.getGameID() + '/end', {
+                            method: 'POST'
+                        });
                         location.reload(true);
                     }
                     globalFunctions.destroyAndRebuildMap();

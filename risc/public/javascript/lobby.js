@@ -41,6 +41,13 @@
                 //game hasn't started yet
                 lobby.displayJoinOrCreateGame(false);
                 lobby.displayGameWaitingRoom(true);
+                $.ajax('/game/' + globalFunctions.getGameID() + '/addPlayer', {
+                    method: 'POST',
+                    data: JSON.stringify({
+                    'name': globalFunctions.getUsername()
+                    }),
+                    contentType: "application/json"
+                    });
                 lobby.pollGameWaitingRoom();
             } else if(data.state === 1) {
                 //game is in progress

@@ -137,12 +137,6 @@
                         var map = $("#map td");
                         $(map).each(function(index) {
                             board.territoryOwner.push(board.territoryInfo.territories[index].owner);
-                            // board.boardInfo.infantry[index] = board.territoryInfo.territories[index].INFANTRY;
-                            // board.boardInfo.automatic[index] = board.territoryInfo.territories[index].AUTOMATIC;
-                            // board.boardInfo.rocket[index] = board.territoryInfo.territories[index].ROCKETS;
-                            // board.boardInfo.tank[index] = board.territoryInfo.territories[index].TANKS;
-                            // board.boardInfo.improvedTank[index] = board.territoryInfo.territories[index].IMPROVEDTANKS;
-                            // board.boardInfo.plane[index] = board.territoryInfo.territories[index].PLANES;
                             board.updateBoardInfoValues(index);
                             board.boardInfo.food[index] = board.territoryInfo.territories[index].food;
                             board.boardInfo.technology[index] = board.territoryInfo.territories[index].technology;
