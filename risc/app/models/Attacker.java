@@ -6,14 +6,19 @@ import java.util.*;
 public class Attacker{
 
 	private Player myOwner;
-	private Army myStrength;
+	private Army myArmy;
 	private int myLocation;
 	private int myHome;
 
-	public Attacker(Player owner, Army size, int territory, int home){
-		myStrength = size;
+	public Attacker(Player owner, Army army, int territory, int home){
+		myArmy = army;
 		myOwner = owner; 
 		myHome = home;
+		myLocation = territory;
+	}
+	public Attacker(Player owner, int territory){
+		myArmy = new Army(owner);
+		myOwner = owner; 
 		myLocation = territory;
 	}
 
@@ -39,6 +44,18 @@ public class Attacker{
 
 	public int getHome(){
 		return myHome;
+	}
+
+	public Army getArmy(){
+		return myArmy;
+	}
+
+	public void addTroop(TroopType t){
+		myArmy.addTroop(t);
+	}
+	
+	public void addTroop(Troop t){
+		myArmy.addTroop(t);
 	}
 
 	}

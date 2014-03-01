@@ -116,12 +116,13 @@ public class DBHelper{
 		return highestTurnCursor.next();
 	}
 
-	public static DBObject getMapForGame(String gameID){
+/*	public static DBObject getMapForGame(String gameID){
 		DBCollection mapsCollection = DBHelper.getMapCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		return mapsCollection.findOne(gameQuery);
 	}
-
+    */
+    
 	public static DBObject getInfoForGame(String gameID){
 		DBCollection infoCollection = DBHelper.getInfoCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
@@ -151,7 +152,7 @@ public class DBHelper{
 	public static DBCursor getWaitingPlayerCursorForGame(String gameID, String username){
 		DBCollection stateCollection = DBHelper.getStateCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
-		gameQUery.put(USERNAME, username)
+		gameQuery.put(USERNAME, username);
 		return stateCollection.find(gameQuery);
 	}
 

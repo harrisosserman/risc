@@ -53,13 +53,12 @@ public class API extends Controller {
 
         RequestBody body = request().body();
         Turn turn = new Turn();
-        //String gameID = turn.getGameID(body);
         int turn_number = turn.createTurn(body);
         boolean json = turn.allTurnsCommitted();
         if(json){
-            //State state = new State(gameID);
-            //state.assembleState(turn_number);
-            return ok("returned true");
+        State state = new State("testGame");
+        int k = state.loadPreviousState();
+          return ok("returned true " + k);
         }
         return ok("Turn commited for turn :" + turn_number );
     }

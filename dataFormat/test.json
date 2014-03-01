@@ -1,0 +1,36 @@
+{
+    "gameID": "testGame",
+    "username": "kat",
+    "turn": 1, 
+    "committed": 1,
+    "timeStamp": 123123,
+    "food": 100,
+    "technology":100,
+    "technology_level": 6,
+    "moves":[
+    {
+            "moveType": 0, // choices are 0 = upgrade,  1= move and 2=attack.
+            "position": 1,
+            "troopType": "INFANTRY",
+            "upgradeType": "AUTOMATIC"
+
+        },
+        {
+            "moveType": 2, // choices are 0 = upgrade,  1= move and 2=attack.
+            "troopType": "AUTOMATIC",
+            "start": 2,
+            "end": 1
+        },
+        {
+            "moveType": 2, // choices are 0 = upgrade,  1= move and 2=attack.
+            "troopType": "AUTOMATIC",
+            "start": 2,
+            "end": 1
+        },
+        {
+            "moveType": 2, // choices are 0 = upgrade,  1= move and 2=attack.
+            "troopType": "PLANES",
+            "start": 2,
+            "end": 1
+        },
+    ]}

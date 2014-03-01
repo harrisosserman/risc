@@ -20,11 +20,11 @@ public class Army{
 		myTroops.put(TroopType.PLANES, new ArrayList<Troop>());
 	}
 
-	public void addTroop(TroopType type, Troop t){
+	/*public void addTroop(TroopType type, Troop t){
 		ArrayList<Troop> troops = myTroops.get(type);
 		troops.add(t);
 		myTroops.put(type, troops);
-	}
+	}*/
 
 	public int getSize(){
 		return myTroops.size();
@@ -36,6 +36,18 @@ public class Army{
 
 	public void setTroops(HashMap<TroopType, ArrayList<Troop>> troops){
 		myTroops = troops;
+	}
+
+	public void addTroop(Troop t){
+		ArrayList troops = myTroops.get(t.getType());
+		troops.add(t);
+		myTroops.put(t.getType(), troops);
+	}
+
+	public void addTroop(TroopType type){
+		ArrayList troops = myTroops.get(type);
+		troops.add(new Troop(myOwner, type));
+		myTroops.put(type, troops);
 	}
 	
 	public void deleteTroop(TroopType type){
@@ -98,5 +110,5 @@ public class Army{
 			return weakest;
 		}
 		return null;
-}
+    }
 }

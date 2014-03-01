@@ -191,9 +191,9 @@ public class Game {
     public ArrayList<Territory> territoriesOwnedByPlayer(int pid){
         ArrayList<Territory> playersTerritories = new ArrayList<Territory>();
         for (Territory t : myTerritories) {
-            if (t.getOwner() == pid) {
-                playersTerritories.add(t);
-            }
+       //     if (t.getOwner() == pid) {
+         //       playersTerritories.add(t);
+           // }
         }
         return playersTerritories;
     }
@@ -201,9 +201,9 @@ public class Game {
     public int territoryCountForPlayer(int pid){
         int count = 0;
         for (Territory t : myTerritories) {
-            if (t.getOwner() == pid) {
-                count++;
-            }
+     //       if (t.getOwner() == pid) {
+       //         count++;
+       //     }
         }
         return count;
     }

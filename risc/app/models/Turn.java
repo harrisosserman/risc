@@ -134,7 +134,7 @@ public class Turn {
         }
         int result = commitTurn(moves, player_);
 
-        return food;
+        return result;
 	}
 
     /*
@@ -159,7 +159,7 @@ public class Turn {
 
 
     // fix this to sort by time stamp and get 0 or 1. 
-    public boolean allTurnsCommitted() throws UnknownHostException{
+    public boolean allTurnsCommitted(){
         DBObject gameInfoObject = DBHelper.getInfoForGame(myGameID);
         BasicDBList players = (BasicDBList) gameInfoObject.get(PLAYERS);
         BasicDBObject[] playersArray = players.toArray(new BasicDBObject[0]);
@@ -196,20 +196,18 @@ public class Turn {
      *
      */
 
-    public int commitTurn(ArrayList<MoveType> moves, Player player1) throws UnknownHostException{
+    public int commitTurn(ArrayList<MoveType> moves, Player player1){
         DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
-        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
-        BasicDBObject query = new BasicDBObject();
-        query.put(GAME_ID, myGameID);
-        DBCursor states = waitingPlayers.find(query);
-        if(!states.hasNext()){
+        DBCursor states = DBHelper.getStateCursorForGame(myGameID);
+       /* if(!states.hasNext()){
             turn = 1;
         }
         else{
-            DBCursor highestTurn = waitingPlayers.find().sort( new BasicDBObject(TURN, -1));
-            turn = (Integer) highestTurn.next().get(TURN);
+            DBObject highestTurn = DBHelper.getCurrentTurnForGame(myGameID);
+            turn = (Integer) highestTurn.get(TURN);
             turn ++;
-        }
+        }*/
+        turn = 1;
         BasicDBObject turn_doc = new BasicDBObject();
         turn_doc.append(GAME_ID, myGameID);
         turn_doc.append(PLAYER, player1.getName());
