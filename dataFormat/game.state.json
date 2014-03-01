@@ -5,9 +5,11 @@
     "territories": [
                 {
                     "owner": "playerID",
+                    "position": 2,
                     "INFANTRY": 5,
                     "AUTOMATIC": 6,
-                    ...
+                    "food": 4,
+                    "technology": 5
                 }
     ],
     "playerInfo": [   <-- NOTE, THIS IS USED AT GAME START, AT THE END OF A ROUND, ETC FOR NEW TROOPS

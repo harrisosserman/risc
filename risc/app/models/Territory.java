@@ -5,21 +5,22 @@ import models.Attacker;
 
 public class Territory{
 
-	private int myOwner;
+	private Player myOwner;
 	private int myTroops;
 	private int myPosition;
 	private int myFood;
 	private int myTechnology;
-	private ArrayList<Attacker> attackers;
+	private HashMap<Integer, Attacker> attackers;
+	private Army myArmy;
 	
 
-	public Territory(int position, int owner, int troops, int food, int technology){
+	public Territory(int position, Player owner, int food, int technology){
 		myPosition = position;
 		myOwner = owner;
-		myTroops = troops;
 		myTechnology = technology;
 		myFood = food;
-		attackers = new ArrayList<Attacker>();
+		myArmy = new Army(myOwner);
+		attackers = new HashMap<Integer, Attacker>();
 
 	}
 	public int getFood(){
@@ -34,29 +35,34 @@ public class Territory{
 		return myPosition;
 	}
 
-	public int getOwner(){
+	public Player getOwner(){
 		return myOwner;
 	}
 
-	public void setOwner(int owner){
+	public void setOwner(Player owner){
 		myOwner = owner;
 	}
 
-	public int getDefendingArmy(){
-		return myTroops;
+	public Army getDefendingArmy(){
+		return myArmy;
 	}
 
-	public void setDefendingArmy(int troops){
-		myTroops = troops;
+	public void setDefendingArmy(Army army_){
+		myArmy = army_;
+	}
+
+	public void addTroop(Troop t){
+		myArmy.addTroop(t.getType(), t);
 	}
 
 	public Attacker getAttacker(int index){
 		return attackers.get(index);
 	}
 
-	public void addAttacker(Attacker a){
-		attackers.add(a);
-	}
+	public void addAttacker(Integer position, Attacker a){
+		ArrayList<Attacker> attackers_ = attackers.get(position);
+	    
+    }
 
 	public ArrayList<Attacker> getAttackers(){
 		return attackers;

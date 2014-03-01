@@ -53,6 +53,8 @@ public class Turn {
     private static final String END = "end";
     private static final String UPGRADETYPE = "upgradeType";
     private static final String TIMESTAMP = "timeStamp";
+    private static final String COMMITTED = "committed";
+    private static final String PLAYERS = "players";
 
     private ArrayList<Territory> territories;
     private String playerID;
@@ -89,42 +91,40 @@ public class Turn {
 
     public int createTurn(RequestBody jsonObject) throws UnknownHostException{
         myGameID = API.removeQuotes(jsonObject.asJson().get(GAME_ID).toString());
-        String username = (String)jsonObject.asJson().get(USERNAME).toString();
+        String username = API.removeQuotes(jsonObject.asJson().get(USERNAME).toString());
         Player player_ = new Player(username);
-        String food_ = jsonObject.asJson().get(FOOD).toString();
-        int food = Integer.parseInt(food_);
-        String technology_ = jsonObject.asJson().get(TECHNOLOGY).toString();
-        int technology = Integer.parseInt(technology_);
-        String technology_level_ = jsonObject.asJson().get(TECHNOLOGY_LEVEL).toString();
-        int technology_level = Integer.parseInt(technology_level_);
+        int food = Integer.parseInt(jsonObject.asJson().get(FOOD).toString());
+        int technology = Integer.parseInt(jsonObject.asJson().get(TECHNOLOGY).toString());
+        int technology_level = Integer.parseInt(jsonObject.asJson().get(TECHNOLOGY_LEVEL).toString());
+        int committed = Integer.parseInt(jsonObject.asJson().get(COMMITTED).toString());
+        Long timeStamp = Long.parseLong(jsonObject.asJson().get(TIMESTAMP).toString());
         player_.setFood(food);
         player_.setTechnology(technology);
         player_.setTechnologyLevel(technology_level);
+        player_.setTurnCommitted(committed);
+        player_.setTimeStamp(timeStamp);
         Integer nodes = jsonObject.asJson().get(MOVES).size();
-        System.out.println(nodes);
         ArrayList<MoveType> moves = new ArrayList<MoveType>();
         Iterator<JsonNode> movesData = jsonObject.asJson().get(MOVES).elements();
         while(movesData.hasNext()){
                 JsonNode moveData = movesData.next();
-                String moveType = moveData.get(MOVETYPE).toString();
+                int moveType = Integer.parseInt(moveData.get(MOVETYPE).toString());
                 System.out.println(moveType);
-                String troopType = moveData.get(TROOPTYPE).toString();
+                String troopType = API.removeQuotes(moveData.get(TROOPTYPE).toString());
                 System.out.println(troopType);
-                if(moveType.equals("upgrade")){
-                    String upgradeType = moveData.get(UPGRADETYPE).toString();
-                    System.out.println(upgradeType);
+                if(moveType == 0){
+                    String upgradeType = API.removeQuotes(moveData.get(UPGRADETYPE).toString());
                     int position = Integer.parseInt(moveData.get(POSITION).toString());
-                    System.out.println(position);
                     Upgrade newMove = new Upgrade(moveType, troopType, upgradeType, position);
                     moves.add(newMove);
                 }
-                else if(moveType.equals("move")){
+                else if(moveType == 1){
                     int start = Integer.parseInt(moveData.get(START).toString());
                     int end = Integer.parseInt(moveData.get(END).toString());
                     Move newMove = new Move(moveType, troopType, start, end);
                     moves.add(newMove);
                 }
-                else if(moveType.equals("attack")){
+                else if(moveType == 2){
                     int start = Integer.parseInt(moveData.get(START).toString());
                     int end = Integer.parseInt(moveData.get(END).toString());
                     Attack newMove = new Attack(moveType, troopType, start, end);
@@ -132,7 +132,7 @@ public class Turn {
                 }
                 
         }
-//        int result = commitTurn();
+        int result = commitTurn(moves, player_);
 
         return food;
 	}
@@ -156,37 +156,30 @@ public class Turn {
      * @return boolean determining if all of the turns have been committed.
      */
 
+
+
+    // fix this to sort by time stamp and get 0 or 1. 
     public boolean allTurnsCommitted() throws UnknownHostException{
-        DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
-        DBCollection state = DBHelper.getStateCollection();
-        DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
-        BasicDBObject query_turn = new BasicDBObject(GAME_ID, myGameID);
-        DBCursor highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
-        int highestTurn_value;
-        if(!highestTurn.hasNext())
-        {
-             highestTurn_value = 1;
-        }
-        else{
-
-             highestTurn_value = (Integer) highestTurn.next().get(TURN);
-        }
-        BasicDBObject query_count = new BasicDBObject();
-        query_count.put(GAME_ID, myGameID);
-        DBObject playerCount = waitingPlayers.findOne(query_count);
-        Integer numPlayers = ((Integer)(playerCount.get(COUNT)));
-        int numMaxTurns = 0;
-        highestTurn = committedTurns.find().sort(new BasicDBObject(TURN, -1));
-        while(highestTurn.hasNext()){
-            DBObject obj = highestTurn.next();
-            int document_turn = (Integer) obj.get(TURN);
-            if(highestTurn_value == document_turn){
-                numMaxTurns ++;
+        DBObject gameInfoObject = DBHelper.getInfoForGame(myGameID);
+        BasicDBList players = (BasicDBList) gameInfoObject.get(PLAYERS);
+        BasicDBObject[] playersArray = players.toArray(new BasicDBObject[0]);
+        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
+        int highestTurn_value = Integer.parseInt(currentTurn.get(TURN).toString());
+        
+        for(BasicDBObject play : playersArray){
+            DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+            String username = play.get(USERNAME).toString();
+            BasicDBObject isPlayerCommitted = new BasicDBObject(GAME_ID, myGameID);
+            isPlayerCommitted.put(TURN, highestTurn_value);
+            isPlayerCommitted.put(USERNAME, username);
+            DBCursor lastCommit = committedTurns.find(isPlayerCommitted).sort(new BasicDBObject(TIMESTAMP, -1));
+            DBObject playerInfo = lastCommit.next();
+            int committed = Integer.parseInt(playerInfo.get(COMMITTED).toString());
+            if(committed == 0){
+                return false;
             }
-
         }
-        boolean full = (numMaxTurns == numPlayers);
-        return full;
+        return true;
     }
 
     /*
@@ -219,35 +212,45 @@ public class Turn {
         }
         BasicDBObject turn_doc = new BasicDBObject();
         turn_doc.append(GAME_ID, myGameID);
-        turn_doc.append(PLAYER, playerID);
+        turn_doc.append(PLAYER, player1.getName());
         turn_doc.append(TURN, turn);
-        List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
-        for(int i=0; i<territories.size(); i++){
-            BasicDBObject territory_doc = new BasicDBObject();
-            int position = territories.get(i).getPosition();
-            territory_doc.append(POSITION, position);
-            territory_doc.append(TROOPS, territories.get(i).getDefendingArmy());
-            List<BasicDBObject> attacker_list = new ArrayList<BasicDBObject>();
-            for(int j=0; j< attackers.size(); j++){
-                if(attackers.get(j).getHome() == territories.get(i).getPosition()){
-                    BasicDBObject attacker_doc = new BasicDBObject();
-                    attacker_doc.append(TERRITORY, attackers.get(j).getTerritory());
-                    attacker_doc.append(TROOPS, attackers.get(j).getStrength());
-                    attacker_list.add(attacker_doc);
-
-                }
+        turn_doc.append(FOOD, player1.getFood());
+        turn_doc.append(COMMITTED, player1.getTurnCommitted());
+        turn_doc.append(TECHNOLOGY, player1.getTechnology());
+        turn_doc.append(TECHNOLOGY_LEVEL, player1.getTechnologyLevel());
+        turn_doc.append(TIMESTAMP, player1.getTimeStamp());
+        List<BasicDBObject> move_list = new ArrayList<BasicDBObject>();
+        for(int i=0; i<moves.size(); i++){
+            System.out.println("in loop of move size " + i);
+            BasicDBObject move_doc = new BasicDBObject();
+            move_doc.append(MOVETYPE, moves.get(i).getMoveType());
+            move_doc.append(TROOPTYPE, moves.get(i).getTroopType());
+            if(moves.get(i).getMoveType() == 0){
+                Upgrade upgrade = (Upgrade) moves.get(i);
+                move_doc.append(UPGRADETYPE, upgrade.getUpgradeType());
+                move_doc.append(POSITION, upgrade.getPosition());
+                move_list.add(move_doc);
             }
-            territory_doc.append(ATTACKING, attacker_list);
-            territory_list.add(territory_doc);
+            else if(moves.get(i).getMoveType() == 1){
+                Move move = (Move) moves.get(i);
+                move_doc.append(START, move.getStart());
+                move_doc.append(END, move.getEnd());
+                move_list.add(move_doc);
+            }
+            else if(moves.get(i).getMoveType() == 2){
+                Attack attack = (Attack) moves.get(i);
+                move_doc.append(START, attack.getStart());
+                move_doc.append(END, attack.getEnd());
+                move_list.add(move_doc);
+            }
+            
         }
 
-        turn_doc.append(TERRITORIES, territory_list);
+        turn_doc.append(MOVES, move_list);
 
         committedTurns.insert(turn_doc);
 
         return turn;
-
-
     }
 
     /*

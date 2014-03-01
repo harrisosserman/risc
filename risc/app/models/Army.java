@@ -6,78 +6,97 @@ import models.Player;
 
 public class Army{
 
-	private ArrayList<Troop> myTroops;
+	private HashMap<TroopType, ArrayList<Troop>> myTroops;
 	private Player myOwner;
 
 	public Army(Player owner){
 		myOwner = owner;
-		myTroops = new ArrayList<Troop>();
+		myTroops = new HashMap<TroopType, ArrayList<Troop>>();
+		myTroops.put(TroopType.INFANTRY, new ArrayList<Troop>());
+		myTroops.put(TroopType.AUTOMATIC, new ArrayList<Troop>());
+		myTroops.put(TroopType.ROCKETS, new ArrayList<Troop>());
+		myTroops.put(TroopType.TANKS, new ArrayList<Troop>());
+		myTroops.put(TroopType.IMPROVEDTANKS, new ArrayList<Troop>());
+		myTroops.put(TroopType.PLANES, new ArrayList<Troop>());
 	}
 
-	public void addTroop(Troop t){
-		myTroops.add(t);
-		return;
+	public void addTroop(TroopType type, Troop t){
+		ArrayList<Troop> troops = myTroops.get(type);
+		troops.add(t);
+		myTroops.put(type, troops);
 	}
 
 	public int getSize(){
 		return myTroops.size();
 	}
 
-	public ArrayList<Troop> getTroops(){
+	public HashMap<TroopType, ArrayList<Troop>> getTroops(){
 		return myTroops;
 	}
 
-	public void setTroops(ArrayList<Troop> troops){
+	public void setTroops(HashMap<TroopType, ArrayList<Troop>> troops){
 		myTroops = troops;
 	}
 	
 	public void deleteTroop(TroopType type){
-		for(int i=0; i<myTroops.size(); i++){
-			if(myTroops.get(i).getType().equals(type)){
-				myTroops.remove(i);
-			}
-		}
+		ArrayList troops = myTroops.get(type);
+		troops.remove(0);
+		myTroops.put(type, troops);
 	}
 
 	public Troop getStrongest(){
-		if(myTroops.size() == 0 ){
-			System.out.println("the army is empty");
-			return null;
-		}
-		int strength = 0;
-        Troop strongest = myTroops.get(0); 
-		for(int i=0; i<myTroops.size(); i++)
-		{   
-			Troop sample = myTroops.get(i);
-			int sample_strength = sample.getStrength();
-			if(sample_strength>=strength);
-			{
-				strength = sample_strength;
-				strongest = sample;
-			}
-		}
+		if(myTroops.get(TroopType.PLANES).size()>0){
+			Troop strongest = myTroops.get(TroopType.PLANES).get(0);
 			return strongest;
+		}
+		if(myTroops.get(TroopType.IMPROVEDTANKS).size()>0){
+			Troop strongest = myTroops.get(TroopType.IMPROVEDTANKS).get(0);
+			return strongest;
+		}
+		if(myTroops.get(TroopType.TANKS).size()>0){
+			Troop strongest = myTroops.get(TroopType.TANKS).get(0);
+			return strongest;
+		}
+		if(myTroops.get(TroopType.ROCKETS).size()>0){
+			Troop strongest = myTroops.get(TroopType.ROCKETS).get(0);
+			return strongest;
+		}
+		if(myTroops.get(TroopType.AUTOMATIC).size()>0){
+			Troop strongest = myTroops.get(TroopType.AUTOMATIC).get(0);
+			return strongest;
+		}
+		if(myTroops.get(TroopType.INFANTRY).size()>0){
+			Troop strongest = myTroops.get(TroopType.INFANTRY).get(0);
+			return strongest;
+		}
+		return null;
 	}
 	
 	public Troop getWeakest(){
-		if(myTroops.size() == 0 ){
-			System.out.println("the army is empty");
-			return null;
-		}
-
-		int strength = 0;
-        Troop weakest = myTroops.get(0); 
-		for(int i=0; i<myTroops.size(); i++)
-		{
-			Troop sample = myTroops.get(0);
-			int sample_strength = sample.getStrength();
-			if(sample_strength>=strength);
-			{
-				strength = sample_strength;
-				weakest = sample;
-			}
-		}
+		if(myTroops.get(TroopType.INFANTRY).size()>0){
+			Troop weakest = myTroops.get(TroopType.INFANTRY).get(0);
 			return weakest;
-	}
+		}
+		if(myTroops.get(TroopType.AUTOMATIC).size()>0){
+			Troop weakest = myTroops.get(TroopType.AUTOMATIC).get(0);
+			return weakest;
+		}
+		if(myTroops.get(TroopType.ROCKETS).size()>0){
+			Troop weakest = myTroops.get(TroopType.ROCKETS).get(0);
+			return weakest;
+		}
+		if(myTroops.get(TroopType.TANKS).size()>0){
+			Troop weakest = myTroops.get(TroopType.TANKS).get(0);
+			return weakest;
+		}
+		if(myTroops.get(TroopType.IMPROVEDTANKS).size()>0){
+			Troop weakest = myTroops.get(TroopType.IMPROVEDTANKS).get(0);
+			return weakest;
+		}
+		if(myTroops.get(TroopType.PLANES).size()>0){
+			Troop weakest = myTroops.get(TroopType.PLANES).get(0);
+			return weakest;
+		}
+		return null;
 }
-
+}

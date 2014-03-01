@@ -4,15 +4,15 @@ import java.util.*;
 
 public abstract class MoveType {
 
-	private String myMoveType;
+	private int myMoveType;
 	private String myTroopType;
 
-	public MoveType(String movetype, String trooptype){
+	public MoveType(int movetype, String trooptype){
 		myMoveType = movetype;
 		myTroopType = trooptype;
 	}
 
-	public String getMoveType(){
+	public int getMoveType(){
 		return myMoveType;
 	}
 

@@ -34,6 +34,8 @@ public class DBHelper{
     public static final String PLAYER_NUMBER_KEY = "playerNumber";
     public static final String PLAYER_ID_KEY = "playerId";
     public static final String PLAYER_NAME_KEY = "name";
+    public static final String USERNAME = "username";
+    public static final String TIMESTAMP = "timeStamp";
 
 	private static MongoConnection myConnection;
 
@@ -124,6 +126,12 @@ public class DBHelper{
 		return waitingPlayersCollection.findOne(gameQuery);
 	}
 
+	public static DBObject getCommittedTurnForPlayerAndGame(String gameID, String username){
+		DBCursor playerCursor = DBHelper.getWaitingPlayerCursorForGame(gameID, username);
+		DBCursor highestTurnCursor = playerCursor.sort(new BasicDBObject(DBHelper.TIMESTAMP, -1));
+		return highestTurnCursor.next();
+	}
+
 	public static DBObject getMapForGame(String gameID){
 		DBCollection mapsCollection = DBHelper.getMapCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
@@ -153,6 +161,13 @@ public class DBHelper{
 	public static DBCursor getStateCursorForGame(String gameID){
 		DBCollection stateCollection = DBHelper.getStateCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		return stateCollection.find(gameQuery);
+	}
+
+	public static DBCursor getWaitingPlayerCursorForGame(String gameID, String username){
+		DBCollection stateCollection = DBHelper.getStateCollection();
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		gameQUery.put(USERNAME, username)
 		return stateCollection.find(gameQuery);
 	}
 }

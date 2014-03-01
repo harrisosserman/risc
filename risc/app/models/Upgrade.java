@@ -7,7 +7,7 @@ public class Upgrade extends MoveType {
 	private int myPosition;
 	private String myUpgradeType;
 
-	public Upgrade(String movetype, String trooptype, String upgrade, int position){
+	public Upgrade(int movetype, String trooptype, String upgrade, int position){
 		super(movetype, trooptype);
 		myPosition = position;
 		myUpgradeType = upgrade;

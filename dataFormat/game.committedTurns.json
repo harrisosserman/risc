@@ -2,8 +2,9 @@
     "gameID": "gameID",
     "username": "playerID",
     "turn": 4, 
+    "committed": 0, //0 = false, 1= true 
     //note harris sends the time stamp"
-    "timeStamp": "",
+    "timeStamp": "", // long?
     "food": 100,
     "technology":100,
     "technology_level": 1,
@@ -11,8 +12,8 @@
  
         { 
             "moveType": 0, // choices are 0 = upgrade,  1= move and 2=attack. 
-            "position": 4,
             "troopType": "INFANTRY",
+            "position": 4,
             "upgradeType": "AUTOMATIC"
             
         },

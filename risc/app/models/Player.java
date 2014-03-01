@@ -8,6 +8,8 @@ public class Player {
 	private int myFood;
 	private int myTechnology;
 	private int myTechnologyLevel;
+	private int turnCommitted;
+	private Long myTimeStamp;
 
 	public Player(String name){
 		this.myName = name;
@@ -19,6 +21,22 @@ public class Player {
 
 	public void setName(String name){
 		myName = name;
+	}
+
+	public void setTurnCommitted(int committed){
+		turnCommitted = committed;
+	}
+
+	public int getTurnCommitted(){
+		return turnCommitted;
+	}
+
+	public void setTimeStamp(Long timeStamp){
+		myTimeStamp = timeStamp;
+	}
+
+	public Long getTimeStamp(){
+		return myTimeStamp;
 	}
 
 	public int getFood(){

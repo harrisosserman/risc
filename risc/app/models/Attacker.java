@@ -25,14 +25,6 @@ public class Attacker{
 		return myLocation;
 	}
 
-	public Army getStrength(){
-		return myStrength;
-	}
-
-	public void setStrength(Army size){
-		myStrength = size;
-	}
-
 	public void setOwner(Player owner){
 		myOwner = owner;
 	}
@@ -40,7 +32,6 @@ public class Attacker{
 	public Player getOwner(){
 		return myOwner;
 	}
-
 
 	public void setHome(int home){
 		myHome = home;

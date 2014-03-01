@@ -7,7 +7,7 @@ public class Attack extends MoveType {
 	private int myStart;
 	private int myEnd;
 
-	public Attack(String movetype, String trooptype, int start, int end){
+	public Attack(int movetype, String trooptype, int start, int end){
 		super(movetype, trooptype);
 		myStart = start;
 		myEnd = end;
