@@ -13,7 +13,6 @@ public class DBHelper{
 
 	private static final String STATE_COLLECTION = "state";
 	private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
-	private static final String MAP_COLLECTION = "map";
 	private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
 	private static final String INFO_COLLECTION = "info";
 	private static final String PLAYER_COLLECTION = "player";
@@ -27,7 +26,7 @@ public class DBHelper{
     public static final String TERRITORIES_KEY = "territories";
     public static final String OWNER_KEY = "owner";
     public static final String TROOPS_KEY = "troops";
-    public static final String ADDITIONAL_TROOPS_KEY = "additionalTroops";
+    public static final String ADDITIONAL_INFANTRY_KEY = "additionalInfantry";
     public static final String TURN_KEY = "turn";
     public static final String ACTIVE_PLAYER_COUNT_KEY = "activePlayerCount";
     public static final String ACTIVE_PLAYERS_KEY = "activePlayers";
@@ -36,34 +35,23 @@ public class DBHelper{
     public static final String PLAYER_NAME_KEY = "name";
     public static final String USERNAME = "username";
     public static final String TIMESTAMP = "timeStamp";
+    public static final String FOOD_KEY = "food";
+    public static final String TECHNOLOGY_KEY = "technology";
+    public static final String LEVEL_KEY = "level";
+    public static final String PLAYER_INFO_KEY = "playerInfo";
+    
+    public static final String INFANTRY_KEY = "INFANTRY";
+    public static final String AUTOMATIC_WEAPONS_KEY = "AUTOMATIC";
+    public static final String ROCKET_LAUNCHERS_KEY = "ROCKETS";
+    public static final String TANKS_KEY = "TANKS";
+    public static final String IMPROVED_TANKS_KEY = "IMPROVEDTANKS";
+    public static final String FIGHTER_PLANES_KEY = "PLANES";
+
 
 	private static MongoConnection myConnection;
 
 	private static MongoConnection getConnection(){
 		return ConnectionManager.getInstance().getConnection();
-	}
-
-	public static void reset(String gameID){
-		MongoConnection connection = DBHelper.getConnection();
-
-		BasicDBObject removalCriteria = new BasicDBObject(GAME_ID_KEY, gameID);
-
-		DBCollection waitingPlayersCollection = connection.getDB(INITIALIZATION_DB).getCollection(WAITING_PLAYERS_COLLECTION);
-		waitingPlayersCollection.remove(removalCriteria);
-
-		DB gameDB = connection.getDB(GAME_DB);
-
-		DBCollection mapCollection = gameDB.getCollection(MAP_COLLECTION);
-		mapCollection.remove(removalCriteria);
-
-		DBCollection committedTurnsCollection = gameDB.getCollection(COMMITTED_TURNS_COLLECTION);
-		committedTurnsCollection.remove(removalCriteria);
-
-		DBCollection stateCollection = gameDB.getCollection(STATE_COLLECTION);
-		stateCollection.remove(removalCriteria);
-
-		DBCollection infoCollection = gameDB.getCollection(INFO_COLLECTION);
-		infoCollection.remove(removalCriteria);
 	}
 
 	//Get DBs
@@ -96,10 +84,6 @@ public class DBHelper{
 
 	public static DBCollection getWaitingPlayersCollection(){
 		return DBHelper.getCollection(INITIALIZATION_DB, WAITING_PLAYERS_COLLECTION);
-	}
-
-	public static DBCollection getMapCollection(){
-		return DBHelper.getCollection(GAME_DB, MAP_COLLECTION);
 	}
 
 	public static DBCollection getCommittedTurnsCollection(){
@@ -169,5 +153,35 @@ public class DBHelper{
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		gameQUery.put(USERNAME, username)
 		return stateCollection.find(gameQuery);
+	}
+
+	//Modifiers
+	private static void performOperatorOnListAndUpdateCollection(String operator, DBObject documentIdentifier, DBObject objectToAffect, String listKey, DBCollection collection){
+		DBObject document = collection.findOne(documentIdentifier);
+
+		if (document != null) {
+			ArrayList<DBObject> list = (ArrayList<DBObject>)document.get(listKey);
+			DBObject updatedList = new BasicDBObject(listKey, objectToAffect);
+			DBObject updateCommand = new BasicDBObject(operator, updatedList);
+			collection.update(document, updateCommand);
+		}
+	}
+
+	public static void addObjectToListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPush, String listKey, DBCollection collection){
+		performOperatorOnListAndUpdateCollection("$addToSet", documentIdentifier, objectToPush, listKey, collection);
+	}
+
+	public static void removeObjectFromListAndUpdateCollection(DBObject documentIdentifier, DBObject objectToPull, String listKey, DBCollection collection){
+		performOperatorOnListAndUpdateCollection("$pull", documentIdentifier, objectToPull, listKey, collection);
+	}
+
+	//Query Makers
+	public static BasicDBObject andQueriesTogether(DBObject... queries){
+		ArrayList<DBObject> andList = new ArrayList<DBObject>();
+		for (DBObject query : queries) {
+			andList.add(query);
+		}
+		BasicDBObject andQuery = new BasicDBObject("$and", andList);
+		return andQuery;
 	}
 }

@@ -1,68 +1,55 @@
 package controllers;
 
-import play.mvc.Result;
-import play.mvc.Controller;
+import com.mongodb.*;
+
 import controllers.routes;
+
 import java.util.*;
+
 import libraries.JSONLibrary.JSONObject;
 import libraries.JSONLibrary.JSONArray;
-import models.Game;
-import play.mvc.Http.RequestBody;
-import play.mvc.BodyParser;
 import libraries.MongoConnection;
-import com.mongodb.*;
-import java.net.UnknownHostException;
+import libraries.DBHelper;
+
+import models.Game;
 import models.Turn;
 import models.State;
-import libraries.DBHelper;
 import models.UserManager;
+import models.WaitingRoom;
+
+import play.mvc.Result;
+import play.mvc.Controller;
+import play.mvc.Http.RequestBody;
+import play.mvc.BodyParser;
 
 public class API extends Controller {
 
-    public static MongoConnection initDB() throws UnknownHostException{
-        MongoConnection mongoConnection = new MongoConnection();
-        return mongoConnection;
-    }
-
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result createGame() throws UnknownHostException{
+    public static Result createWaitingRoom(){
         RequestBody body = request().body();
         String playerName = body.asJson().get(DBHelper.NAME_KEY).toString();
         String playerNameWithoutQuotes = removeQuotes(playerName);
 
-        Game game = new Game();
-
-        boolean canStillJoin = game.canPlayersStillJoin();
-        String gameID = game.getGameID();
-        int playerID;
-
-        if(canStillJoin){
-            game.addWaitingPlayer(playerNameWithoutQuotes);
-            playerID = game.getWaitingPlayerCount();
-        }else{
-            playerID = 0;
-        }
+        WaitingRoom wr = new WaitingRoom();
+        wr.createNewWaitingRoom(playerNameWithoutQuotes);
 
         JSONObject result = new JSONObject();
-        result.put(DBHelper.GAME_ID_KEY, gameID);
-        result.put(DBHelper.PLAYER_ID_KEY, playerID);
+        result.put(DBHelper.GAME_ID_KEY, wr.getGameID());
 
-        if (canStillJoin) {
-            return ok(result.toString());
-        }else{
-            return badRequest(result.toString());
-        }
+        return ok(result.toString());
     }
 
-    public static Result getWaitingPlayers(String id) throws UnknownHostException{
-        Game game = new Game();
-        String json = game.getWaitingPlayersJson(id);
-    	return ok(json);
+     public static Result getWaitingRoomInfo(String gameID){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        return ok(wr.toString());
     }
 
+    public static Result getAllJoinableGames(){
+        return ok(WaitingRoom.getJoinableWaitingRoomsJson());
+    }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result commitTurn(String id) throws UnknownHostException {
+    public static Result commitTurn(String gameID) {
 
         RequestBody body = request().body();
         Turn turn = new Turn();
@@ -78,48 +65,57 @@ public class API extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result startGame(String id) throws UnknownHostException{
+    public static Result addPlayer(String gameID){
         RequestBody body = request().body();
-        int startingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
-        String startingPlayerName = body.asJson().get(DBHelper.NAME_KEY).toString();
-        Game game = new Game();
-        game.start(id, startingPlayerNumber, startingPlayerName);
+        String username = body.asJson().get(DBHelper.NAME_KEY).toString();
+        String usernameWithoutQuotes = removeQuotes(username);
+
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.addPlayer(usernameWithoutQuotes);
+
+        UserManager um = new UserManager();
+        um.addGameToUser(wr.getGameID(), usernameWithoutQuotes);
+
         return ok();
     }
 
-    public static Result getMap(String id) throws UnknownHostException{
-        Game game = new Game();
-        String mapJson = game.getMapJson(id);
-        return ok(mapJson);
-    }
-
     @BodyParser.Of(BodyParser.Json.class)
-    public static Result exit(String id) throws UnknownHostException{
+    public static Result markPlayerReadyAndStartGameIfNeeded(String gameID){
         RequestBody body = request().body();
-        int exitingPlayerNumber = Integer.parseInt(body.asJson().get(DBHelper.PLAYER_NUMBER_KEY).toString());
+        String username = body.asJson().get(DBHelper.NAME_KEY).toString();
+        String usernameWithoutQuotes = removeQuotes(username);
 
-        Game game = new Game();
-        game.removePlayer(exitingPlayerNumber);
-        return ok("Exiting for player:" + exitingPlayerNumber);
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.markPlayerAsReady(usernameWithoutQuotes);
+
+        if (wr.shouldGameBegin()) {
+            //Initalize the new game
+            new Game(wr.getGameID(), wr.getUsernames());
+
+            wr.markRoomAsNotJoinable();
+        }
+
+        return ok();
     }
 
-    public static Result isMapReady(String id) throws UnknownHostException{
-        Game game = new Game();
-        if (game.areAllPlayersCommitted()) {
-            String gameStateJson = game.getCurrentGameStateJson(id);
-            return ok(gameStateJson);
+    public static Result getMap(String gameID){
+        Game game = new Game(gameID);
+        if (game.areAllPlayersCommitedForMostRecentTurn()) {
+            String mapJson = game.getCurrentGameStateJson();
+            return ok(mapJson);
         }else{
-            return badRequest("all players havent committed yet");
+            return badRequest("not all players have committed yet");
         }
+    }
+
+    public static Result endGame(String gameID){
+        WaitingRoom wr = WaitingRoom.getWaitingRoom(gameID);
+        wr.markRoomsGameAsEnded();
+        return ok();
     }
 
     public static String removeQuotes(String stringWithQuotes){
         return stringWithQuotes.substring(1, stringWithQuotes.length() - 1);
-    }
-    
-    public static Result reset(String id) throws UnknownHostException{
-        DBHelper.reset(id);
-        return ok("Reset DB for gameID:" + id);
     }
 
     //-------- Player API Methods ----------

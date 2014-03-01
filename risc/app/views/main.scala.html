@@ -7,9 +7,10 @@
         <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")' />
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/shame.css")' />
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")' />
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
     </head>
     <body>
-        <div class="navbar" class="initializationKnockout">
+        <div class="navbar" id="initializationKnockout1">
             <div class="navbar-inner">
                 <div class="container">
                     <div class="brand">
@@ -20,7 +21,7 @@
                             <button data-bind="click: openInstructions">Instructions</button>
                         </li>
                         <li>
-                            <div data-bind="visible: displayMap">
+                            <div data-bind="visible: displaySubmitTurn">
                                 <button data-bind="click: submitTurnClick" class="submitTurnButton">Submit Turn</button>
                             </div>
                         </li>
@@ -74,13 +75,14 @@
                                             <th>Game State</th>
                                             <th>Join Game</th>
                                         </tr>
-                                        <tbody data-bind="foreach: myGamesList">
-                                            <tr>
-                                                <td data-bind="text: players"></td>
-                                                <td data-bind="text: stateDescription"></td>
-                                                <td><button data-bind="click: $parent.enterGame">Join</button></td>
-                                            </tr>
                                     </thead>
+                                    <tbody data-bind="foreach: myGamesList">
+                                        <tr>
+                                            <td data-bind="text: players"></td>
+                                            <td data-bind="text: stateDescription"></td>
+                                            <td><button data-bind="click: $parent.enterGame">Join</button></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             <div class="control-group">
@@ -93,13 +95,14 @@
                                             <th>Game State</th>
                                             <th>Join Game</th>
                                         </tr>
-                                        <tbody data-bind="foreach: lobbyGamesList">
-                                            <tr>
-                                                <td data-bind="text: players"></td>
-                                                <td data-bind="text: stateDescription"></td>
-                                                <td><button data-bind="click: $parent.enterGame">Join</button></td>
-                                            </tr>
                                     </thead>
+                                    <tbody data-bind="foreach: lobbyGamesList">
+                                        <tr>
+                                            <td data-bind="text: players"></td>
+                                            <td data-bind="text: stateDescription"></td>
+                                            <td><button data-bind="click: $parent.enterGame">Join</button></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             <div class="control-group">
@@ -134,11 +137,7 @@
                 </div>
             </div>
 
-
-                    <!-- <div data-bind="visible: displayGameWaitingRoom">
-
-                    </div> -->
-            <div class="initializationKnockout">
+            <div id="instructionsKnockout">
                 <div class="modal" data-bind="visible: displayInstructions">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -170,47 +169,126 @@
                     </div>
                 </div>
             </div>
-<!--             <div data-bind="visible: displayMap" class="initializationKnockout"> -->
-                <div class="row-fluid">
-                    <table class="table table-bordered">
-                        <tbody id="map">
-                            <!-- The table cells are created with JavaScript in the index.js file -->
-                        </tbody>
-                    </table>
-                </div>
-                <!-- <div class="row-fluid">
-                    <div class = "well well-sm">
-                        <table class="playerInfoTable">
-                            <thead>
-                                <tr>
-                                    <th>Player</th>
-                                    <th>Color</th>
-                                    <th>Additional Troops</th>
-                                </tr>
-                            </thead>
-                            <tbody data-bind="foreach: playerList">
-                                <tr>
-                                    <td>
-                                        <span data-bind="text: ($index() + 1)"></span>: <span data-bind="text: name"></span>
-                                    </td>
-                                    <td data-bind="text: color"></td>
-                                    <td data-bind="text: additionalTroops"></td>
-                                </tr>
+            <div id="boardKnockout">
+                <div data-bind="visible: displayMap">
+                    <div class="row-fluid">
+                        <table class="table table-bordered">
+                            <tbody id="map">
+                                <!-- The table cells are created with JavaScript in the index.js file -->
                             </tbody>
                         </table>
                     </div>
-                </div> -->
+                    <div id="dialog">
+                        <h5>Enter the number of troops that you would like to use</h5>
+                        <input type="text" data-bind="value: inputNumberAttackOrMove" placeholder="Number of Troops"></input>
+                        <h5>Enter the type of troop</h5>
+                        <select data-bind="options: typesOfTroops, value: typeOfTroopSelected"></select>
+                        <div data-bind="visible: displayUpgradeTroopsModal">
+                            <h5>Upgrade to</h5>
+                            <select data-bind="options: typesOfTroops, value: typeOfTroopUpgradeSelected"></select>
+                        </div>
+                        <button data-bind="click: submitMove">Submit</button>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="well well-sm">
+                            <h3 class="centerAlign">Territory: <span data-bind="text: territoryClickTerritoryNumber"></span></h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Food</th>
+                                        <th>Technology</th>
+                                        <th>Infantry</th>
+                                        <th>Automatic Weapons</th>
+                                        <th>Rocket Launchers</th>
+                                        <th>Tanks</th>
+                                        <th>Improved Tanks</th>
+                                        <th>Fighter Planes</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: territoryClickInfo">
+                                    <tr>
+                                        <td data-bind="text: food"></td>
+                                        <td data-bind="text: tech"></td>
+                                        <td data-bind="text: infantry"></td>
+                                        <td data-bind="text: automatic"></td>
+                                        <td data-bind="text: rocket"></td>
+                                        <td data-bind="text: tank"></td>
+                                        <td data-bind="text: improvedTank"></td>
+                                        <td data-bind="text: plane"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3 class="centerAlign">Attacks</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Destination Territory</th>
+                                        <th>Infantry</th>
+                                        <th>Automatic Weapons</th>
+                                        <th>Rocket Launchers</th>
+                                        <th>Tanks</th>
+                                        <th>Improved Tanks</th>
+                                        <th>Fighter Planes</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: territoryClickAttackInfo">
+                                    <tr>
+                                        <td data-bind="text: destination"></td>
+                                        <td data-bind="text: infantry"></td>
+                                        <td data-bind="text: automatic"></td>
+                                        <td data-bind="text: rocket"></td>
+                                        <td data-bind="text: tank"></td>
+                                        <td data-bind="text: improvedTank"></td>
+                                        <td data-bind="text: plane"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class = "well well-sm">
+                            <table class="playerInfoTable">
+                                <thead>
+                                    <tr>
+                                        <th>Player</th>
+                                        <th>Color</th>
+                                        <th>Additional Infantry</th>
+                                        <th>Food</th>
+                                        <th>Technology</th>
+                                        <th>Maximum Technology Level</th>
+                                        <th><button data-bind="click: upgradeTechLevel, enable: hasNotUpgradedThisTurn">Upgrade Technology Level</button></th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: playerList">
+                                    <tr>
+                                        <td>
+                                            <span data-bind="text: ($index() + 1)"></span>: <span data-bind="text: name"></span>
+                                        </td>
+                                        <td data-bind="text: color"></td>
+                                        <td data-bind="text: additionalInfantry"></td>
+                                        <td data-bind="text: food"></td>
+                                        <td data-bind="text: tech"></td>
+                                        <td data-bind="text: techLevel"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/knockout.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/bootstrap.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/turn.js")'></script>
-        <script type='text/javascript' src='@routes.Assets.at("javascript/board.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/boardEditing.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/boardInitialization.js")'></script>
         <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha512.js"></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/player.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/lobby.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/instructions.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/initialization.js")'></script>
     </body>
 </html>

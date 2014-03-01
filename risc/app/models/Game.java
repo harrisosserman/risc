@@ -4,201 +4,43 @@ import java.util.*;
 import libraries.MongoConnection;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import java.net.UnknownHostException;
 import libraries.DBHelper;
 
 public class Game {
 
-    private static final String DEFAULT_GAME_ID = "12345";
-    private static final int NUM_TERRITORIES = 50;
+    private static final int NUM_TERRITORIES = 25;
     private static final int TOTAL_TROOP_COUNT = 240;   //(2*3*4*5)*2
+    private static final int TOTAL_FOOD_COUNT = TOTAL_TROOP_COUNT;
+    private static final int TOTAL_TECHNOLOGY_COUNT = TOTAL_TROOP_COUNT / 2;
 
     private String myGameID;
-    private ArrayList<Player> myPlayers;
     private Territory[] myTerritories;
 
-    public Game(){
-        this.myGameID = DEFAULT_GAME_ID;
-        this.myPlayers = new ArrayList<Player>();
+    //used for getting an existing game
+    public Game(String gameID){
+        myGameID = gameID;
     }
 
-    public void addWaitingPlayer(String playerName) throws UnknownHostException{
-        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
+    //used for creating a new game.
+    public Game(String gameID, ArrayList<String> usernames){
+        myGameID = gameID;
 
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);      
+        DBCursor stateCursor = getStateCursor();
+        if (!stateCursor.hasNext()) {
+            int numPlayers = usernames.size();
 
-        if (waitingPlayers == null) {
-            BasicDBObject doc = new BasicDBObject();
+            int[] countryOwners = assignCountryOwners(numPlayers);
 
-            BasicDBObject firstPlayer = new BasicDBObject(DBHelper.NAME_KEY, playerName).append(DBHelper.READY_KEY, false);
-            ArrayList<BasicDBObject> playersList = new ArrayList<BasicDBObject>();
-            playersList.add(firstPlayer);
-            doc.append(DBHelper.PLAYERS_KEY, playersList);
-            doc.append(DBHelper.COUNT_KEY, 1);
-            doc.append(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
+            int[] foodProductions = assignResourceForTerritoryOwners(numPlayers, countryOwners, TOTAL_FOOD_COUNT);
+            int[] techProductions = assignResourceForTerritoryOwners(numPlayers, countryOwners, TOTAL_TECHNOLOGY_COUNT);
 
-            waitingPlayersCollection.insert(doc);
-        }else{
-            BasicDBObject joiningPlayer = new BasicDBObject(DBHelper.PLAYERS_KEY, new BasicDBObject(DBHelper.NAME_KEY, playerName).append(DBHelper.READY_KEY, false));
-            DBObject updateQuery = new BasicDBObject("$push", joiningPlayer);
-            waitingPlayersCollection.update(new BasicDBObject(), updateQuery);
-
-            BasicDBObject query = new BasicDBObject(DBHelper.COUNT_KEY,  new BasicDBObject("$gte", 0));
-            BasicDBObject incValue = new BasicDBObject(DBHelper.COUNT_KEY, 1);
-            BasicDBObject intModifier = new BasicDBObject("$inc", incValue);
-            waitingPlayersCollection.update(query, intModifier);
+            DBObject initialState = makeInitialState(usernames, countryOwners, foodProductions, techProductions);
+            DBCollection stateCollection = DBHelper.getStateCollection();
+            stateCollection.insert(initialState);
         }
     }
 
-    public String getWaitingPlayersJson(String gameID) throws UnknownHostException{
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
-        return waitingPlayers.toString();
-    }
-
-    public void start(String gameID, int startingPlayerNumber, String startingPlayerName) throws UnknownHostException{
-        //update initialization.waitingPlayers to show that someone is ready
-        markWaitingPlayerReady(gameID, startingPlayerNumber, startingPlayerName);
-
-		if (areAllPlayersReady(gameID) && getWaitingPlayerCount() >= 2) {
-			int[] territoryOwners = assignCountryOwners(getWaitingPlayerCount());
-			makeInitialGameMap(territoryOwners, gameID);
-            makeInitialInfo();
-		}
-	}
-
-    private boolean areAllPlayersReady(String gameID) throws UnknownHostException{
-        int waitingPlayerCount = getWaitingPlayerCount();
-
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(gameID);
-        if (waitingPlayers == null) {
-            return false;
-        }
-
-        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
-        int readyCount = 0;
-        for (DBObject player : players) {
-           if ((Boolean)player.get(DBHelper.READY_KEY)) {
-                readyCount++;
-           }
-        }
-        return readyCount == waitingPlayerCount;
-    }
-
-    public boolean areAllPlayersCommitted() throws UnknownHostException{
-        DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
-        BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID);
-        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
-        int turn = -1;
-        int committedTurnsInSameTurn = 0;
-        while(committedTurnsCursor.hasNext()) {
-            DBObject committedTurn = committedTurnsCursor.next();
-            if(turn == -1) {
-                turn = (Integer)committedTurn.get(DBHelper.TURN_KEY);
-            }
-            if(turn != (Integer)committedTurn.get(DBHelper.TURN_KEY)) {
-                break;
-            }
-            committedTurnsInSameTurn++;
-        }
-        if(turn == -1) {
-            return false;
-        }
-
-        DBCollection stateCollection = DBHelper.getStateCollection();
-        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, DEFAULT_GAME_ID).append(DBHelper.TURN_KEY, turn);
-        DBObject state = stateCollection.findOne(stateQuery);
-        if(state == null) {
-            return false;
-        }
-
-        return true;
-    }
-
-	private boolean gameMapHasBeenCreated(String gameID){
-        DBObject map = DBHelper.getMapForGame(gameID);
-        return (map != null);
-	}
-
-	public boolean canPlayersStillJoin() throws UnknownHostException{
-		if (getWaitingPlayerCount() >= 5) {
-			return false;
-		}
-
-		if (gameMapHasBeenCreated(myGameID)) {
-			return false;
-		}
-
-		return true;
-	}
-
-    private void markWaitingPlayerReady(String gameID, int playerNumber, String playerName) throws UnknownHostException{
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(gameID);
-
-        ArrayList<BasicDBObject> players = (ArrayList<BasicDBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
-        int playerIndex = playerNumber - 1; // - 1 because 1-indexed instead of 0-indexed
-        BasicDBObject startingPlayer = players.get(playerIndex);
-
-        BasicDBObject newDocument = new BasicDBObject("$set", waitingPlayers);
-        String readyPath = DBHelper.PLAYERS_KEY + "." + playerIndex + "." + DBHelper.READY_KEY;
-        newDocument.append("$set", new BasicDBObject().append(readyPath, true));
-
-        DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-        waitingPlayersCollection.update(new BasicDBObject(), newDocument);
-    }
-
-    private void makeInitialGameMap(int[] territoryOwners, String gameID) throws UnknownHostException{
-        DBCollection mapCollection = DBHelper.getMapCollection();
-
-        BasicDBObject doc = new BasicDBObject();
-
-        doc.append(DBHelper.GAME_ID_KEY, gameID);
-
-        int waitingPlayerCount = getWaitingPlayerCount();
-        doc.append(DBHelper.NUM_PLAYERS_KEY, waitingPlayerCount);
-
-        ArrayList<BasicDBObject> territories = new ArrayList<BasicDBObject>();
-        for (int ownerIndex : territoryOwners) {
-            BasicDBObject territory = new BasicDBObject();
-            int ownerNumber = ownerIndex + 1; //beacuse 1-indexed instead of 0-indexed
-            territory.append(DBHelper.OWNER_KEY, ownerNumber);
-            territory.append(DBHelper.TROOPS_KEY, 0);
-
-            territories.add(territory);
-        }
-        doc.append(DBHelper.TERRITORIES_KEY, territories);
-
-        ArrayList<BasicDBObject> additionalTroops = new ArrayList<BasicDBObject>();
-        for (int i = 0; i < waitingPlayerCount; i++) {
-        	BasicDBObject additionalTroop = new BasicDBObject();
-        	int ownerNumber = i + 1;
-        	additionalTroop.append(DBHelper.OWNER_KEY, ownerNumber);
-        	additionalTroop.append(DBHelper.TROOPS_KEY, (TOTAL_TROOP_COUNT/waitingPlayerCount));
-            additionalTroops.add(additionalTroop);
-        }
-        doc.append(DBHelper.ADDITIONAL_TROOPS_KEY, additionalTroops);
-
-        mapCollection.insert(doc);
-    }
-
-    private void makeInitialInfo(){
-        DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
-        int activePlayerCount = (Integer)waitingPlayers.get(DBHelper.COUNT_KEY);
-
-        ArrayList<DBObject> activePlayers = new ArrayList<DBObject>();
-        for (int i = 1; i <= activePlayerCount; i++) {
-            DBObject activePlayer = new BasicDBObject(DBHelper.PLAYER_NUMBER_KEY, i);
-            activePlayers.add(activePlayer);
-        }
-
-        DBCollection infoCollection = DBHelper.getInfoCollection();
-
-        BasicDBObject info = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        info.append(DBHelper.ACTIVE_PLAYERS_KEY, activePlayers);
-
-        infoCollection.insert(info);
-    }
-
-    private int[] assignCountryOwners(int playerCount) {
+        private int[] assignCountryOwners(int playerCount) {
         ArrayList<Integer> indices = new ArrayList<Integer>();
         for(int i = 0; i < NUM_TERRITORIES; i++){
             indices.add(i);
@@ -214,21 +56,129 @@ public class Game {
         return owners;
     }
 
-    public String getMapJson(String gameID) throws UnknownHostException{
-        DBObject map = DBHelper.getMapForGame(gameID);
-        return map.toString();
+    private int[] assignResourceForTerritoryOwners(int numPlayers, int[] countryOwners, int totalResourceCount){
+        ArrayList<int[]> resourceArraysForPlayers = new ArrayList<int[]>();
+        int resourcesPerPlayer = totalResourceCount / numPlayers;
+        int numPlayersWithAdditionalTerritories = NUM_TERRITORIES % numPlayers;
+        for (int i = 0; i < numPlayers; i++) {
+            int numTerritories = (NUM_TERRITORIES / numPlayers) + ((i < numPlayersWithAdditionalTerritories) ? 1 : 0);
+            int[] resourceArr = getRandomArray(numTerritories, resourcesPerPlayer);
+            resourceArraysForPlayers.add(resourceArr);
+        }
+
+        int[] resourceAssignments = new int[countryOwners.length];
+        int[] currentCountryIndexForPlayer = new int[numPlayers];
+        for (int i = 0; i < countryOwners.length; i++) {
+            int countryOwner = countryOwners[i];
+            int[] resourceArr = resourceArraysForPlayers.get(countryOwner);
+            resourceAssignments[i] = resourceArr[currentCountryIndexForPlayer[countryOwner]];
+            currentCountryIndexForPlayer[countryOwner]++;
+        }
+        return resourceAssignments;
     }
 
-    public String getCurrentGameStateJson(String gameID) throws UnknownHostException{
-        DBObject currentTurn = DBHelper.getCurrentTurnForGame(gameID);
+    //Not very efficient. Only use for reasonably small numbers
+    private int[] getRandomArray(int length, int sum){
+        int[] array = new int[length];
+        Random generator = new Random(); 
+        for (int i = 0; i < sum; i++) {
+            int index = generator.nextInt(length);
+            array[index]++;
+        }
+        return array;
+    }
+
+    private DBObject makeInitialState(ArrayList<String> usernames, int[] countryOwners, int[] foodProductions, int[] techProductions){
+        BasicDBObject state = new BasicDBObject();
+        state.append(DBHelper.GAME_ID_KEY, myGameID);
+        state.append(DBHelper.NUM_PLAYERS_KEY, usernames.size());
+        state.append(DBHelper.TURN_KEY, 0);
+
+        ArrayList<DBObject> territories = new ArrayList<DBObject>();
+        for (int i = 0; i < countryOwners.length; i++) {
+            BasicDBObject territory = new BasicDBObject();
+
+            String countryOwner = usernames.get(countryOwners[i]);
+            territory.append(DBHelper.OWNER_KEY, countryOwner);
+
+            territory.append(DBHelper.FOOD_KEY, foodProductions[i]);
+            territory.append(DBHelper.TECHNOLOGY_KEY, techProductions[i]);
+
+            territories.add(territory);
+        }
+        state.append(DBHelper.TERRITORIES_KEY, territories);
+
+        int foodPerPlayer = TOTAL_FOOD_COUNT / usernames.size();
+        int techPerPlayer = TOTAL_TECHNOLOGY_COUNT / usernames.size();
+        int infantryPerPlayer = TOTAL_TROOP_COUNT / usernames.size();
+        ArrayList<DBObject> playerInfo = new ArrayList<DBObject>();
+        for (String username : usernames) {
+            BasicDBObject info = new BasicDBObject();
+            info.append(DBHelper.OWNER_KEY, username);
+            info.append(DBHelper.LEVEL_KEY, 0);
+            info.append(DBHelper.FOOD_KEY, foodPerPlayer);
+            info.append(DBHelper.TECHNOLOGY_KEY, techPerPlayer);
+            info.append(DBHelper.ADDITIONAL_INFANTRY_KEY, infantryPerPlayer);
+
+            playerInfo.add(info);
+        }
+        state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
+
+        return state;
+    }
+
+    private DBCursor getStateCursor(){
+        DBCursor stateCursor = DBHelper.getStateCursorForGame(myGameID);
+        return stateCursor;
+    }
+
+    private DBObject getMostRecentTurn(){
+        DBObject mostRecentTurn = DBHelper.getCurrentTurnForGame(myGameID);
+        return  mostRecentTurn;
+    }
+
+    public boolean areAllPlayersCommitedForMostRecentTurn(){
+        DBCollection committedTurnsCollection = DBHelper.getCommittedTurnsCollection();
+        BasicDBObject committedTurnsQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
+        DBCursor committedTurnsCursor = committedTurnsCollection.find(committedTurnsQuery).sort(new BasicDBObject(DBHelper.TURN_KEY, -1));
+        int turn = -1;
+        int committedTurnsInSameTurn = 0;
+        while(committedTurnsCursor.hasNext()) {
+            DBObject committedTurn = committedTurnsCursor.next();
+            if(turn == -1) {
+                turn = (Integer)committedTurn.get(DBHelper.TURN_KEY);
+            }
+            if(turn != (Integer)committedTurn.get(DBHelper.TURN_KEY)) {
+                break;
+            }
+            committedTurnsInSameTurn++;
+        }
+        // if no players have committed yet for this turn, return true 
+        // because every player is still committed for the last turn
+        if(turn == -1) {
+            return true;
+        }
+
+        DBCollection stateCollection = DBHelper.getStateCollection();
+        BasicDBObject stateQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID).append(DBHelper.TURN_KEY, turn);
+        DBObject state = stateCollection.findOne(stateQuery);
+        if(state == null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public String getCurrentGameStateJson(){
+        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         return currentTurn.toString();
     }
 
     public String getGameID(){
-        return this.myGameID;
+        return myGameID;
     }
 
-    public Integer getWaitingPlayerCount() throws UnknownHostException{
+    public Integer getWaitingPlayerCount(){
         DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
         if (waitingPlayers == null) {
             return 0;
@@ -257,79 +207,4 @@ public class Game {
         }
         return count;
     }
-
-    public void removePlayer(int pid) throws UnknownHostException{
-        System.out.println("------- Remove called");
-        //First update info collection
-        //decrement game.state.activePlayerCount
-        DBCollection infoCollection = DBHelper.getInfoCollection();
-        DBObject info = DBHelper.getInfoForGame(myGameID);
-
-        //info is null while the players are still waiting and the map hasn't yet been created
-        if(info == null){
-            DBCollection waitingPlayersCollection = DBHelper.getWaitingPlayersCollection();
-            DBObject waitingPlayers = DBHelper.getWaitingPlayersForGame(myGameID);
-            ArrayList<DBObject> players = (ArrayList<DBObject>)waitingPlayers.get(DBHelper.PLAYERS_KEY);
-            players.remove((pid - 1));
-            waitingPlayers.put(DBHelper.COUNT_KEY, players.size());
-
-            BasicDBObject newWaitingPlayers = new BasicDBObject("$set", waitingPlayers);
-            newWaitingPlayers.append("$set", new BasicDBObject(DBHelper.PLAYERS_KEY, players));
-            BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-            waitingPlayersCollection.update(gameQuery, newWaitingPlayers);
-
-            BasicDBObject newWaitingPlayers2 = new BasicDBObject("$set", waitingPlayers);
-            newWaitingPlayers2.append("$set", new BasicDBObject(DBHelper.COUNT_KEY, players.size()));
-            waitingPlayersCollection.update(gameQuery, newWaitingPlayers2);
-
-            if (players.size() == 0) {
-                DBHelper.reset(myGameID);
-                System.out.println("----- Resetting game");
-                return;
-            }
-        }
-
-        //remove player from activePlayers
-        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)info.get(DBHelper.ACTIVE_PLAYERS_KEY);
-        ArrayList<DBObject> updatedActivePlayers = new ArrayList<DBObject>();
-        for (DBObject activePlayer : activePlayers) {
-            if ((Integer)activePlayer.get(DBHelper.PLAYER_NUMBER_KEY) != pid) {
-                updatedActivePlayers.add(activePlayer);
-            }
-        }
-
-        if (updatedActivePlayers.size() == 0) {
-            DBHelper.reset(myGameID);
-            System.out.println("----- Resetting game");
-            return;
-        }
-
-        BasicDBObject newInfo = new BasicDBObject("$set", info);
-        newInfo.append("$set", new BasicDBObject(DBHelper.ACTIVE_PLAYERS_KEY, updatedActivePlayers));
-        BasicDBObject gameQuery = new BasicDBObject(DBHelper.GAME_ID_KEY, myGameID);
-        infoCollection.update(gameQuery, newInfo);
-
-        //Second update most recent state turn
-        DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
-
-        // is null if no turns have yet been committed to state
-        if (currentTurn == null) {
-            return;
-        }
-
-        //Then set all troops in that player's territories to 0
-        ArrayList<DBObject> territories = (ArrayList<DBObject>)currentTurn.get(DBHelper.TERRITORIES_KEY);
-        for (DBObject territory : territories) {
-            boolean isOwnedByPid = ((Integer)territory.get(DBHelper.OWNER_KEY)).equals(pid);
-            if (isOwnedByPid) {
-                territory.put(DBHelper.TROOPS_KEY, 0);
-            }
-        }
-
-        BasicDBObject updatedCurrentTurn = new BasicDBObject("$set", currentTurn);
-        updatedCurrentTurn.append("$set", new BasicDBObject(DBHelper.TERRITORIES_KEY, territories));
-        DBCollection stateCollection = DBHelper.getStateCollection();
-        stateCollection.update(gameQuery, updatedCurrentTurn);
-    }
-
 }

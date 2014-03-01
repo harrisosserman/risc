@@ -89,7 +89,7 @@ public class Turn {
      * and is treated like a JSON Object for parsing.
      */
 
-    public int createTurn(RequestBody jsonObject) throws UnknownHostException{
+    public int createTurn(RequestBody jsonObject){
         myGameID = API.removeQuotes(jsonObject.asJson().get(GAME_ID).toString());
         String username = API.removeQuotes(jsonObject.asJson().get(USERNAME).toString());
         Player player_ = new Player(username);

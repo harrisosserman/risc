@@ -169,6 +169,13 @@ public void loadPreviousState(String gameID) throws UnknownHostException{
 
 }
 
+public void moveTypeMove(BasicDBObject move)
+
+public void moveTypeAttack(BasicDBObject move)
+
+public void moveTypeUpgrade(BasicDBObject move)
+
+public void moveTypeTechUpgrade(BasicDBObject move)
 
 public void updateStateWithTurn(){
 
@@ -184,7 +191,21 @@ public void updateStateWithTurn(){
         DBObject lastCommittedTurn = DBHelper.getCommittedTurnForPlayerAndGame(gameID, username);
         BasicDBList movesList = (BasicDBList) lastCommittedTurn.get(MOVES);  
         BasicDBObject[] movesArray = movesList.toArray(new BasicDBObject[0]);
-        for(BasicDBObject player : playerArray){
+        for(BasicDBObject move : movesArray){
+            int moveType = Integer.parseInt(move.get(MOVETYPE).toString());
+            if(moveType == 0){
+                moveTypeMove(move);
+            }
+            else if(moveType == 1){
+
+            }
+            else if(moveType == 2){
+
+            }
+            else if(moveType == 3){
+
+            }
+        }
     }
     
 }

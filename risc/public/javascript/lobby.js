@@ -19,6 +19,12 @@
         globalFunctions.getGameID = function() {
             return lobby.gameID;
         };
+        globalFunctions.getElementOfColorList = function(index) {
+            return lobby.colorList[index];
+        };
+        globalFunctions.getPlayerList = function() {
+            return lobby.playerList;
+        };
 
         lobby.getGameState = function(state) {
             if(state === 0) {
@@ -35,17 +41,41 @@
                 //game hasn't started yet
                 lobby.displayJoinOrCreateGame(false);
                 lobby.displayGameWaitingRoom(true);
+                $.ajax('/game/' + globalFunctions.getGameID() + '/addPlayer', {
+                    method: 'POST',
+                    data: JSON.stringify({
+                    'name': globalFunctions.getUsername()
+                    }),
+                    contentType: "application/json"
+                    });
                 lobby.pollGameWaitingRoom();
             } else if(data.state === 1) {
                 //game is in progress
-
+                lobby.displayJoinOrCreateGame(false);
+                lobby.displayGameWaitingRoom(false);
+                lobby.displayGameLobby(false);
+                lobby.setPlayerNumber();
+                globalFunctions.createAndLoadMap();
             } else {
                 //game is over
 
             }
         };
+        lobby.setPlayerNumber = function() {
+            $.ajax('/game/' + lobby.gameID, {
+                        method: 'GET',
+                    }).done(function(result) {
+                        var players = $.parseJSON(result);
+                        for(k=0; k<players.players.length; k++) {
+                            if(players.players[k].name === globalFunctions.getUsername()) {
+                                globalFunctions.setPlayerNumber(k + 1);
+                                return;
+                            }
+                        }
+                    });
+        };
         lobby.startGame = function() {
-            $.ajax('/test/game/' + lobby.gameID + '/start', {
+            $.ajax('/game/' + lobby.gameID + '/start', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': globalFunctions.getUsername()
@@ -54,7 +84,7 @@
             });
         };
         lobby.createNewGame = function() {
-            $.ajax('/test/game', {
+            $.ajax('/game', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': globalFunctions.getUsername()
@@ -63,16 +93,19 @@
             }).done(function(data) {
                 data = $.parseJSON(data);
                 lobby.gameID = data.gameID;
+                lobby.displayJoinOrCreateGame(false);
+                lobby.displayGameWaitingRoom(true);
+                lobby.pollGameWaitingRoom();
             });
         };
         lobby.loadMyGames = function() {
-            $.ajax('/test/player/' + globalFunctions.getUsername(), {
+            $.ajax('/player/' + globalFunctions.getUsername(), {
                 method: 'GET'
             }).done(function(result) {
                 result = $.parseJSON(result);
                 lobby.myGamesList.removeAll();
                 for(var k=0; k<result.games.length; k++) {
-                    $.ajax('/test/game/' + result.games[k].game, {
+                    $.ajax('/game/' + result.games[k].game, {
                         method: 'GET'
                     }).done(function(data) {
                         lobby.loadMyGamesInnerFunc(data);
@@ -85,7 +118,7 @@
             lobby.loadGamesHelper(lobby.myGamesList, data);
         };
         lobby.loadAllGames = function() {
-            $.ajax('/test/game', {
+            $.ajax('/game', {
                 method: 'GET'
             }).done(function(result) {
                 lobby.lobbyGamesList.removeAll();
@@ -111,6 +144,7 @@
                 state: game.state,
                 gameID: gameID
             });
+            // globalFunctions.createPlayerList(game);
 
         };
         lobby.createPlayerList = function(data) {
@@ -130,15 +164,14 @@
                 if(allPlayersReady === true) {
                     lobby.displayGameLobby(false);
                     // initialization.displayMap(true);
-                    new Board(globalFunctions);
-                    globalFunctions.createMap();
+                    globalFunctions.createAndLoadMap();
                 } else {
                     setTimeout(lobby.pollGameWaitingRoom, 1000); //wait 1 second before polling again
                 }
             });
         };
         lobby.loadWaitingPlayers = function(deferredObject) {
-           $.ajax('/test/game/' + lobby.gameID, {
+           $.ajax('/game/' + lobby.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
@@ -149,7 +182,7 @@
                         globalFunctions.setPlayerNumber(-1);
                         for(k=0; k<players.players.length; k++) {
                             if(players.players[k].ready === false) allPlayersReady = false;
-                            if(players.players[k] === globalFunctions.getUsername()) {
+                            if(players.players[k].name === globalFunctions.getUsername()) {
                                 globalFunctions.setPlayerNumber(k + 1);
                             }
                         }
