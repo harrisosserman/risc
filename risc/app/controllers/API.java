@@ -1,5 +1,11 @@
 package controllers;
 
+import akka.*;
+import scala.concurrent.duration.Duration;
+import java.util.concurrent.TimeUnit;
+import akka.actor.Props;
+import play.libs.Akka;
+
 import com.mongodb.*;
 
 import controllers.routes;
@@ -152,6 +158,18 @@ public class API extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result logUserIn(String username){
+
+        Akka.system().scheduler().scheduleOnce(
+            Duration.create(10, TimeUnit.SECONDS),
+            new Runnable() {
+                public void run() {
+                    System.out.println("----------HELLO----------");
+                }
+            },
+            Akka.system().dispatcher()
+        ); 
+
+
         RequestBody body = request().body();
         String jsonUsername = body.asJson().get(UserManager.NAME_KEY).toString();
         String usernameWithoutQuotes = removeQuotes(jsonUsername);
