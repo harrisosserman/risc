@@ -470,7 +470,14 @@ public void doAttacksAndMoves(){
             int attackingFrom = a.getTerritory();
             HashMap<Integer, Attacker> attackers_crossing = territories.get(attackingFrom).getAttackers();
             if(attackers_crossing.containsKey(position)){
-
+                Attacker opposingAttacker = attackers_crossing.get(position);
+                int winner = battleCrossing(opposingAttacker.getArmy(), position, a.getArmy(), attackingFrom);
+                if(winner == attackingFrom){
+                    attackers.remove(attackingFrom);
+                }
+                else{
+                    attackers_crossing.remove(position);
+                }   
             }
             Player p = a.getOwner();
             if(attackers.containsKey(p)){
@@ -492,94 +499,68 @@ public void doAttacksAndMoves(){
     finalizeState();
 }
 
-/*public Army battleCrossing(Army attackers, Army defender){
-    while(attackers.size()>0){
-        System.out.println("loop 1");
-        for(int i=attackers.size()-1; i>=0; i--){
+public int battleCrossing(Army attacker, int attackerHome, Army defender, int defenderHome){
+    while(attacker.getNumberOfTroops()>0 & defender.getNumberOfTroops()>0){
 
-            Army attacker = attackers.get(i).getArmy();
-            System.out.println("first attacker is " + attackers.get(i).getName());
-            Troop battler_1 = defender.getStrongest();
-            System.out.println("first strongest defender is a " + battler_1.getType());
-            Troop battler_2 = attacker.getWeakest();
-            System.out.println("first weakest attacker is a " + battler_2.getType());
-            double batt_1 = battler_1.battle();
-            double batt_2 = battler_2.battle();
-            if(batt_1 == batt_2){
-                System.out.println("it was a tie " + batt_1);
-                if(battler_1.getStrength() >= battler_2.getStrength()){
-                    batt_1++;
-                }
-                else{
-                    batt_2++;
-                }
-            }
-            if(batt_1 < batt_2){
-                System.out.println(batt_1 + " is less than  " +batt_2 + " the defender lost one troop");
-                defender.deleteTroop(battler_1.getType());
-                if(defender.getNumberOfTroops()==0){
-                    System.out.println("the defender lost the battle");
-                    defender = attacker;
-                    System.out.println("the new defender is " + attacker.getName());
-                    attackers.remove(i);
-                    if(attackers.size()==0){
-                        System.out.println("the battle is over");
-                        return defender;
-                    }
-                }
+        Troop battler_1 = defender.getStrongest();
+        System.out.println("first strongest defender is a " + battler_1.getType());
+        Troop battler_2 = attacker.getWeakest();
+        System.out.println("first weakest attacker is a " + battler_2.getType());
+        double batt_1 = battler_1.battle();
+        double batt_2 = battler_2.battle();
+        if(batt_1 == batt_2){
+            System.out.println("it was a tie " + batt_1);
+            if(battler_1.getStrength() >= battler_2.getStrength()){
+                batt_1++;
             }
             else{
-                System.out.println(batt_2 + " is less than  " + batt_1 + " the attacker lost one troop");
-                attacker.deleteTroop(battler_2.getType());
-                if(attacker.getNumberOfTroops()==0){
-                    attackers.remove(i);
-                    if(attackers.size()==0){
-                        System.out.println("the battle is over");
-                        return defender;
-                    }
-                } 
+                batt_2++;
             }
         }
-        System.out.println("loop 2");
-        for(int j=attackers.size()-1; j>=0; j--){
-            Army attacker = attackers.get(j).getArmy();
-            System.out.println("first attacker is " + attackers.get(j).getName());
-            Troop battler_1 = defender.getWeakest();
-            System.out.println("first weakest defender is " + battler_1.getType());
-            Troop battler_2 = attacker.getStrongest();
-            System.out.println("first strongest attacker is " + battler_2.getType());
-            double batt_1 = battler_1.battle();
-            double batt_2 = battler_2.battle();
-
-            if(batt_1 < batt_2){
-                System.out.println(batt_1 + " is less than  " + batt_2 + " the defender lost one troop");
-                defender.deleteTroop(battler_1.getType());
-
-                if(defender.getNumberOfTroops()==0){
-                    defender = attacker;
-                    attackers.remove(j);
-                    if(attackers.size()==0){
-                        System.out.println("the battle is over");
-                        return defender;
-                    }
-
-                }                
+        if(batt_1 < batt_2){
+            System.out.println(batt_1 + " is less than  " +batt_2 + " the defender lost one troop");
+            defender.deleteTroop(battler_1.getType());
+            if(defender.getNumberOfTroops()==0){
+                return attackerHome;
             }
-            else{
-                 System.out.println(batt_1 + " is less than  " + batt_2 + " the attacker lost one troop");
-                attacker.deleteTroop(battler_2.getType());
-                if(attacker.getNumberOfTroops()==0){
-                    attackers.remove(j);
-                    if(attackers.size()==0){
-                        System.out.println("the battle is over");
-                        return defender;
-                    }
-                } 
+        }
+        else{
+            System.out.println(batt_2 + " is less than  " + batt_1 + " the attacker lost one troop");
+            attacker.deleteTroop(battler_2.getType());
+            if(attacker.getNumberOfTroops()==0){
+                return defenderHome;
             }
+        }       
+        battler_1 = defender.getWeakest();
+        System.out.println("first weakest defender is " + battler_1.getType());
+        battler_2 = attacker.getStrongest();
+        System.out.println("first strongest attacker is " + battler_2.getType());
+        batt_1 = battler_1.battle();
+        batt_2 = battler_2.battle();
+        if(batt_1 < batt_2){
+            System.out.println(batt_1 + " is less than  " + batt_2 + " the defender lost one troop");
+            defender.deleteTroop(battler_1.getType());
+            if(defender.getNumberOfTroops()==0){
+                return attackerHome;
+            }                
+        }
+        else{
+            System.out.println(batt_1 + " is less than  " + batt_2 + " the attacker lost one troop");
+            attacker.deleteTroop(battler_2.getType());
+            if(attacker.getNumberOfTroops()==0){
+                return defenderHome;
+            } 
         }
     }
-    return defender;
-}*/
+
+    if(attacker.getNumberOfTroops()>0){
+        return attackerHome;
+    }
+    else{
+        return defenderHome;
+    }
+      
+}
 
 
 /* 
@@ -612,6 +593,17 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             Army attacker = attackers.get(i).getArmy();
             System.out.println("first attacker is " + attackers.get(i).getName());
             Troop battler_1 = defender.getStrongest();
+            if(battler_1==null){
+                    System.out.println("the defender lost the battle");
+                    defender = attacker;
+                    System.out.println("the new defender is " + attacker.getName());
+                    attackers.remove(i);
+                    if(attackers.size()==0){
+                        System.out.println("the battle is over");
+                        return defender;
+                    }
+                    continue;       
+            }
             System.out.println("first strongest defender is a " + battler_1.getType());
             Troop battler_2 = attacker.getWeakest();
             System.out.println("first weakest attacker is a " + battler_2.getType());
@@ -713,7 +705,7 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
  * be determined.
  */
 
- public void finalizeState(){
+public void finalizeState(){
     System.out.println("finalizing");
     for(String username: myActivePlayers.keySet()){
         Player player = myActivePlayers.get(username);
@@ -789,8 +781,6 @@ public String typeToString(TroopType t){
 		}
     }
 
-
-
 public boolean playerOwnsATerritory(Player owner){
     for(Integer position : territories.keySet()){
         Territory t = territories.get(position);
@@ -800,7 +790,6 @@ public boolean playerOwnsATerritory(Player owner){
     }
     return false;
 }
-
 
 public void saveState(){
     System.out.println("saving");

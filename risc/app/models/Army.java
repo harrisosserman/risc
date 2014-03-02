@@ -33,6 +33,7 @@ public class Army{
 		troops.add(t);
 		myTroops.put(type, troops);
 	}*/
+
 	public ArrayList<Troop> getArrayOfTroops(){
 		ArrayList<Troop> troops = new ArrayList<Troop>();
 		for(TroopType type : myTroops.keySet()){

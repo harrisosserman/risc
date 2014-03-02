@@ -53,7 +53,7 @@ public class Troop{
 	}
 
 	public double battle(){
-        double value = (Math.random()*19 + 1) + myStrength;
+        double value = (double)(Math.round(Math.random()*19 + 1) + myStrength);
         return value;
 	}
 
