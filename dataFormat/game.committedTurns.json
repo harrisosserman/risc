@@ -28,6 +28,11 @@
             "troopType": "AUTOMATIC",
             "start": 4,
             "end": 4
+        },
+        {
+            "moveType": 3,
+            "troopType": "INFANTRY",
+            "position": 4
         }
 
 
