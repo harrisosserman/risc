@@ -46,10 +46,28 @@ function BoardEditing(globals) {
                 end: end
             };
             editing.moveOrder.push(result);
+        } else if(moveType === 3){
+            result = {
+                moveType: moveType,
+                position: start,
+                troopType: troopType
+            };
+            editing.moveOrder.push(result);
         }
         globalFunctions.commitTurn(midTurn=true);
     };
-    editing.removeMove = function(moveType, start, end, troopType, numberOfMoves) {
+    editing.removeAdditionalTroop = function(moveType, position, troopType) {
+        troopType = editing.convertTextForTroopCommit(troopType);
+        for(var k=0; k<editing.moveOrder.length; k++) {
+            var move = editing.moveOrder[k];
+            if(move.moveType === moveType && move.position === position && move.troopType === troopType) {
+                editing.moveOrder.splice(k, 1);
+                break;
+            }
+        }
+        globalFunctions.commitTurn(midTurn=true);
+    };
+    editing.removeAttack = function(moveType, start, end, troopType, numberOfMoves) {
         troopType = editing.convertTextForTroopCommit(troopType);
         var indicesToRemove = [];
 
@@ -68,6 +86,7 @@ function BoardEditing(globals) {
         for(var m=0; m<indicesToRemove.length; m++) {
             editing.moveOrder.splice(indicesToRemove[m], 1);
         }
+        globalFunctions.commitTurn(midTurn=true);
 
     };
     editing.calculateAdditionalTroops = function(troopDelta, index, key, infantry, additionalInfantry) {
@@ -176,7 +195,7 @@ function BoardEditing(globals) {
             for(var k=0; k<attackingTroops[origin].length; k++) {
                 if(attackingTroops[origin][k].destination === destination) {
                     var troopsPreviouslyAttacking = attackingTroops[origin][k][troopType.text];
-                    editing.removeMove(2, origin, destination, troopType.index, troopsPreviouslyAttacking);
+                    editing.removeAttack(2, origin, destination, troopType.index, troopsPreviouslyAttacking);
                     troopArray[origin] = troopArray[origin] + troopsPreviouslyAttacking;
                     attackingTroops[origin][k][troopType.text] = numberOfTroopsAttacking;
                     return;

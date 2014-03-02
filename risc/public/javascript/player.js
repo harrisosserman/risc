@@ -23,6 +23,23 @@
         globalFunctions.getPlayerNumber = function() {
             return player.playerNumber;
         };
+        globalFunctions.showGameLobby = function() {
+            player.displaySignupSigninModal(false);
+            player.displayLogin(false);
+            player.loginError(false);
+            globalFunctions.setDisplayGameLobby(true);
+            globalFunctions.setDisplayMap(false);
+        };
+        globalFunctions.showGameSigninSignup = function() {
+            player.displaySignupSigninModal(true);
+            player.displayGameStart(true);
+            player.displayLogin(true);
+            player.displaySignup(false);
+            player.usernameError(false);
+            player.passwordError(false);
+            player.loginError(false);
+
+        };
         player.usernameChanged = function() {
             $.ajax('/player/' + player.username(), {
                 method: 'GET'
@@ -43,12 +60,8 @@
                     'password': CryptoJS.SHA512(player.password()).toString()
                 }),
                 contentType: "application/json"
-            }).done(function(result) {
-                //do something with result
-                player.displaySignupSigninModal(false);
-                player.displayLogin(false);
-                player.loginError(false);
-                globalFunctions.setDisplayGameLobby(true);
+            }).done(function() {
+                globalFunctions.showGameLobby();
             }).fail(function() {
                 player.loginError(true);
             });

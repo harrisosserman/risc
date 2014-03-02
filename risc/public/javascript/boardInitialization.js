@@ -244,11 +244,13 @@
                             board.editing.calculateAdditionalTroops(1, index, input, board.boardInfo.infantry, board.additionalInfantry);
                             board.updateTerritoryClickTable(index);
                             board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
+                            board.editing.addMove(3, index, -1, 0, -1);
                         } else if(input.keyCode === 40) {
                             //down arrow
                             board.editing.calculateAdditionalTroops(-1, index, input, board.boardInfo.infantry, board.additionalInfantry);
                             board.updateTerritoryClickTable(index);
                             board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
+                            board.editing.removeAdditionalTroop(3, index, 0);
                         }
                 });
             }
