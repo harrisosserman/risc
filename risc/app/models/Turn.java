@@ -169,10 +169,10 @@ public class Turn {
         BasicDBObject[] playersArray = players.toArray(new BasicDBObject[0]);
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         int highestTurn_value = Integer.parseInt(currentTurn.get(TURN).toString());
-        System.out.println("highest turn is " + highestTurn_value);
+    //    System.out.println("highest turn is " + highestTurn_value);
         
         for(BasicDBObject play : playersArray){
-            System.out.println("entered player array " + play.get(NAME));
+  //          System.out.println("entered player array " + play.get(NAME));
             DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
             String username = play.get(NAME).toString();
             BasicDBObject isPlayerCommitted = new BasicDBObject(GAME_ID, myGameID);
@@ -180,17 +180,17 @@ public class Turn {
             isPlayerCommitted.put(USERNAME, username);
             DBCursor lastCommit = committedTurns.find(isPlayerCommitted).sort(new BasicDBObject(TIMESTAMP, -1));
             if(!lastCommit.hasNext()){
-                System.out.println("last commit does nt have next" + username);
+         //       System.out.println("last commit does nt have next" + username);
                 return false;
             }
             DBObject playerInfo = lastCommit.next();
             int committed = Integer.parseInt(playerInfo.get(COMMITTED).toString());
             if(committed == 0){
-                System.out.println("didnt commit?");
+       //         System.out.println("didnt commit?");
                 return false;
             }
         }
-        System.out.println("test passed");
+     //   System.out.println("test passed");
         return true;
     }
 
@@ -230,7 +230,7 @@ public class Turn {
         turn_doc.append(TIMESTAMP, player1.getTimeStamp());
         List<BasicDBObject> move_list = new ArrayList<BasicDBObject>();
         for(int i=0; i<moves.size(); i++){
-            System.out.println("in loop of move size " + i);
+         //   System.out.println("in loop of move size " + i);
             BasicDBObject move_doc = new BasicDBObject();
             move_doc.append(MOVETYPE, moves.get(i).getMoveType());
             move_doc.append(TROOPTYPE, moves.get(i).getTroopType());
