@@ -56,6 +56,7 @@ public class API extends Controller {
     public static Result commitTurn(String gameID) {
 
         RequestBody body = request().body();
+        //BattleTest b = new BattleTest();
         Turn turn = new Turn();
         int turn_number = turn.createTurn(body);
         boolean json = turn.allTurnsCommitted();

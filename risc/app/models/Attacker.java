@@ -54,8 +54,12 @@ public class Attacker{
 	}
 
 	public void combineAttackers(Attacker a2){
+		System.out.println("combining");
     	ArrayList<Troop> a = a2.getArmy().getArrayOfTroops();
+    			System.out.println("combining");
    		myArmy.addTroops(a);
+   				System.out.println("combining");
+   		return;
 	}
 
 	public void addTroop(TroopType t){
