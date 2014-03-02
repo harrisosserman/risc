@@ -14,7 +14,6 @@
                     $(pollingNextTurnDOM).remove();
                     var gameMap = data.territories;
                     //handling when player loses or when player wins
-                    var playerNumber = globalFunctions.getPlayerNumber();
                     var playerNumberFound = false;
                     var otherPlayersFound = false;
                     var owner = gameMap[0].owner;
@@ -22,7 +21,7 @@
                         if(gameMap[k].owner !== owner) {
                             otherPlayersFound = true;
                         }
-                        if(gameMap[k].owner === playerNumber) {
+                        if(gameMap[k].owner === globalFunctions.getUsername()) {
                             playerNumberFound = true;
                         }
                     }
