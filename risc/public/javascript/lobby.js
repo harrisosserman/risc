@@ -13,6 +13,7 @@
 
         globalFunctions.setDisplayGameLobby = function(input) {
             lobby.displayGameLobby(input);
+            lobby.displayJoinOrCreateGame(input);
             lobby.loadMyGames();
             lobby.loadAllGames();
         };

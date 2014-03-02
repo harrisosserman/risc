@@ -18,6 +18,15 @@
             globalFunctions.commitTurn(midTurn=false);
         };
 
+        $('#gameName').click(function() {
+            if(typeof globalFunctions.getUsername() !== 'undefined' && globalFunctions.getUsername().length > 0) {
+                globalFunctions.showGameLobby();
+                $("#map").empty();
+            } else {
+                globalFunctions.showGameSigninSignup();
+            }
+        });
+
         new Player(globalFunctions);
         new Lobby(globalFunctions);
         new Board(globalFunctions);
