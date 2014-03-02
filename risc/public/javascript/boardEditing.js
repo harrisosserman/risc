@@ -146,10 +146,14 @@ function BoardEditing(globals) {
         if(playerInfo.maxTechLevel < troopTypeConvertTo.index) {
             alert("Your technology level is lower than the selected troop upgrade level");
             return;
+        } else if(troopTypeConvertFrom.index > troopTypeConvertTo.index){
+            alert("You cannot convert troops from a higher technology level to a lower technology level");
+            return;
         } else if(cost > playerInfo.technology) {
             alert("You need " + cost + " technology, but you only have " + playerInfo.technology);
             return;
-        } else {
+        }
+        else {
             playerInfo.technology = playerInfo.technology - cost;
             convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
             convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
