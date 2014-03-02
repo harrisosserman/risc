@@ -34,6 +34,9 @@ public class API extends Controller {
         WaitingRoom wr = new WaitingRoom();
         wr.createNewWaitingRoom(playerNameWithoutQuotes);
 
+        UserManager um = new UserManager();
+        um.addGameToUser(wr.getGameID(), playerNameWithoutQuotes);
+
         JSONObject result = new JSONObject();
         result.put(DBHelper.GAME_ID_KEY, wr.getGameID());
 
