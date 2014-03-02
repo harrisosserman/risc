@@ -493,8 +493,8 @@ public void doAttacksAndMoves(){
         Army winner = battle(attackersForBattle(attacks), territories.get(position).getDefendingArmy());
         System.out.println("the winner is " + winner.getOwner().getName());
         territories.get(position).setDefendingArmy(winner);
-
         Territory t = territories.get(position);
+        t.addTroop(TroopType.INFANTRY);
         t.setOwner(winner.getOwner());
         territories.put(position, t);
 

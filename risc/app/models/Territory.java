@@ -64,6 +64,10 @@ public class Territory{
 		myArmy.addTroop(t.getType());
 	}
 
+	public void addTroop(TroopType type){
+		myArmy.addTroop(type);
+	}
+
 	/* public void addAttacker(Integer position, Attacker a, Player p){
 		ArrayList<Attacker> attackers_ = attackers.get(position);
 		attackers_.add(a);
