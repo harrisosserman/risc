@@ -27,12 +27,13 @@ import libraries.DBHelper;
 
 public class Turn {
 
-	private static final int NUM_TERRITORIES = 25;
-	private static final String INITIALIZATION_DB = "initialization";
+    private static final int NUM_TERRITORIES = 25;
+    private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
     private static final String GAME_DB = "game";
     private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
     private static final String PLAYER = "player";
+    private static final String NAME = "name";
     private static final String USERNAME = "username";
     private static final String ATTACKING = "attacking";
     private static final String TROOPS = "troops";
@@ -63,10 +64,10 @@ public class Turn {
     private int turn;
 
 
-	public Turn(){
+    public Turn(){
         attackers = new ArrayList<Attacker>();
         territories = new ArrayList<Territory>();
-	}
+    }
 
     /* Create turn is called directly from the API call and is responsible
      * for manually parsing the data into the data structures the model
@@ -109,9 +110,7 @@ public class Turn {
         while(movesData.hasNext()){
                 JsonNode moveData = movesData.next();
                 int moveType = Integer.parseInt(moveData.get(MOVETYPE).toString());
-                System.out.println(moveType);
                 String troopType = API.removeQuotes(moveData.get(TROOPTYPE).toString());
-                System.out.println(troopType);
                 if(moveType == 0){
                     String upgradeType = API.removeQuotes(moveData.get(UPGRADETYPE).toString());
                     int position = Integer.parseInt(moveData.get(POSITION).toString());
@@ -130,12 +129,17 @@ public class Turn {
                     Attack newMove = new Attack(moveType, troopType, start, end);
                     moves.add(newMove);
                 }
+                else if(moveType == 3){
+                    int position = Integer.parseInt(moveData.get(POSITION).toString());
+                    Place newMove = new Place(moveType, troopType, position);
+                    moves.add(newMove);
+                }
                 
         }
         int result = commitTurn(moves, player_);
 
         return result;
-	}
+    }
 
     /*
      * This is a method called from every committedTurns API call, and it checks after
@@ -165,20 +169,28 @@ public class Turn {
         BasicDBObject[] playersArray = players.toArray(new BasicDBObject[0]);
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         int highestTurn_value = Integer.parseInt(currentTurn.get(TURN).toString());
+        System.out.println("highest turn is " + highestTurn_value);
         
         for(BasicDBObject play : playersArray){
+            System.out.println("entered player array " + play.get(NAME));
             DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
-            String username = play.get(USERNAME).toString();
+            String username = play.get(NAME).toString();
             BasicDBObject isPlayerCommitted = new BasicDBObject(GAME_ID, myGameID);
-            isPlayerCommitted.put(TURN, highestTurn_value);
+            isPlayerCommitted.put(TURN, highestTurn_value + 1);
             isPlayerCommitted.put(USERNAME, username);
             DBCursor lastCommit = committedTurns.find(isPlayerCommitted).sort(new BasicDBObject(TIMESTAMP, -1));
+            if(!lastCommit.hasNext()){
+                System.out.println("last commit does nt have next" + username);
+                return false;
+            }
             DBObject playerInfo = lastCommit.next();
             int committed = Integer.parseInt(playerInfo.get(COMMITTED).toString());
             if(committed == 0){
+                System.out.println("didnt commit?");
                 return false;
             }
         }
+        System.out.println("test passed");
         return true;
     }
 
@@ -209,7 +221,7 @@ public class Turn {
         }
         BasicDBObject turn_doc = new BasicDBObject();
         turn_doc.append(GAME_ID, myGameID);
-        turn_doc.append(PLAYER, player1.getName());
+        turn_doc.append(USERNAME, player1.getName());
         turn_doc.append(TURN, turn);
         turn_doc.append(FOOD, player1.getFood());
         turn_doc.append(COMMITTED, player1.getTurnCommitted());
@@ -238,6 +250,11 @@ public class Turn {
                 Attack attack = (Attack) moves.get(i);
                 move_doc.append(START, attack.getStart());
                 move_doc.append(END, attack.getEnd());
+                move_list.add(move_doc);
+            }
+            else if(moves.get(i).getMoveType() == 3){
+                Place place = (Place) moves.get(i);
+                move_doc.append(POSITION, place.getPosition());
                 move_list.add(move_doc);
             }
             

@@ -9,6 +9,7 @@ public class Player {
 	private int myTechnology;
 	private int myTechnologyLevel;
 	private int turnCommitted;
+    private int additionalTroops;
 	private Long myTimeStamp;
 
 	public Player(String name){
@@ -19,6 +20,14 @@ public class Player {
 		return myName;
 	}
 
+    public void setAdditionalTroops(int numTroops){
+        additionalTroops = numTroops;
+    }
+    
+    public int getAdditionalTroops(){
+        return additionalTroops;
+    }
+    
 	public void setName(String name){
 		myName = name;
 	}

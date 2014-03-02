@@ -20,6 +20,14 @@ public class Army{
 		myTroops.put(TroopType.PLANES, new ArrayList<Troop>());
 	}
 
+    public Player getOwner(){
+        return myOwner;
+    }
+
+    public String getName(){
+        return myOwner.getName();
+    }
+    
 	/*public void addTroop(TroopType type, Troop t){
 		ArrayList<Troop> troops = myTroops.get(type);
 		troops.add(t);

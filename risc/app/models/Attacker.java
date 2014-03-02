@@ -21,6 +21,9 @@ public class Attacker{
 		myOwner = owner; 
 		myLocation = territory;
 	}
+	public String getName(){
+		return myOwner.getName();
+	}
 
 	public void setTerritory(int territory){
 		myLocation = territory;

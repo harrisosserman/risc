@@ -16,7 +16,7 @@ import models.Turn;
 import models.State;
 import models.UserManager;
 import models.WaitingRoom;
-import models.TurnTest;
+import models.BattleTest;
 
 import play.mvc.Result;
 import play.mvc.Controller;
@@ -53,16 +53,16 @@ public class API extends Controller {
     public static Result commitTurn(String gameID) {
 
         RequestBody body = request().body();
-        TurnTest turn = new TurnTest();
+        Turn turn = new Turn();
         int turn_number = turn.createTurn(body);
-      //  boolean json = turn.allTurnsCommitted();
-        if(false){
+        boolean json = turn.allTurnsCommitted();
+        if(json){
             System.out.println("entered json loop");
-        State state = new State(gameID);
-        int k = state.loadPreviousState();
-          return ok("returned true " + k);
+            State state = new State(gameID);
+            int k = state.loadPreviousState();
+            return ok("returned true " + k);
         }
-        return ok("Turn commited for turn :" + turn_number );
+        return ok("Turn commited for turn :" + turn_number);
     }
 
     @BodyParser.Of(BodyParser.Json.class)
