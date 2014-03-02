@@ -257,6 +257,23 @@ public void moveTypeUpgrade(BasicDBObject move){
     }
 }
 
+public void moveTypePlace(BasicDBObject move, Player p){
+    System.out.println("made it into UPGRADE");
+    int position = Integer.parseInt(move.get(POSITION).toString());
+    Territory position_ = territories.get(position);
+    String troopType = move.get(TROOPTYPE).toString();
+    String upgradeType = move.get(UPGRADETYPE).toString();
+    TroopType trooptype = getTroopType(troopType);
+    TroopType upgradetype = getTroopType(upgradeType);
+    Army army = position_.getDefendingArmy();
+    if(){
+        System.out.println("there was no " + trooptype + " to upgrade");
+        army.deleteTroop(trooptype);
+        army.addTroop(upgradetype);
+        position_.setDefendingArmy(army);
+    }
+}
+
 public void updateStateWithMoves(){
      System.out.println("made it into moves");
     for(String username : myActivePlayers.keySet()){

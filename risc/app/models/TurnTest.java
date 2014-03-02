@@ -207,7 +207,7 @@ public class TurnTest {
 
     public int commitTurn(ArrayList<MoveType> moves, Player player1){
         DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
-       /* DBCursor states = DBHelper.getStateCursorForGame(myGameID);
+        DBCursor states = DBHelper.getStateCursorForGame(myGameID);
         if(!states.hasNext()){
             turn = 1;
         }
@@ -215,8 +215,7 @@ public class TurnTest {
             DBObject highestTurn = DBHelper.getCurrentTurnForGame(myGameID);
             turn = (Integer) highestTurn.get(TURN);
             turn ++;
-        }*/
-        turn = 1;
+        }
         BasicDBObject turn_doc = new BasicDBObject();
         turn_doc.append(GAME_ID, myGameID);
         turn_doc.append(USERNAME, player1.getName());

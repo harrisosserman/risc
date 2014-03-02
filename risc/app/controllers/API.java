@@ -55,8 +55,8 @@ public class API extends Controller {
         RequestBody body = request().body();
         TurnTest turn = new TurnTest();
         int turn_number = turn.createTurn(body);
-        boolean json = turn.allTurnsCommitted();
-        if(json){
+      //  boolean json = turn.allTurnsCommitted();
+        if(false){
             System.out.println("entered json loop");
         State state = new State(gameID);
         int k = state.loadPreviousState();
