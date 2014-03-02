@@ -100,7 +100,7 @@ public class Game {
 
             String countryOwner = usernames.get(countryOwners[i]);
             territory.append(DBHelper.OWNER_KEY, countryOwner);
-
+            territory.append(DBHelper.POSITION_KEY, i);
             territory.append(DBHelper.FOOD_KEY, foodProductions[i]);
             territory.append(DBHelper.TECHNOLOGY_KEY, techProductions[i]);
 

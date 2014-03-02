@@ -28,6 +28,10 @@ public class Territory{
 		return myFood;
 	}
 
+	public int getNumberOfTroops(){
+		return myArmy.getNumberOfTroops();
+	}
+
 	public int getTechnology(){
 		return myTechnology;
 	}
@@ -66,6 +70,17 @@ public class Territory{
 		attackers_.put(position, attackers_);
 
     }*/
+
+    public boolean tryToDeleteTroop(TroopType type){
+    	if(myArmy.containsTroop(type)){
+    		myArmy.deleteTroop(type);
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+
+    }
 
 	public void addTrooptoAttacker(Integer position, TroopType t, Player p){
 		if(attackers.containsKey(position)){

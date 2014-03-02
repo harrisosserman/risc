@@ -64,7 +64,7 @@
         };
 
         turn.commitTurn = function(midturn) {
-            var result = turn.constructComittedTurn();
+            var result = turn.constructComittedTurn(midturn);
             $.ajax('/game/' + globalFunctions.getGameID(), {
                 method: 'POST',
                 data: JSON.stringify(result),
@@ -80,15 +80,19 @@
             });
         };
 
-        turn.constructComittedTurn = function() {
+        turn.constructComittedTurn = function(midturn) {
             var returnData = {};
             returnData['gameID'] = globalFunctions.getGameID();
+            returnData['committed'] = 1;
             returnData['username'] = globalFunctions.getUsername();
             returnData['timeStamp'] = new Date().getTime();
             returnData['food'] = globalFunctions.getPlayerInfo().food;
             returnData['technology'] = globalFunctions.getPlayerInfo().technology;
             returnData['technology_level'] = globalFunctions.getPlayerInfo().maxTechLevel;
             returnData['moves'] = globalFunctions.getMoveOrder();
+            if(midturn === true) {
+                returnData['committed'] = 0;
+            }
             return returnData;
         };
     }

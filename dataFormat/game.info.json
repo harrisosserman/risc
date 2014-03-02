@@ -3,25 +3,12 @@
     "state": 0,   //<!--THIS STATE VALUE WILL BE 0=NOT STARTED, 1=GAME STARTED, 2=GAME DONE -->
     "players": [
         {
-            "player": "[USERNAME]",
+            "name": "[USERNAME]",
             "ready": true
         },
         {
-            "player": "[USERNAME]",
+            "name": "[USERNAME]",
             "ready": false
-        }
-    ],
-    "territories": [
-
-        {
-            "position": 0,
-            "food": 4,
-            "technology": 6
-        },
-        {
-            "position": 1,
-            "food": 2,
-            "technology": 4
         }
     ]
 

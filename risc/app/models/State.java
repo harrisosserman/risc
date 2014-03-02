@@ -34,6 +34,7 @@ public class State{
     private static final int NUM_TERRITORIES = 25;
     private static final String INITIALIZATION_DB = "initialization";
     private static final String WAITING_PLAYERS_COLLECTION = "waitingPlayers";
+    private static final String NUM_PLAYERS = "numPlayers";
     private static final String GAME_DB = "game";
     private static final String COMMITTED_TURNS_COLLECTION = "committedTurns";
     private static final String PLAYER = "player";
@@ -60,7 +61,7 @@ public class State{
     private static final String TIMESTAMP = "timeStamp";
     private static final String COMMITTED = "committed";
     private static final String PLAYERS = "players";
-     private static final String PLAYERINFO = "playerInfo";
+    private static final String PLAYERINFO = "playerInfo";
     private static final String INFANTRY_ = "INFANTRY";
     private static final String AUTOMATIC_ = "AUTOMATIC";
     private static final String ROCKETS_ = "ROCKETS";
@@ -82,6 +83,7 @@ public class State{
 public State(String gameID){
     territories = new HashMap<Integer, Territory>();
     myGameID = gameID;
+    myActivePlayers = new HashMap<String, Player>();
   //  attackers = new ArrayList<Attacker>();
 }
 
@@ -114,22 +116,17 @@ public State(String gameID){
 
 
 public int loadPreviousState(){
-    DBObject lastStateObject = DBHelper.getCurrentTurnForGame("testGame");
+    DBObject lastStateObject = DBHelper.getCurrentTurnForGame(myGameID);
     System.out.println("made it into load prev state");
     BasicDBList playerInfo = (BasicDBList) lastStateObject.get(PLAYERINFO);  
     BasicDBObject[] playerArray = playerInfo.toArray(new BasicDBObject[0]);
     for(BasicDBObject player : playerArray){
-        System.out.println("made it into playsr");
         String username = player.get(OWNER).toString();
-        System.out.println("made it into playsr");
-        Integer food = (Integer)Integer.parseInt(player.get(FOOD).toString());
-        System.out.println("made it into playsr");
+        System.out.println("made it into playsr" + username);
+        int food = Integer.parseInt(player.get(FOOD).toString());
         int technology_level = Integer.parseInt(player.get(LEVEL).toString());
-        System.out.println("made it into playsr");
         int technology = Integer.parseInt(player.get(TECHNOLOGY).toString());
-        System.out.println("made it into playsr");
         Player player1 = new Player(username);
-        System.out.println("made it into playsr");
         player1.setFood(food);
         player1.setTechnologyLevel(technology_level);
         player1.setTechnology(technology);
@@ -137,49 +134,55 @@ public int loadPreviousState(){
     }
     BasicDBList territoryInfo = (BasicDBList) lastStateObject.get(TERRITORIES);
     BasicDBObject[] territoryArray = territoryInfo.toArray(new BasicDBObject[0]);
-    System.out.println("made it into between ");
     for(BasicDBObject territory : territoryArray){
-        System.out.println("made it into terrs");
         String owner = territory.get(OWNER).toString();
         Player p = myActivePlayers.get(owner);
+        System.out.println(territory.get(POSITION));
         int position = Integer.parseInt(territory.get(POSITION).toString());
         int food = Integer.parseInt(territory.get(FOOD).toString());
         int technology = Integer.parseInt(territory.get(TECHNOLOGY).toString());
         Territory terr = new Territory(position, p, food, technology);
+        System.out.println("new Territory");
+        if(territory.get(INFANTRY_)!= null){
         int infantry = Integer.parseInt(territory.get(INFANTRY_).toString());
         for(int i=0; i<infantry; i++){
             Troop t = new Troop(p, TroopType.INFANTRY);
             terr.addTroop(t);
-        }
+        }}
+        if(territory.get(AUTOMATIC_)!= null){
         int automatic = Integer.parseInt(territory.get(AUTOMATIC_).toString());
         for(int i=0; i<automatic; i++){
             Troop t = new Troop(p, TroopType.AUTOMATIC);
             terr.addTroop(t);
-        }
+        }}
+        if(territory.get(ROCKETS_)!= null){
         int rockets = Integer.parseInt(territory.get(ROCKETS_).toString());
         for(int i=0; i<rockets; i++){
             Troop t = new Troop(p, TroopType.ROCKETS);
             terr.addTroop(t);
-        }
+        }}
+        if(territory.get(TANKS_)!= null){
         int tanks = Integer.parseInt(territory.get(TANKS_).toString());
         for(int i=0; i<tanks; i++){
             Troop t = new Troop(p, TroopType.TANKS);
             terr.addTroop(t);
-        }
+        }}
+        if(territory.get(IMPROVEDTANKS_)!= null){
         int impTanks = Integer.parseInt(territory.get(IMPROVEDTANKS_).toString());
         for(int i=0; i<impTanks; i++){
             Troop t = new Troop(p, TroopType.IMPROVEDTANKS);
             terr.addTroop(t);
-        }
+        }}
+        if(territory.get(PLANES_)!= null){
         int planes = Integer.parseInt(territory.get(PLANES_).toString());
         for(int i=0; i<planes; i++){
             Troop t = new Troop(p, TroopType.PLANES);
             terr.addTroop(t);
-        }
+        }}
         territories.put(terr.getPosition(), terr);
     }
-       updateStateWithMoves();
-        return territories.size();
+    updateStateWithMoves();
+    return territories.size();
 
 }
 
@@ -206,32 +209,39 @@ private TroopType getTroopType(String str){
 }
 
 public void moveTypeMove(BasicDBObject move){
-
+ System.out.println("made it into MOVE");
     int startInt = Integer.parseInt(move.get(START).toString());
     Territory start = territories.get(startInt);
     int endInt = Integer.parseInt(move.get(END).toString());
     Territory end = territories.get(endInt);
     String troopType = move.get(TROOPTYPE).toString();
     TroopType type = getTroopType(troopType);
-    end.removeTroopFromArmy(type);
-    Army entering = end.getDefendingArmy();
-    entering.addTroop(type);
-    end.setDefendingArmy(entering);
+    if(start.getDefendingArmy().containsTroop(type)){
+        start.removeTroopFromArmy(type);
+        Army entering = end.getDefendingArmy();
+        entering.addTroop(type);
+        end.setDefendingArmy(entering);
+    }
+    
 }
 
 public void moveTypeAttack(BasicDBObject move, Player p){
-
+ System.out.println("made it into ATTACKING");
     int startInt = Integer.parseInt(move.get(START).toString());
     Territory start = territories.get(startInt);
     int endInt = Integer.parseInt(move.get(END).toString());
     Territory end = territories.get(endInt);
     String troopType = move.get(TROOPTYPE).toString();
     TroopType type = getTroopType(troopType);
-    end.addTrooptoAttacker(startInt, type, p);
-    start.removeTroopFromArmy(type);
+    if(start.getDefendingArmy().containsTroop(type)){
+          System.out.println("there was no " + type + " to move");
+        end.addTrooptoAttacker(startInt, type, p);
+        start.removeTroopFromArmy(type); 
+    }
 }
 
 public void moveTypeUpgrade(BasicDBObject move){
+    System.out.println("made it into UPGRADE");
     int position = Integer.parseInt(move.get(POSITION).toString());
     Territory position_ = territories.get(position);
     String troopType = move.get(TROOPTYPE).toString();
@@ -239,18 +249,28 @@ public void moveTypeUpgrade(BasicDBObject move){
     TroopType trooptype = getTroopType(troopType);
     TroopType upgradetype = getTroopType(upgradeType);
     Army army = position_.getDefendingArmy();
-    army.deleteTroop(trooptype);
-    army.addTroop(upgradetype);
-    position_.setDefendingArmy(army);
+    if(army.containsTroop(trooptype)){
+        System.out.println("there was no " + trooptype + " to upgrade");
+        army.deleteTroop(trooptype);
+        army.addTroop(upgradetype);
+        position_.setDefendingArmy(army);
+    }
 }
 
 public void updateStateWithMoves(){
-
+     System.out.println("made it into moves");
     for(String username : myActivePlayers.keySet()){
+        System.out.println("made it into moves " + username);
+        System.out.println(myGameID);
         DBObject lastCommittedTurn = DBHelper.getCommittedTurnForPlayerAndGame(myGameID, username);
+        System.out.println("made it into moves " + username);
         BasicDBList movesList = (BasicDBList) lastCommittedTurn.get(MOVES);  
+        System.out.println("made it into moves " + username);
         BasicDBObject[] movesArray = movesList.toArray(new BasicDBObject[0]);
+        System.out.println("made it into moves " + username);
         for(BasicDBObject move : movesArray){
+                    System.out.println("made it into moves array ");
+
             int moveType = Integer.parseInt(move.get(MOVETYPE).toString());
             Player p = myActivePlayers.get(username);
             if(moveType == 0){
@@ -268,8 +288,12 @@ public void updateStateWithMoves(){
     doAttacksAndMoves();
 }
 
-public Attacker combineAttackers(Attacker a1, Attacker a2){
-    Army a2.getArmy()
+public ArrayList<Attacker> attackersForBattle(HashMap<Player, Attacker> map){
+    ArrayList<Attacker> attackers = new ArrayList<Attacker>();
+    for(Player p : map.keySet()){
+        attackers.add(map.get(p));
+    }
+    return attackers;
 }
 
 public void doAttacksAndMoves(){
@@ -278,54 +302,26 @@ public void doAttacksAndMoves(){
     */
     for(Integer position : territories.keySet()){
         HashMap<Integer, Attacker> attackers = territories.get(position).getAttackers();
-        ArrayList<Attacker> attacks = new ArrayList<Attacker>();
+        HashMap<Player, Attacker> attacks = new HashMap<Player, Attacker>();
         for(Integer attackerint : attackers.keySet()){
-            attacks.add(attackers.get(attackerint));
+            Attacker a = attackers.get(attackerint);
+            Player p = a.getOwner();
+            if(attackers.containsKey(p)){
+                Attacker a_inMap = attackers.get(p);
+                a_inMap.combineAttackers(a);
+                attacks.put(p, a_inMap);
+            }
+            else{
+                attacks.put(p, a);
+            }
         }
-        battle(attacks, territories.get(position).getDefendingArmy());
+
+        Army winner = battle(attackersForBattle(attacks), territories.get(position).getDefendingArmy());
+        territories.get(position).setDefendingArmy(winner);
     }
+    finalizeState();
 }
 
-public void assembleState(int turn_number) throws UnknownHostException{
-    turn = turn_number;
-    DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
-    BasicDBObject query = new BasicDBObject();
-    query.put(GAME_ID, myGameID);
-    query.put(TURN, turn);
-    DBCursor cursor = committedTurns.find(query);
-    for(int i=0; i<NUM_TERRITORIES; i++){
-     //   Territory territory_empty = new Territory(i, null, -1, 0, 0);
-     //   territories.add(territory_empty);
-   }
-    while(cursor.hasNext()) {
-        DBObject object = cursor.next();
-        playerID = Integer.parseInt(object.get(PLAYER).toString());
-        BasicDBList territoryData = (BasicDBList) object.get(TERRITORIES);
-        BasicDBObject[] territoryArray = territoryData.toArray(new BasicDBObject[0]);
-        for(BasicDBObject terr : territoryArray){
-            String troops_str = terr.get(TROOPS).toString();
-            int troops = Integer.parseInt(troops_str);
-            String position_str = terr.get(POSITION).toString();
-            int position = Integer.parseInt(position_str);
-       //     territories.get(position).setOwner(playerID);
-         //   territories.get(position).setDefendingArmy(troops);
-            BasicDBList attackerData = (BasicDBList) terr.get(ATTACKING);
-            BasicDBObject[] attackerArray = attackerData.toArray(new BasicDBObject[0]);
-            attackerLoop:
-            for(BasicDBObject attack : attackerArray){
-                int attacker_territory = Integer.parseInt(attack.get(TERRITORY).toString());
-                int attacker_number = Integer.parseInt(attack.get(TROOPS).toString());
-           //     Attacker a = new Attacker(playerID, attacker_number, attacker_territory, position);
-           //     territories.get(attacker_territory).addAttacker(a);
-         //       System.out.println("the owner of the attacker is " + a.getOwner());
-            }     
-
-        }
-    }
-    //findState();
-   // saveState();
-    return;
-}
 
 /* 
  * The find state method is where the new state is found after all of the turns
@@ -344,28 +340,6 @@ public void assembleState(int turn_number) throws UnknownHostException{
  * 
  * 
  */
-
-
-/* public void findState(){
-   for(int i=0; i<territories.size(); i++){
-    //System.out.println("we are analyzing territory :" + i);
-    Territory battlefield = territories.get(i);
-    Player defender = battlefield.getOwner();
-    Army defender_troops = battlefield.getDefendingArmy();
-    //System.out.println("the defending player is " + defender + " with " + defender_troops + " troops.");
-    ArrayList<Attacker> attackers = battlefield.getAttackers();
-        for(int j=0; j<attackers.size(); j++){
-            Attacker attacker = attackers.get(j);
-//            int[] winner = battle(attacker.getOwner(), attacker.getStrength(), defender, defender_troops);
-  //          defender = winner[0];
-    //        defender_troops = winner[1];
-
-        }
-        battlefield.setOwner(defender);
-     //   battlefield.setDefendingArmy(defender_troops);
-    }
-}*/ 
-
 
 //add in troops size
 public Army battle(ArrayList<Attacker> attackers, Army defender){
@@ -389,7 +363,7 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             }
             if(batt_1 < batt_2){
                 defender.deleteTroop(battler_1.getType());
-                if(defender.getSize()==0){
+                if(defender.getNumberOfTroops()==0){
                     defender = attacker;
                     attackers.remove(i);
                     if(attackers.size()==0){
@@ -399,7 +373,7 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             }
             else{
                 attacker.deleteTroop(battler_2.getType());
-                if(attacker.getSize()==0){
+                if(attacker.getNumberOfTroops()==0){
                     attackers.remove(i);
                     if(attackers.size()==0){
                         return defender;
@@ -416,7 +390,7 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
 
             if(battler_1.battle() < battler_2.battle()){
                 defender.deleteTroop(battler_1.getType());
-                if(defender.getSize()==0){
+                if(defender.getNumberOfTroops()==0){
                     defender = attacker;
                     attackers.remove(j);
                     if(attackers.size()==0){
@@ -427,7 +401,7 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             }
             else{
                 attacker.deleteTroop(battler_2.getType());
-                if(attacker.getSize()==0){
+                if(attacker.getNumberOfTroops()==0){
                     attackers.remove(j);
                     if(attackers.size()==0){
                         return defender;
@@ -458,40 +432,102 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
  * be determined.
  */
 
+ public void finalizeState(){
+    for(String username: myActivePlayers.keySet()){
+        Player player = myActivePlayers.get(username);
+        int troopsToDelete = 0;
+        int food = player.getFood();
+        for(Integer position : territories.keySet()){
+            Territory t = territories.get(position);
+            if(t.getOwner().equals(player)){
+                int troops = t.getDefendingArmy().getNumberOfTroops();
+                if(food>=troops){
+                    food = food - troops;
+                }
+                else{
+                    troopsToDelete = troopsToDelete + (troops - food);
+                }
+            }
+        }
+        if(troopsToDelete>0){
+            ArrayList<TroopType> types = new ArrayList<TroopType>();
+            types.add(TroopType.INFANTRY);
+            types.add(TroopType.AUTOMATIC);
+            types.add(TroopType.ROCKETS);
+            types.add(TroopType.TANKS);
+            types.add(TroopType.IMPROVEDTANKS);
+            types.add(TroopType.PLANES);
+            for(TroopType type : types){
+                for(Integer position : territories.keySet()){
+                    Territory t = territories.get(position);
+                    if(t.getOwner().equals(player)){
+                        while(t.tryToDeleteTroop(type) && troopsToDelete >0){
+                            troopsToDelete --;
+                        }
+                        if(troopsToDelete==0){
+                            player.setFood(food);
+                            return;
+                        }
+                    }
+                }
+            }
+        } 
+    }
+    saveState(); 
+ }
+ 
+ public String typeToString(TroopType t){
+    	switch(t){
+			case INFANTRY: return "INFANTRY";
+			case AUTOMATIC: return "AUTOMATIC";
+			case ROCKETS: return "ROCKETS";
+			case TANKS: return "TANKS";
+			case IMPROVEDTANKS: return "IMPROVEDTANKS";
+			case PLANES: return "PLANES";
+			default: return "INFANTRY";
+		}
+}
 
-/* public void saveState() throws UnknownHostException{
-    // delete first line?
-    DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+ public void saveState(){
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
     turn_doc.append(GAME_ID, myGameID);
     turn_doc.append(TURN, turn++);
+    turn_doc.append(NUM_PLAYERS, myActivePlayers.size());
     List<BasicDBObject> territory_list = new ArrayList<BasicDBObject>();
-    for(int i=0; i<territories.size(); i++){
+    for(Integer position : territories.keySet()){
+        Territory t = territories.get(position);
         BasicDBObject territory_doc = new BasicDBObject();
-        int position = territories.get(i).getPosition();
-        territory_doc.append(POSITION, position);
-        Player owner = territories.get(i).getOwner();
+        int position_ = t.getPosition();
+        territory_doc.append(POSITION, position_);
+        Player owner = territories.get(position).getOwner();
         territory_doc.append(OWNER, owner);
-
-        BasicDBObject gameQuery = new BasicDBObject(GAME_ID, myGameID);
-        DBObject info = DBHelper.getInfoCollection().findOne(gameQuery);
-        ArrayList<DBObject> activePlayers = (ArrayList<DBObject>)info.get(ACTIVE_PLAYERS);
-
-        int additionalTroopCount = 0;
-        for (DBObject activePlayer : activePlayers) {
- //           if ((Integer)activePlayer.get(PLAYER_NUMBER) == owner) {
-    //            additionalTroopCount = ADDITIONAL_TROOPS;
-         //   }
+        HashMap<TroopType, ArrayList<Troop>> a = t.getDefendingArmy().getTroops();
+        for(TroopType type : a.keySet()){
+            ArrayList<Troop> troops = a.get(type);
+            int size = troops.size();
+            territory_doc.append(typeToString(type), size);
         }
-        territory_doc.append(TROOPS, territories.get(i).getDefendingArmy() + additionalTroopCount);
+        territory_doc.append(FOOD, t.getFood());
+        territory_doc.append(TECHNOLOGY, t.getTechnology());
         territory_list.add(territory_doc);
     }
-
     turn_doc.append(TERRITORIES, territory_list);
+
+    List<BasicDBObject> player_list = new ArrayList<BasicDBObject>();
+    for(String username : myActivePlayers.keySet()){
+        BasicDBObject player_doc = new BasicDBObject();
+        Player p = myActivePlayers.get(username);
+        player_doc.append(OWNER, p.getName());
+        player_doc.append(LEVEL, p.getTechnologyLevel());
+        player_doc.append(FOOD, p.getFood());
+        player_doc.append(TECHNOLOGY, p.getTechnology());
+        player_list.add(player_doc);
+    }
+    turn_doc.append(PLAYERINFO, player_list);
     state.insert(turn_doc);
 
     return;
-}*/
+}
 
 }

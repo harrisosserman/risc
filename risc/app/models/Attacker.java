@@ -50,6 +50,11 @@ public class Attacker{
 		return myArmy;
 	}
 
+	public void combineAttackers(Attacker a2){
+    	ArrayList<Troop> a = a2.getArmy().getArrayOfTroops();
+   		myArmy.addTroops(a);
+	}
+
 	public void addTroop(TroopType t){
 		myArmy.addTroop(t);
 	}

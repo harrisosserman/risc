@@ -21,6 +21,7 @@ public class DBHelper{
 	public static final String NAME_KEY = "name";
     public static final String COUNT_KEY = "count";
     public static final String READY_KEY = "ready";
+    public static final String POSITION_KEY = "position";
     public static final String PLAYERS_KEY = "players";
     public static final String NUM_PLAYERS_KEY = "numPlayers";
     public static final String TERRITORIES_KEY = "territories";
@@ -111,8 +112,9 @@ public class DBHelper{
 	}
 
 	public static DBObject getCommittedTurnForPlayerAndGame(String gameID, String username){
-		DBCursor playerCursor = DBHelper.getWaitingPlayerCursorForGame(gameID, username);
+		DBCursor playerCursor = DBHelper.getCommittedTurnCursorForGame(gameID, username);
 		DBCursor highestTurnCursor = playerCursor.sort(new BasicDBObject(DBHelper.TIMESTAMP, -1));
+		System.out.println(highestTurnCursor.hasNext());
 		return highestTurnCursor.next();
 	}
 
@@ -149,11 +151,19 @@ public class DBHelper{
 		return stateCollection.find(gameQuery);
 	}
 
-	public static DBCursor getWaitingPlayerCursorForGame(String gameID, String username){
-		DBCollection stateCollection = DBHelper.getStateCollection();
+    public static DBCursor getCommittedTurnCursorForGame(String gameID, String username){
+		DBCollection committedturns = DBHelper.getCommittedTurnsCollection();
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		gameQuery.put(USERNAME, username);
-		return stateCollection.find(gameQuery);
+		return committedturns.find(gameQuery);
+	}
+
+
+	public static DBCursor getWaitingPlayerCursorForGame(String gameID, String username){
+		DBCollection waitingPlayers = DBHelper.getWaitingPlayersCollection();
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		gameQuery.put(USERNAME, username);
+		return waitingPlayers.find(gameQuery);
 	}
 
 	//Modifiers
