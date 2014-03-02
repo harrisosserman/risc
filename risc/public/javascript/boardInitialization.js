@@ -117,6 +117,7 @@
         board.getMap = function() {
             $("#dialog").dialog();
             $("#dialog").dialog('close');
+            board.hasNotUpgradedThisTurn(true);
 
             $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
@@ -136,12 +137,13 @@
                         }
                         var map = $("#map td");
                         $(map).each(function(index) {
-                            board.territoryOwner.push(board.territoryInfo.territories[index].owner);
-                            board.updateBoardInfoValues(index);
-                            board.boardInfo.food[index] = board.territoryInfo.territories[index].food;
-                            board.boardInfo.technology[index] = board.territoryInfo.territories[index].technology;
+                            var position = board.territoryInfo.territories[index].position;
+                            board.territoryOwner.splice(position, 0, board.territoryInfo.territories[index].owner);
+                            board.updateBoardInfoValues(position);
+                            board.boardInfo.food[position] = board.territoryInfo.territories[index].food;
+                            board.boardInfo.technology[position] = board.territoryInfo.territories[index].technology;
 
-                            board.territoryDOMElements.push($(this));
+                            board.territoryDOMElements.splice(position, 0, $(this));
                             var playerNumber = board.getPlayerNumberByUsername(board.territoryInfo.territories[index].owner);
                             $(this).addClass("player" + playerNumber);
                             if(playerNumber === globalFunctions.getPlayerNumber()) {
@@ -151,20 +153,20 @@
                                     $(this).removeClass("territoryHover");
                                 });
                                 $(this).click(function() {
-                                    board.highlightMap(index + 1);
+                                    board.highlightMap(position + 1);
                                     $(this).toggleClass("territoryClick");
-                                    board.listenForAdditionalInfantry(index);
+                                    board.listenForAdditionalInfantry(position);
                                     if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
-                                        board.updateTerritoryClickTable(index);
-                                        $($("#map td button")[index]).toggle();
+                                        board.updateTerritoryClickTable(position);
+                                        $($("#map td button")[position]).toggle();
                                     }
                                 });
                             } else {
                                 $(this).click(function() {
                                     //click handler for clicking on enemy territory
-                                    board.userMapAction(index, map);
+                                    board.userMapAction(position, map);
                                     if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
-                                        board.updateTerritoryClickTable(index);
+                                        board.updateTerritoryClickTable(position);
                                     }
                                 });
                             }
