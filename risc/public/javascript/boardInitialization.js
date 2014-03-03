@@ -62,7 +62,9 @@
             globalFunctions.setDisplayMap(true);
             board.territoryInfo = {};
             board.territoryOwner = [];
+            board.fillArrayWithZero(board.territoryOwner, 25);
             board.territoryDOMElements = [];
+            board.fillArrayWithZero(board.territoryDOMElements, 25);
             board.additionalInfantry = [];
             board.attackInfo = [];
             board.editing.removeAllMoves();
@@ -87,6 +89,11 @@
             }
         };
         /*          END GLOBAL FUNCTIONS                    */
+        board.fillArrayWithZero = function(array, elements) {
+            for(var k=0;k<elements; k++) {
+                array[k]= 0;
+            }
+        };
         board.createMap = function() {
             //function to build map out of table
             board.displayMap(true);
@@ -138,49 +145,48 @@
                         var map = $("#map td");
                         $(map).each(function(index) {
                             var position = board.territoryInfo.territories[index].position;
-                            board.territoryOwner.splice(position, 0, board.territoryInfo.territories[index].owner);
-                            board.updateBoardInfoValues(position);
+                            board.territoryOwner[position] = board.territoryInfo.territories[index].owner;
+                            board.updateBoardInfoValues(index, position);
                             board.boardInfo.food[position] = board.territoryInfo.territories[index].food;
                             board.boardInfo.technology[position] = board.territoryInfo.territories[index].technology;
-
-                            board.territoryDOMElements.splice(position, 0, $(this));
                             var playerNumber = board.getPlayerNumberByUsername(board.territoryInfo.territories[index].owner);
-                            $(this).addClass("player" + playerNumber);
+                            $(map[position]).addClass("player" + playerNumber);
                             if(playerNumber === globalFunctions.getPlayerNumber()) {
-                                $(this).hover(function() {
-                                    $(this).addClass("territoryHover");
+                                $(map[position]).hover(function() {
+                                    $(map[position]).addClass("territoryHover");
                                 }, function() {
-                                    $(this).removeClass("territoryHover");
+                                    $(map[position]).removeClass("territoryHover");
                                 });
-                                $(this).click(function() {
+                                $(map[position]).click(function() {
                                     board.highlightMap(position + 1);
-                                    $(this).toggleClass("territoryClick");
+                                    $(map[position]).toggleClass("territoryClick");
                                     board.listenForAdditionalInfantry(position);
-                                    if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
+                                    if(!($(map[position]).hasClass("territoryMoveTroops") || $(map[position]).hasClass("territoryAttack"))) {
                                         board.updateTerritoryClickTable(position);
                                         $($("#map td button")[position]).toggle();
                                     }
                                 });
                             } else {
-                                $(this).click(function() {
+                                $(map[position]).click(function() {
                                     //click handler for clicking on enemy territory
                                     board.userMapAction(position, map);
-                                    if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
+                                    if(!($(map[position]).hasClass("territoryMoveTroops") || $(map[position]).hasClass("territoryAttack"))) {
                                         board.updateTerritoryClickTable(position);
                                     }
                                 });
                             }
                         });
+                        board.territoryDOMElements = $("#map td");
                 });
         };
-        board.updateBoardInfoValues = function(index) {
+        board.updateBoardInfoValues = function(index, position) {
             for(var k=0; k<6; k++) {
                 var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
                 var troopTypeInBoardInfo = board.convertReadableText(board.convertTechLevelToText(k)).text;
                 if(typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
-                    board.boardInfo[troopTypeInBoardInfo][index] = 0;
+                    board.boardInfo[troopTypeInBoardInfo][position] = 0;
                 } else {
-                    board.boardInfo[troopTypeInBoardInfo][index] = board.territoryInfo.territories[index][troopTypeInTerritoryInfo];
+                    board.boardInfo[troopTypeInBoardInfo][position] = board.territoryInfo.territories[index][troopTypeInTerritoryInfo];
                 }
             }
         };
@@ -221,10 +227,11 @@
         };
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
-            var map = board.territoryDOMElements;
+            // var map = board.territoryDOMElements;
+            var map = $("#map td");
             if($(map[index]).hasClass('territoryClick') || $(map[index]).hasClass('territoryAttack') || $(map[index]).hasClass('territoryMoveTroops')) {
                 //user wants to attack, move troops, or de-highlight
-                board.userMapAction(index, board.territoryDOMElements);
+                board.userMapAction(index, map);
                 return;
             }
             board.editing.removeAllPreviousAdjacencies();
