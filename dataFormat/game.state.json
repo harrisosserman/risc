@@ -1,5 +1,6 @@
 {
     "gameID": "testGame",
+    "timeStamp" : NumberLong("1393816130955"),
     "numPlayers": 2,
     "turn": 0,
     "territories": [
