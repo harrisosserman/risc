@@ -177,6 +177,9 @@
                             }
                         });
                         board.territoryDOMElements = $("#map td");
+                }).fail(function() {
+                    console.log("api call failed");
+                    globalFunctions.displayMapNotReadyAndPoll();
                 });
         };
         board.updateBoardInfoValues = function(index, position) {

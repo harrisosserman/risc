@@ -2,11 +2,15 @@
 (function() {
     function turnViewModel(globals) {
         var globalFunctions = globals;
+        var turn = {};
         globalFunctions.commitTurn = function(midTurn) {
             turn.commitTurn(midTurn);
         };
-        var turn = {};
-
+        globalFunctions.displayMapNotReadyAndPoll = function() {
+            globalFunctions.setDisplayMap(false);
+            var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
+            turn.pollForNextTurn(pollingNextTurnDOM);
+        };
         turn.pollForNextTurn = function(pollingNextTurnDOM) {
             var deferred = $.Deferred();
             var result = turn.loadGameMap(deferred);
@@ -26,13 +30,6 @@
                         }
                     }
                     if(playerNumberFound === false) {
-                        // $.ajax('/game/' + globalFunctions.getGameID() + '/exit', {
-                        //     method: 'POST',
-                        //     contentType: "application/json",
-                        //     data: JSON.stringify({
-                        //         'playerNumber': globalFunctions.getPlayerNumber()
-                        //     })
-                        // });
                         globalFunctions.setPlayerNumber(-1);
                     }
                     if(otherPlayersFound === false) {
@@ -69,11 +66,9 @@
                 data: JSON.stringify(result),
                 contentType: "application/json"
             }).done(function() {
-                if(typeof midturn === 'undefined' || midturn === false) {
-                    globalFunctions.setDisplayMap(false);
-                    var pollingNextTurnDOM = $("<h3>Waiting for other players to finish their turns...</h3>").appendTo("body").addClass("centerAlign");
-                    turn.pollForNextTurn(pollingNextTurnDOM);
-                }
+               if(typeof midturn === 'undefined' || midturn === false) {
+                    globalFunctions.displayMapNotReadyAndPoll();
+               }
             }).fail(function() {
                 //FILL THIS IN FOR WHEN TURN VALIDATION FAILS
             });
