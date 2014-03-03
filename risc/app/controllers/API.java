@@ -23,6 +23,7 @@ import models.State;
 import models.UserManager;
 import models.WaitingRoom;
 import models.BattleTest;
+import models.TimeoutManager;
 
 import play.mvc.Result;
 import play.mvc.Controller;
@@ -160,16 +161,14 @@ public class API extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result logUserIn(String username){
 
-        Akka.system().scheduler().scheduleOnce(
-            Duration.create(10, TimeUnit.SECONDS),
-            new Runnable() {
-                public void run() {
-                    System.out.println("----------HELLO----------");
-                }
-            },
+        if (!TimeoutManager.isStarted()) {
+            Akka.system().scheduler().schedule(
+            Duration.create(0, TimeUnit.MILLISECONDS),
+            Duration.create(5, TimeUnit.SECONDS),
+            new TimeoutManager(),
             Akka.system().dispatcher()
-        ); 
-
+            ); 
+        }
 
         RequestBody body = request().body();
         String jsonUsername = body.asJson().get(UserManager.NAME_KEY).toString();

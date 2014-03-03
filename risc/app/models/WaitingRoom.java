@@ -72,6 +72,21 @@ public class WaitingRoom{
 		return joinableGamesJson;
 	}
 
+	public static ArrayList<String> getGamesInProgress(){
+		DBCollection infoCollection = DBHelper.getInfoCollection();
+		BasicDBObject stateQuery = new BasicDBObject(STATE_KEY, GAME_STATE_STARTED);
+		DBCursor startedGamesCursor = infoCollection.find(stateQuery);
+
+		ArrayList<String> startedGameIDs = new ArrayList<String>();
+		while(startedGamesCursor.hasNext()){
+			DBObject startedGameInfo = startedGamesCursor.next();
+			String gameID = (String)startedGameInfo.get(GAME_ID_KEY);
+			startedGameIDs.add(gameID);
+		}
+
+		return startedGameIDs;
+	}
+
 	private BasicDBObject createPlayer(String username){
 		BasicDBObject player = new BasicDBObject();
 		player.append(PLAYER_KEY, username);
