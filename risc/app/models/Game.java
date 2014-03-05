@@ -94,6 +94,9 @@ public class Game {
         state.append(DBHelper.NUM_PLAYERS_KEY, usernames.size());
         state.append(DBHelper.TURN_KEY, 0);
 
+        long millis = System.currentTimeMillis();
+        state.append(DBHelper.TIMESTAMP, new Long(millis));
+
         ArrayList<DBObject> territories = new ArrayList<DBObject>();
         for (int i = 0; i < countryOwners.length; i++) {
             BasicDBObject territory = new BasicDBObject();

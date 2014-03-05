@@ -114,8 +114,11 @@ public class DBHelper{
 	public static DBObject getCommittedTurnForPlayerAndGame(String gameID, String username){
 		DBCursor playerCursor = DBHelper.getCommittedTurnCursorForGame(gameID, username);
 		DBCursor highestTurnCursor = playerCursor.sort(new BasicDBObject(DBHelper.TIMESTAMP, -1));
-		System.out.println(highestTurnCursor.hasNext());
-		return highestTurnCursor.next();
+		if (highestTurnCursor.hasNext()) {
+			return highestTurnCursor.next();
+		}else{
+			return null;
+		}
 	}
 
 /*	public static DBObject getMapForGame(String gameID){
@@ -156,6 +159,12 @@ public class DBHelper{
 		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
 		gameQuery.put(USERNAME, username);
 		return committedturns.find(gameQuery);
+	}
+
+	public static DBCursor getAllCommittedTurnsForGame(String gameID){
+		DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+		BasicDBObject gameQuery = new BasicDBObject(GAME_ID_KEY, gameID);
+		return committedTurns.find(gameQuery);
 	}
 
 

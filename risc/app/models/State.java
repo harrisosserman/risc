@@ -731,6 +731,8 @@ public void saveState(){
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
     turn_doc.append(Constants.GAME_ID, myGameID);
+    long millis = System.currentTimeMillis();
+    turn_doc.append(Constants.TIMESTAMP, new Long(millis));
     turn = turn + 1;
     turn_doc.append(Constants.TURN, turn);
     turn_doc.append(Constants.NUM_PLAYERS, myActivePlayers.size());
