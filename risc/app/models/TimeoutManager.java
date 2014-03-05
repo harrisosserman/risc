@@ -40,7 +40,12 @@ public class TimeoutManager extends Thread {
         			if (mostRecentCommittedTurnNumber < (mostRecentTurnNumber + 1)) {
         				System.out.println("---Got here");
         				//KAT TODO: Create a blank Turn for player (username) and Commit it to game (gameID)
-        				
+        				    DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
+                      BasicDBObject turn_doc = new BasicDBObject();
+                      turn_doc.append(Constants.GAME_ID, gameID);
+                      turn_doc.append(Constants.USERNAME, username);
+                      turn_doc.append(Constants.TURN, mostRecentTurn);
+                      committedTurns.insert(turn_doc);
         				//To test, you must open localhost:9000 and log in because that's where TimeoutManager is made and starts running.
         				//See API.java's logUserIn(String username)
         				//You may also need to drop game.{info, state, committedTurns} because I added a timestamp to game.state.
