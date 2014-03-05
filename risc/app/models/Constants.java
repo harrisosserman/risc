@@ -41,6 +41,10 @@ public final class Constants{
     public static final String PLANES_ = "PLANES";
     public static final String OWNER = "owner";
     public static final String ADDITIONALINFANTRY = "additionalInfantry";
+    public static final String NAME = "name";
+
+
+
 
 
 }
