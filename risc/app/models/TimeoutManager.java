@@ -45,6 +45,7 @@ public class TimeoutManager extends Thread {
                       turn_doc.append(Constants.GAME_ID, gameID);
                       turn_doc.append(Constants.USERNAME, username);
                       turn_doc.append(Constants.TURN, mostRecentTurn);
+                      turn_doc.append(Constants.COMMITTED, 1);
                       committedTurns.insert(turn_doc);
         				//To test, you must open localhost:9000 and log in because that's where TimeoutManager is made and starts running.
         				//See API.java's logUserIn(String username)
