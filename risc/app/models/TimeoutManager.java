@@ -24,7 +24,7 @@ public class TimeoutManager extends Thread {
         	DBObject mostRecentTurn = DBHelper.getCurrentTurnForGame(gameID);
         	long mostRecentTurnCreationTime = (Long)mostRecentTurn.get(DBHelper.TIMESTAMP);
        		long timeDifference = System.currentTimeMillis() - mostRecentTurnCreationTime;
-       		if (timeDifference > MILLISECONDS_PER_10_SEC) {		//For testing purposes only! Switch to MILLISECONDS_PER_HOUR after testing.
+       		if (timeDifference > MILLISECONDS_PER_HOUR) {		//For testing purposes only! Switch to MILLISECONDS_PER_HOUR after testing.
        			//Timeout has occurred
        			System.out.println("----------timeout occurred");
        			int mostRecentTurnNumber = (Integer)mostRecentTurn.get(DBHelper.TURN_KEY);

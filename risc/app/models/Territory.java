@@ -10,7 +10,6 @@ public class Territory{
 	private int myPosition;
 	private int myFood;
 	private int myTechnology;
-	//where I am attacking from, and the army
 	private HashMap<Integer, Attacker> attackers;
 	private Army myArmy;
 	
@@ -67,13 +66,6 @@ public class Territory{
 	public void addTroop(TroopType type){
 		myArmy.addTroop(type);
 	}
-
-	/* public void addAttacker(Integer position, Attacker a, Player p){
-		ArrayList<Attacker> attackers_ = attackers.get(position);
-		attackers_.add(a);
-		attackers_.put(position, attackers_);
-
-    }*/
 
     public boolean tryToDeleteTroop(TroopType type){
     	if(myArmy.containsTroop(type)){

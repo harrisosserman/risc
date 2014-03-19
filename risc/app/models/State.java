@@ -5,15 +5,11 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.fasterxml.jackson.databind.*;
 import java.net.UnknownHostException;
-import models.Territory;
-import models.Troop;
+import models.*;
 import play.mvc.Http.RequestBody;
-import models.Attacker;
 import libraries.DBHelper;
-import models.TroopType;
 import java.util.HashMap;
 import controllers.API;
-import models.WaitingRoom;
 
 /**
  * This class is responsible for computing and updating the state after all
@@ -735,6 +731,8 @@ public void saveState(){
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
     turn_doc.append(Constants.GAME_ID, myGameID);
+    long millis = System.currentTimeMillis();
+    turn_doc.append(Constants.TIMESTAMP, new Long(millis));
     turn = turn + 1;
     turn_doc.append(Constants.TURN, turn);
     turn_doc.append(Constants.NUM_PLAYERS, myActivePlayers.size());

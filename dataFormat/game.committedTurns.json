@@ -4,7 +4,7 @@
     "turn": 4, 
     "committed": 0, //0 = false, 1= true 
     //note harris sends the time stamp"
-    "timeStamp": "", // long?
+    "timeStamp": NumberLong("139123523452314"), // long?
     "food": 100,
     "technology":100,
     "technology_level": 1,

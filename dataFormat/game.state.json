@@ -1,5 +1,6 @@
 {
     "gameID": "testGame",
+    "timeStamp" : NumberLong("1393816130955"),
     "numPlayers": 2,
     "turn": 0,
     "territories": [
@@ -45,6 +46,16 @@
             "food": 5,
             "technology": 10,
             "additionalInfantry": 48,
+            "highestTechnology":[
+                {
+                    "player": "harris",
+                    "level": 4,
+                },
+                {
+                    "player": "julian",
+                    "level": 3
+                }
+            ],
             "territoriesVisible": [5,4,6,7,8]
         },
         {

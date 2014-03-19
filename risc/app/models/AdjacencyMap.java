@@ -4,14 +4,14 @@ import java.util.*;
 
 public class AdjacencyMap{
 
-	private HashMap<int, ArrayList<int>> myAdjacencies; 
+	private HashMap<Integer, ArrayList<Integer>> myAdjacencies; 
 
 	public AdjacencyMap(){
 		myAdjacencies = createMap();
 	}
 
-	public HashMap<int, ArrayList<int>> createMap(){
-
+	public HashMap<Integer, ArrayList<Integer>> createMap(){
+        return myAdjacencies;
 	}
 
 }
