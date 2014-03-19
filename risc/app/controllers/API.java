@@ -110,7 +110,7 @@ public class API extends Controller {
         return ok();
     }
 
-    public static Result getMap(String gameID){
+    public static Result getMap(String gameID, String username){
         Game game = new Game(gameID);
         if (game.areAllPlayersCommitedForMostRecentTurn()) {
             String mapJson = game.getCurrentGameStateJson();
