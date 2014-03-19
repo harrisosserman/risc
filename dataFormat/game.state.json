@@ -29,6 +29,15 @@
                     "technology": 5
                 }
     ],
+    "spies":[
+        {
+            "owner": "kat",
+            "position": "",
+            "percentage": ,
+            "previousType": 
+
+        }
+    ],
 
     "playerInfo": [ 
         {
@@ -36,7 +45,18 @@
             "level": 6,
             "food": 5,
             "technology": 10,
-            "additionalInfantry": 48
+            "additionalInfantry": 48,
+            "highestTechnology":[
+                {
+                    "player": "harris",
+                    "level": 4,
+                },
+                {
+                    "player": "julian",
+                    "level": 3
+                }
+            ],
+            "territoriesVisible": [5,4,6,7,8]
         },
         {
             "owner": "harris",
