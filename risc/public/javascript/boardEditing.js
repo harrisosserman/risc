@@ -179,6 +179,11 @@ function BoardEditing(globals) {
             if(adjacentTerritoriesX[k] < 0 || adjacentTerritoriesX[k] > 4 || adjacentTerritoriesY[k] < 0 || adjacentTerritoriesY[k] > 4) {
                 continue;
             }
+            var territoryLocation = editing.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]];
+            var territoryDOMElement = $("#map td")[territoryLocation];
+            if(!$(territoryDOMElement).hasClass('player1') && !$(territoryDOMElement).hasClass('player2') && !$(territoryDOMElement).hasClass('player3') && !$(territoryDOMElement).hasClass('player4') && !$(territoryDOMElement).hasClass('player5')) {
+                continue;
+            }
             adjacentTerritories.push(editing.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]]);
         }
         return adjacentTerritories;

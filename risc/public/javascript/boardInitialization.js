@@ -143,7 +143,7 @@
                             }
                         }
                         var map = $("#map td");
-                        $(map).each(function(index) {
+                        for(var index=0; index<board.territoryInfo.territories.length; index++) {
                             var position = board.territoryInfo.territories[index].position;
                             board.territoryOwner[position] = board.territoryInfo.territories[index].owner;
                             board.updateBoardInfoValues(index, position);
@@ -152,30 +152,40 @@
                             var playerNumber = board.getPlayerNumberByUsername(board.territoryInfo.territories[index].owner);
                             $(map[position]).addClass("player" + playerNumber);
                             if(playerNumber === globalFunctions.getPlayerNumber()) {
-                                $(map[position]).hover(function() {
-                                    $(map[position]).addClass("territoryHover");
-                                }, function() {
-                                    $(map[position]).removeClass("territoryHover");
-                                });
-                                $(map[position]).click(function() {
-                                    board.highlightMap(position + 1);
-                                    $(map[position]).toggleClass("territoryClick");
-                                    board.listenForAdditionalInfantry(position);
-                                    if(!($(map[position]).hasClass("territoryMoveTroops") || $(map[position]).hasClass("territoryAttack"))) {
-                                        board.updateTerritoryClickTable(position);
-                                        $($("#map td button")[position]).toggle();
-                                    }
-                                });
+                                (function() {
+                                    //created this immediate function because of a closure here
+                                    //was previously only using the last position in the loop to bind the DOM elements
+                                    var pos = position;
+                                    $(map[pos]).hover(function() {
+                                        $(map[pos]).addClass("territoryHover");
+                                    }, function() {
+                                        $(map[pos]).removeClass("territoryHover");
+                                    });
+
+                                    $(map[pos]).click(function() {
+                                        board.highlightMap(pos + 1);
+                                        $(map[pos]).toggleClass("territoryClick");
+                                        board.listenForAdditionalInfantry(pos);
+                                        if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
+                                            board.updateTerritoryClickTable(pos);
+                                            $($("#map td button")[pos]).toggle();
+                                        }
+                                    });
+                                })();
                             } else {
-                                $(map[position]).click(function() {
-                                    //click handler for clicking on enemy territory
-                                    board.userMapAction(position, map);
-                                    if(!($(map[position]).hasClass("territoryMoveTroops") || $(map[position]).hasClass("territoryAttack"))) {
-                                        board.updateTerritoryClickTable(position);
-                                    }
-                                });
+                                (function() {
+                                    var pos = position;
+                                    $(map[pos]).click(function() {
+                                        //click handler for clicking on enemy territory
+                                        board.userMapAction(pos, map);
+                                        if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
+                                            board.updateTerritoryClickTable(pos);
+                                        }
+                                    });
+                                })();
                             }
-                        });
+
+                        }
                         board.territoryDOMElements = $("#map td");
                 }).fail(function() {
                     globalFunctions.displayMapNotReadyAndPoll();
