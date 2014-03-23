@@ -126,7 +126,7 @@
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
 
-            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -178,7 +178,6 @@
                         });
                         board.territoryDOMElements = $("#map td");
                 }).fail(function() {
-                    console.log("api call failed");
                     globalFunctions.displayMapNotReadyAndPoll();
                 });
         };

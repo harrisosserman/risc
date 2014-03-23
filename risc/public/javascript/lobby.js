@@ -42,7 +42,7 @@
                 //game hasn't started yet
                 lobby.displayJoinOrCreateGame(false);
                 lobby.displayGameWaitingRoom(true);
-                $.ajax('/game/' + globalFunctions.getGameID() + '/addPlayer', {
+                $.ajax('/test/game/' + globalFunctions.getGameID() + '/addPlayer', {
                     method: 'POST',
                     data: JSON.stringify({
                     'name': globalFunctions.getUsername()
@@ -63,7 +63,7 @@
             }
         };
         lobby.setPlayerNumber = function() {
-            $.ajax('/game/' + lobby.gameID, {
+            $.ajax('/test/game/' + lobby.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
@@ -76,7 +76,7 @@
                     });
         };
         lobby.startGame = function() {
-            $.ajax('/game/' + lobby.gameID + '/start', {
+            $.ajax('/test/game/' + lobby.gameID + '/start', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': globalFunctions.getUsername()
@@ -85,7 +85,7 @@
             });
         };
         lobby.createNewGame = function() {
-            $.ajax('/game', {
+            $.ajax('/test/game', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': globalFunctions.getUsername()
@@ -100,7 +100,7 @@
             });
         };
         lobby.loadMyGames = function() {
-            $.ajax('/player/' + globalFunctions.getUsername(), {
+            $.ajax('/test/player/' + globalFunctions.getUsername(), {
                 method: 'GET'
             }).done(function(result) {
                 result = $.parseJSON(result);
@@ -119,7 +119,7 @@
             lobby.loadGamesHelper(lobby.myGamesList, data);
         };
         lobby.loadAllGames = function() {
-            $.ajax('/game', {
+            $.ajax('/test/game', {
                 method: 'GET'
             }).done(function(result) {
                 lobby.lobbyGamesList.removeAll();
@@ -172,7 +172,7 @@
             });
         };
         lobby.loadWaitingPlayers = function(deferredObject) {
-           $.ajax('/game/' + lobby.gameID, {
+           $.ajax('/test/game/' + lobby.gameID, {
                         method: 'GET',
                     }).done(function(result) {
                         var players = $.parseJSON(result);
