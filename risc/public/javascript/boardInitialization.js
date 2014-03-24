@@ -188,8 +188,22 @@
                                     });
                                 })();
                             }
-
                         }
+                        $("#map td").each(function(index) {
+                            if(!$(this).hasClass("player1") && !$(this).hasClass("player2") && !$(this).hasClass("player3") && !$(this).hasClass("player4") && !$(this).hasClass("player5")) {
+                                //adding a click handler and CSS to territories that are not visible to player
+                                $(this).addClass('territoryMoveSpy');
+                                $(this).click(function() {
+                                    board.userMapAction(index, map);
+                                    if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
+                                        board.updateTerritoryClickTable(index);
+                                    }
+                                });
+                            }
+                        });
+
+
+
                         board.territoryDOMElements = $("#map td");
                 }).fail(function() {
                     globalFunctions.displayMapNotReadyAndPoll();

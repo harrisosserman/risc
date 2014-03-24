@@ -211,7 +211,8 @@ function BoardEditing(globals) {
         if(troopTypeConvertTo.index === 6) {
             editing.spyDowngrades[origin].push({
                 'troopType': troopTypeConvertFrom.index,
-                'numTroops': numberOfTroopsConverting
+                'numTroops': numberOfTroopsConverting,
+                'numTroopsMovedInEnemyTerritory': 0
             });
         }
     };
