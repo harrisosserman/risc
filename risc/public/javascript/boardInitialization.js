@@ -75,6 +75,7 @@
             editing.constructSpyDowngrades();
             editing.clearSpiesCannotMove();
             editing.constructSpiesCannotMove();
+            board.clearBoardInfo();
         };
         globalFunctions.getPlayerInfo = function() {
             return board.playerInfo;
@@ -93,6 +94,22 @@
             }
         };
         /*          END GLOBAL FUNCTIONS                    */
+        board.clearBoardInfo = function() {
+            board.boardInfo = {
+                food: [],
+                technology: [],
+                infantry: [],
+                automatic: [],
+                rocket: [],
+                tank: [],
+                improvedTank: [],
+                plane: [],
+                spy: []
+            };
+            for(var k=0; k<25; k++) {
+                board.updateBoardInfoValues(k, k);
+            }
+        };
         board.fillArrayWithZero = function(array, elements) {
             for(var k=0;k<elements; k++) {
                 array[k]= 0;
@@ -194,7 +211,9 @@
                                 //adding a click handler and CSS to territories that are not visible to player
                                 $(this).addClass('territoryMoveSpy');
                                 $(this).click(function() {
+                                    board.highlightMap(index + 1);
                                     board.userMapAction(index, map);
+                                    $(map[index]).toggleClass("territoryClick");
                                     if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
                                         board.updateTerritoryClickTable(index);
                                     }
@@ -210,7 +229,7 @@
             for(var k=0; k<7; k++) {
                 var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
                 var troopTypeInBoardInfo = board.convertReadableText(board.convertTechLevelToText(k)).text;
-                if(typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
+                if(typeof board.territoryInfo.territories == 'undefined' || typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
                     board.boardInfo[troopTypeInBoardInfo][position] = 0;
                 } else {
                     board.boardInfo[troopTypeInBoardInfo][position] = board.territoryInfo.territories[index][troopTypeInTerritoryInfo];
@@ -446,7 +465,7 @@
             });
             setTimeout(board.playerWatching, 10000);
         };
-
+        board.clearBoardInfo();
         ko.applyBindings(this, document.getElementById('boardKnockout'));
     }
     window.Board = boardInitializationViewModel;
