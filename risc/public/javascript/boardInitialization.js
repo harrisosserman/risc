@@ -41,6 +41,7 @@
         board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35];
 
         board.editing = new BoardEditing(globalFunctions);
+        board.editing.constructSpyDowngrades();
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.createAndLoadMap = function() {
             board.createMap();
@@ -72,6 +73,8 @@
             $("#map").empty();
             board.createMap();
             board.getMap();
+            editing.clearSpyDowngrades();
+            editing.constructSpyDowngrades();
         };
         globalFunctions.getPlayerInfo = function() {
             return board.playerInfo;

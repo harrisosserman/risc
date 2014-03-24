@@ -3,13 +3,40 @@ function BoardEditing(globals) {
     var editing = this;
     editing.moveOrder = [];
     editing.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
+    editing.spyDowngrades = [];
     // GLOBAL FUNCTIONS
     globalFunctions.getMoveOrder = function() {
         return editing.moveOrder;
     };
     // END GLOBAL FUNCTIONS
+    editing.constructSpyDowngrades = function() {
+        for(var k=0; k<25; k++) {
+            editing.spyDowngrades[k] = [];
+        }
+    };
+    editing.clearSpyDowngrades = function() {
+        editing.spyDowngrades = [];
+    };
     editing.removeAllMoves = function() {
         editing.moveOrder = [];
+    };
+    editing.moveSpyDowngradeObjects = function(origin, destination) {
+        var downgradesList = editing.spyDowngrades[origin];
+        for(var k=0; k<downgradesList.length; k++) {
+            editing.spyDowngrades[destination].push(downgradesList[k]);
+        }
+    };
+    editing.downgradeSpies = function(index, troopType) {
+        var downgradesList = editing.spyDowngrades[index];
+        for(var k=0; k<downgradesList.length; k++) {
+            if(downgradesList[k].troopType === troopType) {
+                if(downgradesList[k].numTroops > 0) {
+                    downgradesList[k].numTroops--;
+                    return 1;
+                }
+            }
+        }
+        return -1;
     };
     editing.convertTextForTroopCommit = function(input) {
         var result = '';
@@ -117,6 +144,9 @@ function BoardEditing(globals) {
         var originTroops = troopArray[origin];
         var destinationTroops = troopArray[destination];
         if(originTroops - numberOfTroopsMoved >= 0 || numberOfTroopsMoved < 0) {
+            if(troopType === 6) {
+                editing.moveSpyDowngradeObjects(origin, destination);
+            }
             originTroops = originTroops - numberOfTroopsMoved;
             destinationTroops = parseInt(destinationTroops, 10) + parseInt(numberOfTroopsMoved, 10);
             troopArray[origin] = originTroops;
@@ -145,9 +175,26 @@ function BoardEditing(globals) {
     };
     editing.upgradeTroops = function(origin, convertFromTroops, convertToTroops, playerInfo, numberOfTroopsConverting, troopTypeConvertFrom, troopTypeConvertTo) {
         var cost = (globalFunctions.getUnitUpgradeCost()[troopTypeConvertTo.index] - globalFunctions.getUnitUpgradeCost()[troopTypeConvertFrom.index]) * numberOfTroopsConverting;
-        if(playerInfo.maxTechLevel < troopTypeConvertTo.index && troopTypeConvertTo.index != 6) {
+        if(convertFromTroops[origin] < numberOfTroopsConverting) {
+            alert("You don't have enough " + troopTypeConvertFrom.text + " to convert the troops");
+            return;
+        }
+        if(playerInfo.maxTechLevel < troopTypeConvertTo.index && troopTypeConvertTo.index != 6 && troopTypeConvertFrom.index != 6) {
             alert("Your technology level is lower than the selected troop upgrade level");
             return;
+        } else if(troopTypeConvertFrom.index === 6) {
+            cost = 5 * numberOfTroopsConverting;
+            if(cost > playerInfo.technology) {
+                alert("You need " + cost + " technology, but you only have " + playerInfo.technology);
+                return;
+            }
+            for(var k=0; k<numberOfTroopsConverting; k++) {
+                if(editing.downgradeSpies(origin, troopTypeConvertTo.index) === -1) {
+                    numberOfTroopsConverting = k;
+                    alert("You don't have enough " + editing.convertTextForTroopCommit(troopTypeConvertTo.index) + " to fill the entire downgrade");
+                    break;
+                }
+            }
         } else if(troopTypeConvertFrom.index > troopTypeConvertTo.index){
             alert("You cannot convert troops from a higher technology level to a lower technology level");
             return;
@@ -155,13 +202,17 @@ function BoardEditing(globals) {
             alert("You need " + cost + " technology, but you only have " + playerInfo.technology);
             return;
         }
-        else {
-            playerInfo.technology = playerInfo.technology - cost;
-            convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
-            convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
-            for(var k=0; k<numberOfTroopsConverting; k++) {
-                editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
-            }
+        playerInfo.technology = playerInfo.technology - cost;
+        convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
+        convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
+        for(var k=0; k<numberOfTroopsConverting; k++) {
+            editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
+        }
+        if(troopTypeConvertTo.index === 6) {
+            editing.spyDowngrades[origin].push({
+                'troopType': troopTypeConvertFrom.index,
+                'numTroops': numberOfTroopsConverting
+            });
         }
     };
     editing.removeAllPreviousAdjacencies = function() {
