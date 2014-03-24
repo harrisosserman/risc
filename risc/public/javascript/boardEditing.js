@@ -23,8 +23,10 @@ function BoardEditing(globals) {
             return 'TANKS';
         } else if(input === 4) {
             return 'IMPROVEDTANKS';
+        } else if(input === 5) {
+            return 'PLANES';
         }
-        return 'PLANES';
+        return 'SPIES';
     };
     editing.addMove = function(moveType, start, end, troopType, upgradeType) {
         troopType = editing.convertTextForTroopCommit(troopType);
@@ -143,7 +145,7 @@ function BoardEditing(globals) {
     };
     editing.upgradeTroops = function(origin, convertFromTroops, convertToTroops, playerInfo, numberOfTroopsConverting, troopTypeConvertFrom, troopTypeConvertTo) {
         var cost = (globalFunctions.getUnitUpgradeCost()[troopTypeConvertTo.index] - globalFunctions.getUnitUpgradeCost()[troopTypeConvertFrom.index]) * numberOfTroopsConverting;
-        if(playerInfo.maxTechLevel < troopTypeConvertTo.index) {
+        if(playerInfo.maxTechLevel < troopTypeConvertTo.index && troopTypeConvertTo.index != 6) {
             alert("Your technology level is lower than the selected troop upgrade level");
             return;
         } else if(troopTypeConvertFrom.index > troopTypeConvertTo.index){

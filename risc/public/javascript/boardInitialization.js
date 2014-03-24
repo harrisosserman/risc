@@ -15,7 +15,8 @@
             rocket: [],
             tank: [],
             improvedTank: [],
-            plane: []
+            plane: [],
+            spy: []
         };
         board.playerInfo = {
             food: -1,
@@ -24,7 +25,7 @@
         };
         board.attackInfo = [];
         board.inputNumberAttackOrMove = ko.observable();
-        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes']);
+        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies']);
         board.displayMap = ko.observable(false);
         board.hasNotUpgradedThisTurn = ko.observable(true);
         board.displayUpgradeTroopsModal = ko.observable(false);
@@ -37,7 +38,7 @@
         board.moveTroops = false;
         board.attackTroops = false;
         board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
-        board.unitUpgradeCost = [0, 3, 11, 30, 55, 90];
+        board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35];
 
         board.editing = new BoardEditing(globalFunctions);
         /*          GLOBAL FUNCTIONS                        */
@@ -192,7 +193,7 @@
                 });
         };
         board.updateBoardInfoValues = function(index, position) {
-            for(var k=0; k<6; k++) {
+            for(var k=0; k<7; k++) {
                 var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
                 var troopTypeInBoardInfo = board.convertReadableText(board.convertTechLevelToText(k)).text;
                 if(typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
@@ -287,7 +288,8 @@
                 rocket: board.boardInfo.rocket[index],
                 tank: board.boardInfo.tank[index],
                 improvedTank: board.boardInfo.improvedTank[index],
-                plane: board.boardInfo.plane[index]
+                plane: board.boardInfo.plane[index],
+                spy: board.boardInfo.spy[index]
             };
             board.territoryClickInfo.push(data);
             board.territoryClickAttackInfo.removeAll();
@@ -300,7 +302,8 @@
                         rocket: board.attackInfo[index][k].rocket,
                         tank: board.attackInfo[index][k].tank,
                         improvedTank: board.attackInfo[index][k].improvedTank,
-                        plane: board.attackInfo[index][k].plane
+                        plane: board.attackInfo[index][k].plane,
+                        spy: board.attackInfo[index][k].spy
                     };
                     board.territoryClickAttackInfo.push(data);
                 }
@@ -351,10 +354,15 @@
                     text: 'improvedTank',
                     index: 4
                 };
-            } else {
+            } else if(input === "Fighter Planes"){
                 result = {
                     text: 'plane',
                     index: 5
+                };
+            } else {
+                result = {
+                    text: 'spy',
+                    index: 6
                 };
             }
             return result;
@@ -372,6 +380,8 @@
                 return 'Improved Tanks';
             } else if(input === 5) {
                 return 'Fighter Planes';
+            } else {
+                return 'Spies';
             }
         };
         board.upgradeTroops = function() {
