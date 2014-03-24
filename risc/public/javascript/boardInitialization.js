@@ -39,9 +39,7 @@
         board.attackTroops = false;
         board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
         board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35];
-
         board.editing = new BoardEditing(globalFunctions);
-        board.editing.constructSpyDowngrades();
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.createAndLoadMap = function() {
             board.createMap();
@@ -75,6 +73,8 @@
             board.getMap();
             editing.clearSpyDowngrades();
             editing.constructSpyDowngrades();
+            editing.clearSpiesCannotMove();
+            editing.constructSpiesCannotMove();
         };
         globalFunctions.getPlayerInfo = function() {
             return board.playerInfo;
@@ -201,9 +201,6 @@
                                 });
                             }
                         });
-
-
-
                         board.territoryDOMElements = $("#map td");
                 }).fail(function() {
                     globalFunctions.displayMapNotReadyAndPoll();

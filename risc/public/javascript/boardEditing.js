@@ -4,6 +4,7 @@ function BoardEditing(globals) {
     editing.moveOrder = [];
     editing.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
     editing.spyDowngrades = [];
+    editing.spiesCannotMove = [];
     // GLOBAL FUNCTIONS
     globalFunctions.getMoveOrder = function() {
         return editing.moveOrder;
@@ -16,6 +17,14 @@ function BoardEditing(globals) {
     };
     editing.clearSpyDowngrades = function() {
         editing.spyDowngrades = [];
+    };
+    editing.constructSpiesCannotMove = function() {
+        for(var k = 0; k<25; k++) {
+            editing.spiesCannotMove[k] = 0;
+        }
+    };
+    editing.clearSpiesCannotMove = function() {
+        editing.spiesCannotMove = [];
     };
     editing.removeAllMoves = function() {
         editing.moveOrder = [];
@@ -139,17 +148,33 @@ function BoardEditing(globals) {
         }
         return -1;
     };
-    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType) {
+    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType, enemyDestination) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         if(typeof troopArray[destination] === 'undefined') {
-            console.log("troop array is undefined");
             troopArray[destination] = 0;
         }
         var destinationTroops = troopArray[destination];
 
         if(originTroops - numberOfTroopsMoved >= 0 || numberOfTroopsMoved < 0) {
             if(troopType === 6) {
+                if(typeof enemyDestination != 'undefined' && enemyDestination === true) {
+                    if(troopArray[origin] - editing.spiesCannotMove[origin] < numberOfTroopsMoved) {
+                        alert("You have already moved some of the requested spies this turn");
+                        return;
+                    } else {
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved;
+                    }
+                } else {
+                    var resultingUnmovableSpies = editing.spiesCannotMove[origin] - numberOfTroopsMoved;
+                    if(resultingUnmovableSpies < 0) {
+                        editing.spiesCannotMove[origin] = 0;
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved + spiesCannotMove;
+                    } else {
+                        editing.spiesCannotMove[origin] = editing.spiesCannotMove[origin] - numberOfTroopsMoved;
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved;
+                    }
+                }
                 editing.moveSpyDowngradeObjects(origin, destination);
             }
             originTroops = originTroops - numberOfTroopsMoved;
@@ -216,8 +241,7 @@ function BoardEditing(globals) {
         if(troopTypeConvertTo.index === 6) {
             editing.spyDowngrades[origin].push({
                 'troopType': troopTypeConvertFrom.index,
-                'numTroops': numberOfTroopsConverting,
-                'numTroopsMovedInEnemyTerritory': 0
+                'numTroops': numberOfTroopsConverting
             });
         }
     };
@@ -281,7 +305,8 @@ function BoardEditing(globals) {
         }
         if(troopType.index === 6) {
             //a spy is trying to move into an enemy territory
-            editing.moveTroops(destination, map, territoryDOMElements, troopArray, numberOfTroopsAttacking, troopType.index);
+            var enemyDestination = true;
+            editing.moveTroops(destination, map, territoryDOMElements, troopArray, numberOfTroopsAttacking, troopType.index, enemyDestination);
             return;
         }
         troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);
@@ -290,6 +315,8 @@ function BoardEditing(globals) {
             editing.addMove(2, origin, destination, troopType.index, -1);
         }
     };
+    editing.constructSpiesCannotMove();
+    editing.constructSpyDowngrades();
     return editing;
 
 }
