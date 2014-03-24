@@ -116,7 +116,7 @@ function BoardEditing(globals) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         var destinationTroops = troopArray[destination];
-        if(originTroops - numberOfTroopsMoved > 0 || numberOfTroopsMoved < 0) {
+        if(originTroops - numberOfTroopsMoved >= 0 || numberOfTroopsMoved < 0) {
             originTroops = originTroops - numberOfTroopsMoved;
             destinationTroops = parseInt(destinationTroops, 10) + parseInt(numberOfTroopsMoved, 10);
             troopArray[origin] = originTroops;
