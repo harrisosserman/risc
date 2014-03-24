@@ -142,7 +142,12 @@ function BoardEditing(globals) {
     editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
+        if(typeof troopArray[destination] === 'undefined') {
+            console.log("troop array is undefined");
+            troopArray[destination] = 0;
+        }
         var destinationTroops = troopArray[destination];
+
         if(originTroops - numberOfTroopsMoved >= 0 || numberOfTroopsMoved < 0) {
             if(troopType === 6) {
                 editing.moveSpyDowngradeObjects(origin, destination);
@@ -235,9 +240,6 @@ function BoardEditing(globals) {
             }
             var territoryLocation = editing.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]];
             var territoryDOMElement = $("#map td")[territoryLocation];
-            if(!$(territoryDOMElement).hasClass('player1') && !$(territoryDOMElement).hasClass('player2') && !$(territoryDOMElement).hasClass('player3') && !$(territoryDOMElement).hasClass('player4') && !$(territoryDOMElement).hasClass('player5')) {
-                continue;
-            }
             adjacentTerritories.push(editing.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]]);
         }
         return adjacentTerritories;
@@ -275,6 +277,11 @@ function BoardEditing(globals) {
         var originTroops = troopArray[origin];
         if(originTroops < numberOfTroopsAttacking || numberOfTroopsAttacking < 0) {
             alert("You don't have enough troops to do that attack.  You have " + originTroops + " and are trying to attack with " + numberOfTroopsAttacking);
+            return;
+        }
+        if(troopType.index === 6) {
+            //a spy is trying to move into an enemy territory
+            editing.moveTroops(destination, map, territoryDOMElements, troopArray, numberOfTroopsAttacking, troopType.index);
             return;
         }
         troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);

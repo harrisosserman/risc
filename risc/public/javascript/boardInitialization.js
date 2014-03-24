@@ -267,6 +267,13 @@
             board.editing.removeAllPreviousAdjacencies();
             var adjacentTerritories = board.editing.findValidAdjacencies(index);
             for(var k=0; k<adjacentTerritories.length; k++) {
+                // if(board.territoryOwner[adjacentTerritories[k]] === globalFunctions.getUsername()) {
+                //     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
+                // } else if($(map[adjacentTerritories[k]]).hasClass('territoryMoveSpy')) {
+                //     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
+                // }
+
+
                 if(board.territoryOwner[adjacentTerritories[k]] != globalFunctions.getUsername()) {
                     $(map[adjacentTerritories[k]]).addClass('territoryAttack');
                 } else {

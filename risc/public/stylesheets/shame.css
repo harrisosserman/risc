@@ -20,6 +20,9 @@ table > tbody > td{
 .player5 {
     background-color: #445569;
 }
+.territoryMoveSpy {
+    background-color: #C0C0C0;
+}
 .territoryHover {
     background-color: #FFFFE0;
 }
@@ -32,10 +35,6 @@ table > tbody > td{
 }
 .territoryMoveTroops {
     background-color: #4D5D53;
-    opacity: .5;
-}
-.territoryMoveSpy {
-    background-color: #C0C0C0;
     opacity: .5;
 }
 .attackComponent {
