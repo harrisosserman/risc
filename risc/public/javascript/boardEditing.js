@@ -48,7 +48,6 @@ function BoardEditing(globals) {
         return -1;
     };
     editing.convertTextForTroopCommit = function(input) {
-        var result = '';
         if(input === 0) {
             return 'INFANTRY';
         } else if(input === 1) {
@@ -63,6 +62,22 @@ function BoardEditing(globals) {
             return 'PLANES';
         }
         return 'SPIES';
+    };
+    editing.convertTextFromCapitalsToIndex = function(input) {
+        if(input === 'INFANTRY') {
+            return 0;
+        } else if(input === 'AUTOMATIC') {
+            return 1;
+        } else if(input === 'ROCKETS') {
+            return 2;
+        } else if(input === 'TANKS') {
+            return 3;
+        } else if(input === 'IMPROVEDTANKS') {
+            return 4;
+        } else if(input === 'PLANES') {
+            return 5;
+        }
+        return 6;
     };
     editing.addMove = function(moveType, start, end, troopType, upgradeType) {
         troopType = editing.convertTextForTroopCommit(troopType);
@@ -169,7 +184,7 @@ function BoardEditing(globals) {
                     var resultingUnmovableSpies = editing.spiesCannotMove[origin] - numberOfTroopsMoved;
                     if(resultingUnmovableSpies < 0) {
                         editing.spiesCannotMove[origin] = 0;
-                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved + spiesCannotMove;
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved + resultingUnmovableSpies;
                     } else {
                         editing.spiesCannotMove[origin] = editing.spiesCannotMove[origin] - numberOfTroopsMoved;
                         editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved;
@@ -243,6 +258,16 @@ function BoardEditing(globals) {
                 'troopType': troopTypeConvertFrom.index,
                 'numTroops': numberOfTroopsConverting
             });
+        }
+    };
+    editing.constructSpyDowngradesAtStart = function(spies, spiesTerritoryList) {
+        for(var k=0; k<spies.length; k++) {
+            var spyDowngrade = {
+                'troopType': editing.convertTextFromCapitalsToIndex(spies[k].previousType),
+                'numTroops': 1
+            };
+            editing.spyDowngrades[spies[k].position].push(spyDowngrade);
+            spiesTerritoryList[spies[k].position] = spiesTerritoryList[spies[k].position] + 1;
         }
     };
     editing.removeAllPreviousAdjacencies = function() {

@@ -184,9 +184,13 @@ public class TestAPI extends Controller {
         // map.put(new JSONObject().put("owner", 1).put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30));
         // map.put(new JSONObject().put("owner", 1).put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30));
         result.put("territories", map);
+        JSONArray spies = new JSONArray();
+        spies.put(new JSONObject().put("owner", "harriso").put("position", 1).put("percentage", 15).put("previousType", "AUTOMATIC"));
+        spies.put(new JSONObject().put("owner", "harriso").put("position", 1).put("percentage", 15).put("previousType", "INFANTRY"));
+        result.put("spies", spies);
         JSONArray additionalInfo = new JSONArray();
-        additionalInfo.put(new JSONObject().put("owner", "rickybobby").put("level", 2).put("food", 5).put("technology", 10).put("additionalInfantry", 50));
-        additionalInfo.put(new JSONObject().put("owner", "magicman").put("level", 3).put("food", 5).put("technology", 10).put("additionalInfantry", 50));
+        additionalInfo.put(new JSONObject().put("owner", "rickybobby").put("level", 2));
+        additionalInfo.put(new JSONObject().put("owner", "magicman").put("level", 3));
         additionalInfo.put(new JSONObject().put("owner", "harriso").put("level", 0).put("food", 35).put("technology", 100).put("additionalInfantry", 50));
         result.put("playerInfo", additionalInfo);
         return ok(result.toString());

@@ -220,6 +220,7 @@
                                 });
                             }
                         });
+                        board.editing.constructSpyDowngradesAtStart(board.territoryInfo.spies, board.boardInfo.spy);
                         board.territoryDOMElements = $("#map td");
                 }).fail(function() {
                     globalFunctions.displayMapNotReadyAndPoll();
@@ -258,6 +259,11 @@
                     tech: playerInfo[index].technology,
                     techLevel: board.convertTechLevelToText(playerInfo[index].level)
                 };
+                if(typeof playerInfo[index].technology == 'undefined') {
+                    newPlayerObject.food = 0;
+                    newPlayerObject.tech = 0;
+                    newPlayerObject.additionalInfantry = 0;
+                }
             } else {
                 newPlayerObject = {
                     name: playerObject.name,
@@ -440,6 +446,7 @@
             var intRegex = /^\d+$/;
             if(!(intRegex.test(board.inputNumberAttackOrMove()))) {
                alert('You must enter a nonnegative integer');
+               return;
             }
             var troopType = board.convertReadableText(board.typeOfTroopSelected());
             if(board.displayUpgradeTroopsModal() === true) {
