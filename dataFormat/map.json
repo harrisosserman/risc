@@ -1,7 +1,7 @@
 {
     "gameID": "testGame",
     "timeStamp" : NumberLong("1393816130955"),
-    "numPlayers": 2,
+    "numPlayers": 3,
     "turn": 0,
     "territories": [
                 {
@@ -34,29 +34,27 @@
             "owner": "kat",
             "position": 0,
             "percentage": 15,
-            "previousType":"AUTOMATIC" 
+            "previousType":"AUTOMATIC"
 
         }
     ],
 
-    "playerInfo": [ 
+    "playerInfo": [
         {
             "owner": "kat",
             "level": 6,
             "food": 5,
             "technology": 10,
             "additionalInfantry": 48,
-            "highestTechnology":[
-                {
-                    "player": "harris",
-                    "level": 4,
-                },
-                {
-                    "player": "julian",
-                    "level": 3
-                }
-            ],
             "territoriesVisible": [5,4,6,7,8]
+        },
+        {
+            "owner": "kat",
+            "level": 4
+        },
+        {
+            "owner": "julian",
+            "level": 8
         }
     ]
 }
