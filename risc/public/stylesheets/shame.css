@@ -20,6 +20,9 @@ table > tbody > td{
 .player5 {
     background-color: #445569;
 }
+.territoryMoveSpy {
+    background-color: #C0C0C0;
+}
 .territoryHover {
     background-color: #FFFFE0;
 }

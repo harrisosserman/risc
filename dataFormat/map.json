@@ -1,21 +1,60 @@
 {
-    "gameID": "asdfasfdadf",
-    "numPlayers": 5,
+    "gameID": "testGame",
+    "timeStamp" : NumberLong("1393816130955"),
+    "numPlayers": 3,
+    "turn": 0,
     "territories": [
                 {
-                    "owner": 2,
-                    "troops": 5
+                    "owner": "kat",
+                    "position": 2,
+                    "INFANTRY": 5,
+                    "AUTOMATIC": 6,
+                    "ROCKETS": 0,
+                    "TANKS": 1,
+                    "IMPROVEDTANKS": 3,
+                    "PLANES": 0,
+                    "food": 4,
+                    "technology": 5
+                }
+                {
+                    "owner": "harris",
+                    "position": 1,
+                    "INFANTRY": 5,
+                    "AUTOMATIC": 6,
+                    "ROCKETS": 0,
+                    "TANKS": 1,
+                    "IMPROVEDTANKS": 3,
+                    "PLANES": 0,
+                    "food": 4,
+                    "technology": 5
                 }
     ],
-    "additionalTroops": [   <-- NOTE, THIS IS USED AT GAME START, AT THE END OF A ROUND, ETC FOR NEW TROOPS
+    "spies":[
         {
-            "owner": 3,
+            "owner": "kat",
+            "position": 0,
+            "percentage": 15,
+            "previousType":"AUTOMATIC"
+
+        }
+    ],
+
+    "playerInfo": [
+        {
+            "owner": "kat",
+            "level": 6,
             "food": 5,
-            "technology": 10
+            "technology": 10,
+            "additionalInfantry": 48,
+            "territoriesVisible": [5,4,6,7,8]
         },
         {
-            "owner": 1,
-            "food": 5,
-            "technology": 10
+            "owner": "kat",
+            "level": 4
+        },
+        {
+            "owner": "julian",
+            "level": 8
         }
+    ]
 }
