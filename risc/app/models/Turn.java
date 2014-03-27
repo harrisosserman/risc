@@ -105,10 +105,6 @@ public class Turn {
                     Place newMove = new Place(moveType, troopType, position);
                     moves.add(newMove);
                 }
-                else if(moveType == 4){
-                    
-                }
-                
         }
         int result = commitTurn(moves, player_);
 

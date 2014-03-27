@@ -33,13 +33,6 @@
             "troopType": "INFANTRY",
             "position": 4
         }
-        {
-
-            "moveType": 3, // 3=placechoices are 0 = upgrade,  1= move and 2=attack.
-            "troopType": "INFANTRY",
-            "position": 4
-        }
-
 
 
     ]

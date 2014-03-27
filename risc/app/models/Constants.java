@@ -42,8 +42,11 @@ public final class Constants{
     public static final String OWNER = "owner";
     public static final String ADDITIONALINFANTRY = "additionalInfantry";
     public static final String NAME = "name";
-
-
+    public static final String SPY = "SPY";
+    public static final String SPIES = "spies";
+    public static final String PERCENTAGE = "percentage";
+    public static final String PREVIOUSTYPE = "previousType";
+    public static final String TERRITORIESVISIBLE = "territoriesVisible";
 
 
 
