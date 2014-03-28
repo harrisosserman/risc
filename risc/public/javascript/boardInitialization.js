@@ -71,10 +71,10 @@
             $("#map").empty();
             board.createMap();
             board.getMap();
-            editing.clearSpyDowngrades();
-            editing.constructSpyDowngrades();
-            editing.clearSpiesCannotMove();
-            editing.constructSpiesCannotMove();
+            board.editing.clearSpyDowngrades();
+            board.editing.constructSpyDowngrades();
+            board.editing.clearSpiesCannotMove();
+            board.editing.constructSpiesCannotMove();
             board.clearBoardInfo();
         };
         globalFunctions.getPlayerInfo = function() {

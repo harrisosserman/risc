@@ -261,6 +261,9 @@ function BoardEditing(globals) {
         }
     };
     editing.constructSpyDowngradesAtStart = function(spies, spiesTerritoryList) {
+        if(typeof spies == 'undefined') {
+            return;
+        }
         for(var k=0; k<spies.length; k++) {
             var spyDowngrade = {
                 'troopType': editing.convertTextFromCapitalsToIndex(spies[k].previousType),
