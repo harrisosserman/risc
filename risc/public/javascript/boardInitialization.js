@@ -147,7 +147,7 @@
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
 
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -465,7 +465,7 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
                 method: 'GET',
             }).done(function() {
                 globalFunctions.destroyAndRebuildMap();
