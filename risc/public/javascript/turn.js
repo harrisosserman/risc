@@ -49,7 +49,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/game/' + globalFunctions.getGameID() + '/map', {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
