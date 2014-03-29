@@ -40,6 +40,9 @@ public class DBHelper{
     public static final String TECHNOLOGY_KEY = "technology";
     public static final String LEVEL_KEY = "level";
     public static final String PLAYER_INFO_KEY = "playerInfo";
+    public static final String VISIBLE_TERRITORIES_KEY = "territoriesVisible";
+    public static final String SPIES_KEY = "spies";
+    public static final String HIGHEST_TECHNOLOGY_KEY = "highestTechnology";
     
     public static final String INFANTRY_KEY = "INFANTRY";
     public static final String AUTOMATIC_WEAPONS_KEY = "AUTOMATIC";
