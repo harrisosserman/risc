@@ -113,7 +113,7 @@ public class API extends Controller {
     public static Result getMap(String gameID, String username){
         Game game = new Game(gameID);
         if (game.areAllPlayersCommitedForMostRecentTurn()) {
-            String mapJson = game.getCurrentGameStateJson();
+            String mapJson = game.getCurrentGameStateJson(username);
             return ok(mapJson);
         }else{
             return badRequest("not all players have committed yet");
