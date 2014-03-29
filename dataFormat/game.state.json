@@ -48,11 +48,11 @@
             "additionalInfantry": 48,
             "highestTechnology":[
                 {
-                    "player": "harris",
+                    "owner": "harris",
                     "level": 4,
                 },
                 {
-                    "player": "julian",
+                    "owner": "julian",
                     "level": 3
                 }
             ],

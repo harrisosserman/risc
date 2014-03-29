@@ -123,33 +123,9 @@ public class Game {
             info.append(DBHelper.TECHNOLOGY_KEY, techPerPlayer);
             info.append(DBHelper.ADDITIONAL_INFANTRY_KEY, infantryPerPlayer);
 
-            //Remove this-------------
-            ArrayList visibleTerritories = new ArrayList<Integer>();
-            visibleTerritories.add(new Integer(5));
-            visibleTerritories.add(new Integer(4));
-            visibleTerritories.add(new Integer(6));
-            visibleTerritories.add(new Integer(7));
-            visibleTerritories.add(new Integer(8));
-            visibleTerritories.add(new Integer(9));
-            info.append(DBHelper.VISIBLE_TERRITORIES_KEY, visibleTerritories);
-            //Remove this-------------
-
             playerInfo.add(info);
         }
         state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
-
-        //Remove this-------------
-        ArrayList<DBObject>spies = new ArrayList<DBObject>();
-        BasicDBObject spy = new BasicDBObject();
-        spy.append(DBHelper.OWNER_KEY, "a");
-        spy.append(DBHelper.POSITION_KEY, 0);
-        spies.add(spy);
-        BasicDBObject spy2 = new BasicDBObject();
-        spy2.append(DBHelper.OWNER_KEY, "b");
-        spy2.append(DBHelper.POSITION_KEY, 1);
-        spies.add(spy2);
-        state.append(DBHelper.SPIES_KEY, spies);
-        //Remove this-------------
 
         return state;
     }
@@ -208,10 +184,12 @@ public class Game {
     private DBObject filterStateForUsername(DBObject currentTurn, String username){
         //Filter territories
         ArrayList<DBObject> playerInfo = (ArrayList<DBObject>)currentTurn.get(DBHelper.PLAYER_INFO_KEY);
+        DBObject targetPlayerInfo = null;
         ArrayList<Integer> territoriesVisible = null;
         for (DBObject info : playerInfo) {
             String owner = (String)info.get(DBHelper.OWNER_KEY);
             if (owner.equals(username)) {
+                targetPlayerInfo = info;
                 territoriesVisible = (ArrayList<Integer>)info.get(DBHelper.VISIBLE_TERRITORIES_KEY);
             }
         }
@@ -239,10 +217,23 @@ public class Game {
             }
 
         currentTurn.put(DBHelper.SPIES_KEY, filteredSpies);
-        System.out.println("Filtered: " + currentTurn.toString());
         }
 
         //Filter playerInfo
+        ArrayList<DBObject> filteredPlayerInfo = new ArrayList<DBObject>();
+        filteredPlayerInfo.add(targetPlayerInfo);
+        ArrayList<DBObject> highestTech = (ArrayList<DBObject>)targetPlayerInfo.get(DBHelper.HIGHEST_TECHNOLOGY_KEY);
+        for (DBObject tech : highestTech) {
+            String owner = (String)tech.get(DBHelper.OWNER_KEY);
+            int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
+
+            BasicDBObject formattedTech = new BasicDBObject();
+            formattedTech.append(DBHelper.OWNER_KEY, owner);
+            formattedTech.append(DBHelper.LEVEL_KEY, level);
+            filteredPlayerInfo.add(formattedTech);
+        }
+
+        currentTurn.put(DBHelper.PLAYER_INFO_KEY, filteredPlayerInfo);
 
         return currentTurn;
     }
