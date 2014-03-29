@@ -3,16 +3,51 @@ function BoardEditing(globals) {
     var editing = this;
     editing.moveOrder = [];
     editing.territory2DArray = [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14], [15, 16, 17, 18, 19], [20, 21, 22, 23, 24]];
+    editing.spyDowngrades = [];
+    editing.spiesCannotMove = [];
     // GLOBAL FUNCTIONS
     globalFunctions.getMoveOrder = function() {
         return editing.moveOrder;
     };
     // END GLOBAL FUNCTIONS
+    editing.constructSpyDowngrades = function() {
+        for(var k=0; k<25; k++) {
+            editing.spyDowngrades[k] = [];
+        }
+    };
+    editing.clearSpyDowngrades = function() {
+        editing.spyDowngrades = [];
+    };
+    editing.constructSpiesCannotMove = function() {
+        for(var k = 0; k<25; k++) {
+            editing.spiesCannotMove[k] = 0;
+        }
+    };
+    editing.clearSpiesCannotMove = function() {
+        editing.spiesCannotMove = [];
+    };
     editing.removeAllMoves = function() {
         editing.moveOrder = [];
     };
+    editing.moveSpyDowngradeObjects = function(origin, destination) {
+        var downgradesList = editing.spyDowngrades[origin];
+        for(var k=0; k<downgradesList.length; k++) {
+            editing.spyDowngrades[destination].push(downgradesList[k]);
+        }
+    };
+    editing.downgradeSpies = function(index, troopType) {
+        var downgradesList = editing.spyDowngrades[index];
+        for(var k=0; k<downgradesList.length; k++) {
+            if(downgradesList[k].troopType === troopType) {
+                if(downgradesList[k].numTroops > 0) {
+                    downgradesList[k].numTroops--;
+                    return 1;
+                }
+            }
+        }
+        return -1;
+    };
     editing.convertTextForTroopCommit = function(input) {
-        var result = '';
         if(input === 0) {
             return 'INFANTRY';
         } else if(input === 1) {
@@ -23,8 +58,26 @@ function BoardEditing(globals) {
             return 'TANKS';
         } else if(input === 4) {
             return 'IMPROVEDTANKS';
+        } else if(input === 5) {
+            return 'PLANES';
         }
-        return 'PLANES';
+        return 'SPIES';
+    };
+    editing.convertTextFromCapitalsToIndex = function(input) {
+        if(input === 'INFANTRY') {
+            return 0;
+        } else if(input === 'AUTOMATIC') {
+            return 1;
+        } else if(input === 'ROCKETS') {
+            return 2;
+        } else if(input === 'TANKS') {
+            return 3;
+        } else if(input === 'IMPROVEDTANKS') {
+            return 4;
+        } else if(input === 'PLANES') {
+            return 5;
+        }
+        return 6;
     };
     editing.addMove = function(moveType, start, end, troopType, upgradeType) {
         troopType = editing.convertTextForTroopCommit(troopType);
@@ -110,11 +163,35 @@ function BoardEditing(globals) {
         }
         return -1;
     };
-    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType) {
+    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType, enemyDestination) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
+        if(typeof troopArray[destination] === 'undefined') {
+            troopArray[destination] = 0;
+        }
         var destinationTroops = troopArray[destination];
-        if(originTroops - numberOfTroopsMoved > 0 || numberOfTroopsMoved < 0) {
+
+        if(originTroops - numberOfTroopsMoved >= 0 || numberOfTroopsMoved < 0) {
+            if(troopType === 6) {
+                if(typeof enemyDestination != 'undefined' && enemyDestination === true) {
+                    if(troopArray[origin] - editing.spiesCannotMove[origin] < numberOfTroopsMoved) {
+                        alert("You have already moved some of the requested spies this turn");
+                        return;
+                    } else {
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved;
+                    }
+                } else {
+                    var resultingUnmovableSpies = editing.spiesCannotMove[origin] - numberOfTroopsMoved;
+                    if(resultingUnmovableSpies < 0) {
+                        editing.spiesCannotMove[origin] = 0;
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved + resultingUnmovableSpies;
+                    } else {
+                        editing.spiesCannotMove[origin] = editing.spiesCannotMove[origin] - numberOfTroopsMoved;
+                        editing.spiesCannotMove[destination] = editing.spiesCannotMove[destination] + numberOfTroopsMoved;
+                    }
+                }
+                editing.moveSpyDowngradeObjects(origin, destination);
+            }
             originTroops = originTroops - numberOfTroopsMoved;
             destinationTroops = parseInt(destinationTroops, 10) + parseInt(numberOfTroopsMoved, 10);
             troopArray[origin] = originTroops;
@@ -143,9 +220,26 @@ function BoardEditing(globals) {
     };
     editing.upgradeTroops = function(origin, convertFromTroops, convertToTroops, playerInfo, numberOfTroopsConverting, troopTypeConvertFrom, troopTypeConvertTo) {
         var cost = (globalFunctions.getUnitUpgradeCost()[troopTypeConvertTo.index] - globalFunctions.getUnitUpgradeCost()[troopTypeConvertFrom.index]) * numberOfTroopsConverting;
-        if(playerInfo.maxTechLevel < troopTypeConvertTo.index) {
+        if(convertFromTroops[origin] < numberOfTroopsConverting) {
+            alert("You don't have enough " + troopTypeConvertFrom.text + " to convert the troops");
+            return;
+        }
+        if(playerInfo.maxTechLevel < troopTypeConvertTo.index && troopTypeConvertTo.index != 6 && troopTypeConvertFrom.index != 6) {
             alert("Your technology level is lower than the selected troop upgrade level");
             return;
+        } else if(troopTypeConvertFrom.index === 6) {
+            cost = 5 * numberOfTroopsConverting;
+            if(cost > playerInfo.technology) {
+                alert("You need " + cost + " technology, but you only have " + playerInfo.technology);
+                return;
+            }
+            for(var k=0; k<numberOfTroopsConverting; k++) {
+                if(editing.downgradeSpies(origin, troopTypeConvertTo.index) === -1) {
+                    numberOfTroopsConverting = k;
+                    alert("You don't have enough " + editing.convertTextForTroopCommit(troopTypeConvertTo.index) + " to fill the entire downgrade");
+                    break;
+                }
+            }
         } else if(troopTypeConvertFrom.index > troopTypeConvertTo.index){
             alert("You cannot convert troops from a higher technology level to a lower technology level");
             return;
@@ -153,13 +247,30 @@ function BoardEditing(globals) {
             alert("You need " + cost + " technology, but you only have " + playerInfo.technology);
             return;
         }
-        else {
-            playerInfo.technology = playerInfo.technology - cost;
-            convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
-            convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
-            for(var k=0; k<numberOfTroopsConverting; k++) {
-                editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
-            }
+        playerInfo.technology = playerInfo.technology - cost;
+        convertFromTroops[origin] = parseInt(convertFromTroops[origin], 10) - parseInt(numberOfTroopsConverting, 10);
+        convertToTroops[origin] = parseInt(convertToTroops[origin], 10) + parseInt(numberOfTroopsConverting, 10);
+        for(var k=0; k<numberOfTroopsConverting; k++) {
+            editing.addMove(0, origin, -1, troopTypeConvertFrom.index, troopTypeConvertTo.index);
+        }
+        if(troopTypeConvertTo.index === 6) {
+            editing.spyDowngrades[origin].push({
+                'troopType': troopTypeConvertFrom.index,
+                'numTroops': numberOfTroopsConverting
+            });
+        }
+    };
+    editing.constructSpyDowngradesAtStart = function(spies, spiesTerritoryList) {
+        if(typeof spies == 'undefined') {
+            return;
+        }
+        for(var k=0; k<spies.length; k++) {
+            var spyDowngrade = {
+                'troopType': editing.convertTextFromCapitalsToIndex(spies[k].previousType),
+                'numTroops': 1
+            };
+            editing.spyDowngrades[spies[k].position].push(spyDowngrade);
+            spiesTerritoryList[spies[k].position] = spiesTerritoryList[spies[k].position] + 1;
         }
     };
     editing.removeAllPreviousAdjacencies = function() {
@@ -179,6 +290,8 @@ function BoardEditing(globals) {
             if(adjacentTerritoriesX[k] < 0 || adjacentTerritoriesX[k] > 4 || adjacentTerritoriesY[k] < 0 || adjacentTerritoriesY[k] > 4) {
                 continue;
             }
+            var territoryLocation = editing.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]];
+            var territoryDOMElement = $("#map td")[territoryLocation];
             adjacentTerritories.push(editing.territory2DArray[adjacentTerritoriesX[k]][adjacentTerritoriesY[k]]);
         }
         return adjacentTerritories;
@@ -218,12 +331,20 @@ function BoardEditing(globals) {
             alert("You don't have enough troops to do that attack.  You have " + originTroops + " and are trying to attack with " + numberOfTroopsAttacking);
             return;
         }
+        if(troopType.index === 6) {
+            //a spy is trying to move into an enemy territory
+            var enemyDestination = true;
+            editing.moveTroops(destination, map, territoryDOMElements, troopArray, numberOfTroopsAttacking, troopType.index, enemyDestination);
+            return;
+        }
         troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);
         editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking);
         for(var k=0; k<numberOfTroopsAttacking; k++) {
             editing.addMove(2, origin, destination, troopType.index, -1);
         }
     };
+    editing.constructSpiesCannotMove();
+    editing.constructSpyDowngrades();
     return editing;
 
 }

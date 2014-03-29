@@ -9,13 +9,25 @@ public class Spy{
 	private TroopType myPreviousType;
 	private Integer myCatchPercentage;
 	private Territory myLocation;
+    private boolean hasMovedThisTurn;
 
 
 
 	public Spy(Player owner, TroopType type){
 		myOwner = owner;
 		myPreviousType = type;
-	}
+	    hasMovedThisTurn = false;
+    }
+
+    public boolean canMove(){
+        if(hasMovedThisTurn==false){
+            hasMovedThisTurn=true;
+            return hasMovedThisTurn;
+        }
+        else{
+            return false;
+        }
+    }
 
     public Player getOwner(){
         return myOwner;
@@ -51,6 +63,16 @@ public class Spy{
     
     public void setCatchPercentage(Integer percentage){
         myCatchPercentage = percentage;
+    }
+
+    public boolean spyCaughtOrNot(){
+        double value =  (Math.random() * 100);
+        if(myCatchPercentage>=value){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 

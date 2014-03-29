@@ -11,7 +11,7 @@ import libraries.DBHelper;
 import java.util.HashMap;
 import controllers.API;
 
-/**
+/** 
  * This class is responsible for computing and updating the state after all
  * the turns are committed. The constants listed below are used for accessing
  * the different things in the database. 
@@ -33,6 +33,8 @@ public class State{
     private String myGameID;
     private HashMap<Integer, Territory> territories;
     private HashMap<String, Player> myActivePlayers;
+    private HashMap<Player, TreeSet<Integer>> visibleTerritoriesForEachPlayer;
+    private HashMap<Integer, ArrayList<Spy>> spies;
     //private ArrayList<Attacker> attackers;
 
 
@@ -40,7 +42,8 @@ public State(String gameID){
     territories = new HashMap<Integer, Territory>();
     myGameID = gameID;
     myActivePlayers = new HashMap<String, Player>();
-  //  attackers = new ArrayList<Attacker>();
+    visibleTerritoriesForEachPlayer = new HashMap<Player, TreeSet<Integer>>();
+    spies = new HashMap<Integer, ArrayList<Spy>>();
 }
 
 /*
@@ -137,6 +140,31 @@ public int loadPreviousState(){
         }}
         territories.put(terr.getPosition(), terr);
     }
+    BasicDBList spyInfo = (BasicDBList) lastStateObject.get(Constants.SPIES);
+    BasicDBObject[] spyArray = spyInfo.toArray(new BasicDBObject[0]);
+    for(BasicDBObject spy : spyArray){
+        String owner = spy.get(Constants.OWNER).toString();
+        Player p = myActivePlayers.get(owner);
+        int position = Integer.parseInt(spy.get(Constants.POSITION).toString());
+        String type_string = spy.get(Constants.PREVIOUSTYPE).toString();
+        int percentage = Integer.parseInt(spy.get(Constants.PERCENTAGE).toString());
+        TroopType type = getTroopType(type_string);
+        Spy spy_ = new Spy(p, type);
+        Territory location = territories.get(position);
+        spy_.setLocation(location);
+        spy_.setCatchPercentage(percentage);
+        ArrayList<Spy> spys = new ArrayList<Spy>();
+        if(spies.containsKey(position)){
+            spys = spies.get(position);
+        }
+        else{
+            spys = new ArrayList<Spy>();
+
+        }
+        spys.add(spy_);
+        spies.put(position, spys);
+
+    }
     updateStateWithMoves();
     saveState(); 
     return 5;
@@ -162,23 +190,65 @@ private TroopType getTroopType(String str){
     if(str.equals("PLANES")){
         return TroopType.PLANES;
     }
+    if(str.equals("SPY")){
+        return TroopType.SPY;
+    }
         return null;
 }
 
-public void moveTypeMove(BasicDBObject move){
+public void moveTypeMove(BasicDBObject move, Player p){
     int startInt = Integer.parseInt(move.get(Constants.START).toString());
     Territory start = territories.get(startInt);
     int endInt = Integer.parseInt(move.get(Constants.END).toString());
     Territory end = territories.get(endInt);
     String troopType = move.get(Constants.TROOPTYPE).toString();
     TroopType type = getTroopType(troopType);
-    if(start.getDefendingArmy().containsTroop(type)){
-        start.removeTroopFromArmy(type);
-        Army entering = end.getDefendingArmy();
-        entering.addTroop(type);
-        end.setDefendingArmy(entering);
+    if(type.equals(TroopType.SPY)){
+        if(spies.containsKey(startInt)){
+            ArrayList<Spy> spys = spies.get(startInt);
+            Spy spyToMove = null; 
+            for(Spy spyChoice : spys){
+                if(spyChoice.getOwner().equals(p)){
+                    spyToMove = spyChoice;
+                }
+            }
+            if(spyToMove!=null){
+                if(checkAdjacency(startInt, endInt)){
+                    if(spyToMove.canMove()){
+                        spyToMove.setLocation(territories.get(endInt));
+                        if(spies.containsKey(endInt)){
+                            spys = spies.get(endInt);
+                        }
+                        else{
+                            spys = new ArrayList<Spy>();
+                        }
+                        spys.add(spyToMove);
+                        spies.put(endInt, spys);          
+                    }
+                }  
+            }
+        }
+    }
+    else{
+        if(start.getDefendingArmy().containsTroop(type)){
+            start.removeTroopFromArmy(type);
+            Army entering = end.getDefendingArmy();
+            entering.addTroop(type);
+            end.setDefendingArmy(entering);
+        }
     }
     
+}
+
+public boolean checkAdjacency(int start, int end){
+    AdjacencyMap mapOfAdjacencies = new AdjacencyMap();
+    ArrayList<Integer> adjacencies = mapOfAdjacencies.getAdjacencies(start);
+    if(adjacencies.contains(end)){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 public void moveTypeAttack(BasicDBObject move, Player p){
@@ -202,6 +272,7 @@ public void moveTypeUpgrade(BasicDBObject move, Player p){
     String upgradeType = move.get(Constants.UPGRADETYPE).toString();
     TroopType trooptype = getTroopType(troopType);
     TroopType upgradetype = getTroopType(upgradeType);
+
     Army army = position_.getDefendingArmy();
     if(army.containsTroop(trooptype)){
         int cost = computeCostOfTroopUpgrade(trooptype, upgradetype);
@@ -210,7 +281,23 @@ public void moveTypeUpgrade(BasicDBObject move, Player p){
             p.setTechnology(newTech);
             myActivePlayers.put(p.getName(), p);
             army.deleteTroop(trooptype);
-            army.addTroop(upgradetype);
+            if(upgradetype.equals(TroopType.SPY)){
+                Spy spy_ = new Spy(p, trooptype);
+                spy_.setLocation(position_);
+                spy_.setCatchPercentage(1);
+                ArrayList<Spy> spys = new ArrayList<Spy>();
+                if(spies.containsKey(position)){
+                    spys = spies.get(position);
+                }
+                else{
+                    spys = new ArrayList<Spy>();
+                }
+                spys.add(spy_);
+                spies.put(position, spys);
+            }
+            else{
+                army.addTroop(upgradetype);
+            }
             position_.setDefendingArmy(army);
         }
     }
@@ -288,6 +375,12 @@ public int computeCostOfUpgrade(int oldlevel, int newlevel){
 }
 
 public int computeCostOfTroopUpgrade(TroopType old, TroopType new_){
+    if(old.equals(TroopType.SPY)){
+        return 5;
+    }
+    if(new_.equals(TroopType.SPY)){
+        return 35;
+    }
     if(old.equals(TroopType.INFANTRY)){
         if(new_.equals(TroopType.AUTOMATIC)){
             return 3;
@@ -374,7 +467,7 @@ public void updateStateWithMoves(){
                 moveTypeUpgrade(move, p);
             }
             else if(moveType == 1){
-                moveTypeMove(move);
+                moveTypeMove(move, p);
             }
             else if(moveType == 2){
                 moveTypeAttack(move, p);
@@ -501,8 +594,6 @@ public int battleCrossing(Army attacker, int attackerHome, Army defender, int de
     }
       
 }
-
-
 /* 
  * The find state method is where the new state is found after all of the turns
  * are entered into an array list of territories. The territories are then updated
@@ -528,11 +619,9 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
 
     while(attackers.size()>0){
         System.out.println("battle has begun");
-//        System.out.println("loop 1");
         for(int i=attackers.size()-1; i>=0; i--){
 
             Army attacker = attackers.get(i).getArmy();
-  //          System.out.println("first attacker is " + attackers.get(i).getName());
             Troop battler_1 = defender.getStrongest();
             if(battler_1==null){
                     System.out.println("the defender lost the battle because he had no army");
@@ -547,11 +636,9 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             }
           //  System.out.println("first strongest defender is a " + battler_1.getType());
             Troop battler_2 = attacker.getWeakest();
-//            System.out.println("first weakest attacker is a " + battler_2.getType());
             double batt_1 = battler_1.battle();
             double batt_2 = battler_2.battle();
             if(batt_1 == batt_2){
-  //              System.out.println("it was a tie " + batt_1);
                 if(battler_1.getStrength() >= battler_2.getStrength()){
                     batt_1++;
                 }
@@ -560,15 +647,11 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
                 }
             }
             if(batt_1 < batt_2){
-    //            System.out.println(batt_1 + " is less than  " +batt_2 + " the defender lost one troop");
                 defender.deleteTroop(battler_1.getType());
                 if(defender.getNumberOfTroops()==0){
-      //              System.out.println("the defender lost the battle");
                     defender = attacker;
-        //            System.out.println("the new defender is " + attacker.getName());
                     attackers.remove(i);
                     if(attackers.size()==0){
-          //              System.out.println("the battle is over");
                         return defender;
                     }
                 }
@@ -625,8 +708,6 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
     }
     return defender;
 }
-
-
 
 /* 
  * The save state method takes the current ArrayList of territories
@@ -703,6 +784,36 @@ public void finalizeState(){
     }
     
  }
+
+public void visibleTerritories(){
+    AdjacencyMap adjacencies = new AdjacencyMap();
+    for(String username : myActivePlayers.keySet()){
+        Player p = myActivePlayers.get(username);
+        TreeSet<Integer> set = new TreeSet<Integer>();
+        visibleTerritoriesForEachPlayer.put(p,set);
+        
+    }
+    for(Integer position : territories.keySet()){
+        Territory t = territories.get(position);
+        Player p = t.getOwner();
+        TreeSet<Integer> ints = visibleTerritoriesForEachPlayer.get(p);
+        ints.add(position);
+        ArrayList<Integer> adjacentPositions = adjacencies.getAdjacencies(position);
+        for(Integer positionAdjacent : adjacentPositions){
+            ints.add(positionAdjacent);
+        } 
+        visibleTerritoriesForEachPlayer.put(p, ints);
+    }
+    for(Integer spyposition : spies.keySet()){
+        ArrayList<Spy> spy = spies.get(spyposition);
+        for(Spy s : spy){
+            Player p = s.getOwner();
+            TreeSet<Integer> ints = visibleTerritoriesForEachPlayer.get(p);
+            ints.add(spyposition);
+            visibleTerritoriesForEachPlayer.put(p, ints);
+        }
+    }
+} 
  
 public String typeToString(TroopType t){
     	switch(t){
@@ -768,6 +879,7 @@ public void saveState(){
             player_doc.append(Constants.FOOD, p.getFood());
             player_doc.append(Constants.TECHNOLOGY, p.getTechnology());
             player_doc.append(Constants.ADDITIONALINFANTRY, 0);
+            player_doc.append(Constants.TERRITORIESVISIBLE, visibleTerritoriesForEachPlayer.get(p));
             player_list.add(player_doc);
         }
 

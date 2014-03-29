@@ -61,18 +61,24 @@ public class API extends Controller {
 
     @BodyParser.Of(BodyParser.Json.class)
     public static Result commitTurn(String gameID) {
-
+        System.out.println("lien 1 first");
         RequestBody body = request().body();
-        //BattleTest b = new BattleTest();
+    
+        System.out.println("lien 1");
         Turn turn = new Turn();
+                System.out.println("lien 1");
         int turn_number = turn.createTurn(body);
+        System.out.println("lien" + turn_number);
         boolean json = turn.allTurnsCommitted();
         if(json){
             System.out.println("entered json loop");
             State state = new State(gameID);
             int k = state.loadPreviousState();
+            System.out.println("lien 1 end in");
             return ok("returned true " + k);
+        
         }
+        System.out.println("lien 1 end out");
         return ok("Turn commited for turn :" + turn_number);
     }
 
