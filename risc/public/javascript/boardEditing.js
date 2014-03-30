@@ -214,7 +214,7 @@ function BoardEditing(globals) {
             playerInfo.technology = playerInfo.technology - globalFunctions.getTechnologyLevelCost()[playerInfo.maxTechLevel];
             return true;
         } else {
-            alert("Unable to issue upgrade request.  You need " + board.technologyLevelCost[board.playerInfo.maxTechLevel + 1] + " technology and you have " + board.playerInfo.technology);
+            alert("Unable to issue upgrade request.  You don't have enough technology");
             return false;
         }
     };
