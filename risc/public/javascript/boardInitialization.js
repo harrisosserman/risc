@@ -198,7 +198,9 @@
                                     var pos = position;
                                     $(map[pos]).click(function() {
                                         //click handler for clicking on enemy territory
+                                        board.highlightMap(pos + 1);
                                         board.userMapAction(pos, map);
+                                        $(map[pos]).toggleClass("territoryClick");
                                         if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
                                             board.updateTerritoryClickTable(pos);
                                         }
@@ -307,19 +309,19 @@
             $("body").unbind("keydown");
             if($(board.territoryDOMElements[index]).hasClass('territoryClick')) {
                 $("body").keydown(function(input) {
-                        if(input.keyCode === 38) {
-                            //up arrow
-                            board.editing.calculateAdditionalTroops(1, index, input, board.boardInfo.infantry, board.additionalInfantry);
-                            board.updateTerritoryClickTable(index);
-                            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
-                            board.editing.addMove(3, index, -1, 0, -1);
-                        } else if(input.keyCode === 40) {
-                            //down arrow
-                            board.editing.calculateAdditionalTroops(-1, index, input, board.boardInfo.infantry, board.additionalInfantry);
-                            board.updateTerritoryClickTable(index);
-                            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
-                            board.editing.removeAdditionalTroop(3, index, 0);
-                        }
+                    if(input.keyCode === 38) {
+                        //up arrow
+                        board.editing.calculateAdditionalTroops(1, index, input, board.boardInfo.infantry, board.additionalInfantry);
+                        board.updateTerritoryClickTable(index);
+                        board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
+                        board.editing.addMove(3, index, -1, 0, -1);
+                    } else if(input.keyCode === 40) {
+                        //down arrow
+                        board.editing.calculateAdditionalTroops(-1, index, input, board.boardInfo.infantry, board.additionalInfantry);
+                        board.updateTerritoryClickTable(index);
+                        board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1);
+                        board.editing.removeAdditionalTroop(3, index, 0);
+                    }
                 });
             }
         };
@@ -453,9 +455,9 @@
                 var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());
                 board.editing.upgradeTroops(board.territoryClickTerritoryNumber() - 1, board.boardInfo[troopType.text], board.boardInfo[troopTypeUpgradeTo.text], board.playerInfo, board.inputNumberAttackOrMove(), troopType, troopTypeUpgradeTo);
             } else if(board.moveTroops === true) {
-                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove(), troopType.index);
+                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove(), troopType.index, board.territoryOwner);
             } else if(board.attackTroops === true) {
-                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType);
+                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType, board.territoryOwner);
             }
             board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
             board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);

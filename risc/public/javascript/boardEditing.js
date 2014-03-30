@@ -163,17 +163,21 @@ function BoardEditing(globals) {
         }
         return -1;
     };
-    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType, enemyDestination) {
+    editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType, territoryOwner) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         if(typeof troopArray[destination] === 'undefined') {
             troopArray[destination] = 0;
         }
+        if(territoryOwner[origin] !== globalFunctions.getUsername() && troopType != 6) {
+            alert("You can only move spies from an enemy territory");
+            return;
+        }
         var destinationTroops = troopArray[destination];
 
         if(originTroops - numberOfTroopsMoved >= 0 || numberOfTroopsMoved < 0) {
             if(troopType === 6) {
-                if(typeof enemyDestination != 'undefined' && enemyDestination === true) {
+                if(territoryOwner[destination] != globalFunctions.getUsername()) {
                     if(troopArray[origin] - editing.spiesCannotMove[origin] < numberOfTroopsMoved) {
                         alert("You have already moved some of the requested spies this turn");
                         return;
@@ -324,7 +328,7 @@ function BoardEditing(globals) {
             attackingTroops[origin].push(data);
         }
     };
-    editing.attack = function(destination, map, territoryDOMElements, troopArray, attackingTroops, numberOfTroopsAttacking, troopType) {
+    editing.attack = function(destination, map, territoryDOMElements, troopArray, attackingTroops, numberOfTroopsAttacking, troopType, territoryOwner) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
         var originTroops = troopArray[origin];
         if(originTroops < numberOfTroopsAttacking || numberOfTroopsAttacking < 0) {
@@ -333,9 +337,13 @@ function BoardEditing(globals) {
         }
         if(troopType.index === 6) {
             //a spy is trying to move into an enemy territory
-            var enemyDestination = true;
-            editing.moveTroops(destination, map, territoryDOMElements, troopArray, numberOfTroopsAttacking, troopType.index, enemyDestination);
+            editing.moveTroops(destination, map, territoryDOMElements, troopArray, numberOfTroopsAttacking, troopType.index, territoryOwner);
             return;
+        } else {
+            if(territoryOwner[origin] !== globalFunctions.getUsername()) {
+                alert("You can only move spies from an enemy territory");
+                return;
+            }
         }
         troopArray[origin] = parseInt(originTroops, 10) - parseInt(numberOfTroopsAttacking, 10);
         editing.updateAttackingTroops(origin, destination, attackingTroops, troopArray, troopType, numberOfTroopsAttacking);
