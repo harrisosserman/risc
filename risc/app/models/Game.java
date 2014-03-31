@@ -124,43 +124,48 @@ public class Game {
             info.append(DBHelper.ADDITIONAL_INFANTRY_KEY, infantryPerPlayer);
 
 
-            //Remove this-------------
-            ArrayList visibleTerritories = new ArrayList<Integer>();
-            visibleTerritories.add(new Integer(5));
-            visibleTerritories.add(new Integer(4));
-            visibleTerritories.add(new Integer(6));
-            visibleTerritories.add(new Integer(7));
-            visibleTerritories.add(new Integer(8));
-            visibleTerritories.add(new Integer(9));
+            ArrayList<Integer> visibleTerritories = initialVisibleTerritories(countryOwners, usernames.indexOf(username));
             info.append(DBHelper.VISIBLE_TERRITORIES_KEY, visibleTerritories);
-
-            ArrayList<DBObject> highestTech = new ArrayList<DBObject>();
-            BasicDBObject tech = new BasicDBObject();
-            tech.append(DBHelper.OWNER_KEY, "b");
-            tech.append(DBHelper.LEVEL_KEY, 4);
-            highestTech.add(tech);
+            
+            ArrayList<DBObject> highestTech = initialHighestTech(username, usernames);
             info.append(DBHelper.HIGHEST_TECHNOLOGY_KEY, highestTech);
-            //Remove this-------------
 
             playerInfo.add(info);
         }
         state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
 
-
-        //Remove this-------------
         ArrayList<DBObject> spies = new ArrayList<DBObject>();
-        BasicDBObject spy = new BasicDBObject();
-        spy.append(DBHelper.OWNER_KEY, "a");
-        spy.append(DBHelper.POSITION_KEY, 0);
-        spies.add(spy);
-        BasicDBObject spy2 = new BasicDBObject();
-        spy2.append(DBHelper.OWNER_KEY, "b");
-        spy2.append(DBHelper.POSITION_KEY, 1);
-        spies.add(spy2);
         state.append(DBHelper.SPIES_KEY, spies);
-        //Remove this-------------
 
         return state;
+    }
+
+    private ArrayList<Integer> initialVisibleTerritories(int[] countryOwners, int owner){
+        HashSet<Integer> visibleIndexSet = new HashSet<Integer>();
+        AdjacencyMap adjacencyMap = new AdjacencyMap();
+        for(int i = 0; i < countryOwners.length; i++){
+            int ownerNumber = countryOwners[i];
+            if (ownerNumber == owner) {
+                visibleIndexSet.add(i);
+
+                ArrayList<Integer> adjacencies = adjacencyMap.getAdjacencies(i);
+                visibleIndexSet.addAll(adjacencies);
+            }
+        }
+        return new ArrayList<Integer>(visibleIndexSet);
+    }
+
+    private ArrayList<DBObject> initialHighestTech(String username, ArrayList<String> usernames){
+        ArrayList<DBObject> highestTech = new ArrayList<DBObject>();
+        for (String user : usernames) {
+            if(!user.equals(username)){
+                BasicDBObject tech = new BasicDBObject();
+                tech.append(DBHelper.OWNER_KEY, user);
+                tech.append(DBHelper.LEVEL_KEY, 0);
+                highestTech.add(tech);
+            }
+        }
+        return highestTech;
     }
 
     private DBCursor getStateCursor(){
@@ -205,9 +210,7 @@ public class Game {
         return true;
     }
 
-    public String getCurrentGameStateJson(String username){
-        System.out.println("Get game state for username: " + username);
-        
+    public String getCurrentGameStateJson(String username){        
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         DBObject filteredCurrentTurn = filterStateForUsername(currentTurn, username);
 
