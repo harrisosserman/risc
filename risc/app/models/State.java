@@ -879,6 +879,19 @@ public void saveState(){
             player_doc.append(Constants.FOOD, p.getFood());
             player_doc.append(Constants.TECHNOLOGY, p.getTechnology());
             player_doc.append(Constants.ADDITIONALINFANTRY, 0);
+            List<BasicDBObject> otherPlayer_list = new ArrayList<BasicDBObject>();
+            for(String username_ : wr.getUsernames()){
+                if(username_.equals(p.getName())){
+                    continue;
+                }
+                else{
+                    BasicDBObject otherPlayer_doc = new BasicDBObject();
+                    otherPlayer_doc.append(Constants.OWNER, username_);
+                    otherPlayer_doc.append(Constants.LEVEL, 1);
+                    otherPlayer_list.add(otherPlayer_doc);
+                }
+            }
+            player_doc.append(Constants.HIGHESTTECHNOLOGY, otherPlayer_list);
             player_doc.append(Constants.TERRITORIESVISIBLE, visibleTerritoriesForEachPlayer.get(p));
             player_list.add(player_doc);
         }
