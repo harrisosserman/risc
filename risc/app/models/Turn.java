@@ -139,10 +139,10 @@ public class Turn {
         BasicDBObject[] playersArray = players.toArray(new BasicDBObject[0]);
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         int highestTurn_value = Integer.parseInt(currentTurn.get(Constants.TURN).toString());
-    //    System.out.println("highest turn is " + highestTurn_value);
+        System.out.println("highest turn is " + highestTurn_value);
         
         for(BasicDBObject play : playersArray){
-  //          System.out.println("entered player array " + play.get(NAME));
+            System.out.println("entered player array " + play.get(Constants.NAME));
             DBCollection committedTurns = DBHelper.getCommittedTurnsCollection();
             String username = play.get(Constants.NAME).toString();
             BasicDBObject isPlayerCommitted = new BasicDBObject(Constants.GAME_ID, myGameID);
@@ -150,17 +150,17 @@ public class Turn {
             isPlayerCommitted.put(Constants.USERNAME, username);
             DBCursor lastCommit = committedTurns.find(isPlayerCommitted).sort(new BasicDBObject(Constants.TIMESTAMP, -1));
             if(!lastCommit.hasNext()){
-         //       System.out.println("last commit does nt have next" + username);
+                System.out.println("last commit does nt have next" + username);
                 return false;
             }
             DBObject playerInfo = lastCommit.next();
             int committed = Integer.parseInt(playerInfo.get(Constants.COMMITTED).toString());
             if(committed == 0){
-       //         System.out.println("didnt commit?");
+                System.out.println("didnt commit?");
                 return false;
             }
         }
-     //   System.out.println("test passed");
+        System.out.println("test passed");
         return true;
     }
 

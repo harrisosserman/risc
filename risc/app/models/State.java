@@ -69,7 +69,7 @@ public State(String gameID){
  * and explained below.
  * 
  * @param turn_number the number turn the game is on
- * @throws UnknownHostException Thrown to indicate that the IP address of a host could not 
+ * @throws UnknownHost Exception Thrown to indicate that the IP address of a host could not 
  * be determined.
  */
 
@@ -294,6 +294,20 @@ public void moveTypeUpgrade(BasicDBObject move, Player p){
                 }
                 spys.add(spy_);
                 spies.put(position, spys);
+            }
+            else if(trooptype.equals(TroopType.SPY)){
+                if(spies.containsKey(position_)){
+                    ArrayList<Spy> spys_ = spies.get(position_);
+                    Spy spy;
+                    int k = 0;
+                    for(Spy s : spys_){
+                        if(s.getOwner().equals(p)){
+                            spys_.remove(k);
+                            army.addTroop(upgradetype);
+                        }
+                        k++;
+                    }
+                }
             }
             else{
                 army.addTroop(upgradetype);
@@ -823,6 +837,7 @@ public String typeToString(TroopType t){
 			case TANKS: return "TANKS";
 			case IMPROVEDTANKS: return "IMPROVEDTANKS";
 			case PLANES: return "PLANES";
+            case SPY: return "SPY";
 			default: return "INFANTRY";
 		}
     }
@@ -887,7 +902,7 @@ public void saveState(){
                 else{
                     BasicDBObject otherPlayer_doc = new BasicDBObject();
                     otherPlayer_doc.append(Constants.OWNER, username_);
-                    otherPlayer_doc.append(Constants.LEVEL, 1);
+                    otherPlayer_doc.append(Constants.LEVEL, myActivePlayers.get(username_).getTechnologyLevel());
                     otherPlayer_list.add(otherPlayer_doc);
                 }
             }

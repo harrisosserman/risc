@@ -76,7 +76,6 @@ public class API extends Controller {
             int k = state.loadPreviousState();
             System.out.println("lien 1 end in");
             return ok("returned true " + k);
-        
         }
         System.out.println("lien 1 end out");
         return ok("Turn commited for turn :" + turn_number);
