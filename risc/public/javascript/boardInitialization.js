@@ -135,25 +135,12 @@
             $("#map td button").hide();
         };
         board.getPlayerNumberByUsername = function(username) {
-            if(username === "kat") {
-                return 1;
+            for(var k=0; k<board.territoryInfo.playerInfo.length; k++) {
+                if(username === board.territoryInfo.playerInfo[k].owner) {
+                    return board.territoryInfo.playerInfo[k].playerNumber + 1;
+                }
             }
-            return 2;
-            // var output = -1;
-
-            // $.ajax('/game/' + globalFunctions.getGameID(), {
-            //     method: 'GET',
-            //         }).done(function(result) {
-            //             var data  = $.parseJSON(result);
-            //             console.log(data);
-            //             for(var k=0; k<data.players.length; k++) {
-            //                 if(username === data.players[k].name) {
-            //                     output =  k + 1;
-            //                     break;
-            //                 }
-            //             }
-            //         });
-
+            return -1;
         };
         board.getMap = function() {
             $("#dialog").dialog();
@@ -170,7 +157,6 @@
                         board.territoryInfo = $.parseJSON(result);
                         for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
                             var playerNum = board.getPlayerNumberByUsername(board.territoryInfo.playerInfo[m].owner) - 1;
-                            console.log("for player " + board.territoryInfo.playerInfo[m].owner + " player number is " + playerNum);
                             board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo, false, playerNum);
                             board.additionalInfantry[playerNum] = board.territoryInfo.playerInfo[m].additionalInfantry;
                             if(globalFunctions.getPlayerNumber() - 1 === playerNum) {
@@ -299,7 +285,6 @@
             }
             board.playerList.remove(playerObject);
             if(typeof playerNumber !== 'undefined') {
-                console.log("player number is: " + playerNumber);
                 board.playerList.splice(playerNumber, 0, newPlayerObject);
             } else {
                 board.playerList.splice(index, 0, newPlayerObject);
