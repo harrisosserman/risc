@@ -92,6 +92,7 @@ public int loadPreviousState(){
         player1.setAdditionalTroops(addTroops);
         myActivePlayers.put(username, player1);
     }
+    //players loaded
     BasicDBList territoryInfo = (BasicDBList) lastStateObject.get(Constants.TERRITORIES);
     BasicDBObject[] territoryArray = territoryInfo.toArray(new BasicDBObject[0]);
     for(BasicDBObject territory : territoryArray){
@@ -140,6 +141,7 @@ public int loadPreviousState(){
         }}
         territories.put(terr.getPosition(), terr);
     }
+    System.out.println("territories loaded");
     BasicDBList spyInfo = (BasicDBList) lastStateObject.get(Constants.SPIES);
     BasicDBObject[] spyArray = spyInfo.toArray(new BasicDBObject[0]);
     for(BasicDBObject spy : spyArray){
@@ -165,8 +167,12 @@ public int loadPreviousState(){
         spies.put(position, spys);
 
     }
+System.out.println("spies loaded");
+
     updateStateWithMoves();
+    System.out.println("between methods");
     saveState(); 
+    System.out.println("state saved");
     return 5;
 
 }
@@ -459,6 +465,7 @@ public int computeCostOfTroopUpgrade(TroopType old, TroopType new_){
 }
 
 public void updateStateWithMoves(){
+    System.out.println("within state with moves method");
     for(String username : myActivePlayers.keySet()){
         Player p = myActivePlayers.get(username);
         System.out.println(myGameID);
@@ -473,21 +480,26 @@ public void updateStateWithMoves(){
                 myActivePlayers.put(p.getName(), p);
             }
         }
+        System.out.println("within state with moves method");
         BasicDBList movesList = (BasicDBList) lastCommittedTurn.get(Constants.MOVES);  
         BasicDBObject[] movesArray = movesList.toArray(new BasicDBObject[0]);
         for(BasicDBObject move : movesArray){
             int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
             if(moveType == 0){
+                System.out.println("move type = 0");
                 moveTypeUpgrade(move, p);
             }
             else if(moveType == 1){
                 moveTypeMove(move, p);
+                System.out.println("move type = 1");
             }
             else if(moveType == 2){
                 moveTypeAttack(move, p);
+                System.out.println("move type = 2");
             }
             else if(moveType == 3){
                 moveTypePlace(move, p);
+                System.out.println("move type = 3");
             }
 
         }
@@ -742,7 +754,9 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
  */
 
 public void finalizeState(){
+    System.out.println("finalize");
     for(String username: myActivePlayers.keySet()){
+         System.out.println("finalize players");
         Player player = myActivePlayers.get(username);
         int food = player.getFood();
         for(Integer position : territories.keySet()){
@@ -756,6 +770,7 @@ public void finalizeState(){
         }
     }
     for(String username: myActivePlayers.keySet()){
+         System.out.println("players again");
         Player player = myActivePlayers.get(username);
         int troopsToDelete = 0;
         int food = player.getFood();
@@ -853,6 +868,7 @@ public boolean playerOwnsATerritory(Player owner){
 }
 
 public void saveState(){
+    visibleTerritories();
     System.out.println("saving");
     DBCollection state = DBHelper.getStateCollection();
     BasicDBObject turn_doc = new BasicDBObject();
@@ -896,17 +912,21 @@ public void saveState(){
             player_doc.append(Constants.ADDITIONALINFANTRY, 0);
             List<BasicDBObject> otherPlayer_list = new ArrayList<BasicDBObject>();
             for(String username_ : wr.getUsernames()){
+                System.out.println(username_ + "in loop");
                 if(username_.equals(p.getName())){
+                    System.out.println(username_ + " equal");
                     continue;
                 }
                 else{
                     BasicDBObject otherPlayer_doc = new BasicDBObject();
                     otherPlayer_doc.append(Constants.OWNER, username_);
+                    System.out.println("username is " + username_);
                     otherPlayer_doc.append(Constants.LEVEL, myActivePlayers.get(username_).getTechnologyLevel());
                     otherPlayer_list.add(otherPlayer_doc);
                 }
             }
             player_doc.append(Constants.HIGHESTTECHNOLOGY, otherPlayer_list);
+            System.out.println(visibleTerritoriesForEachPlayer.size() + "size");
             player_doc.append(Constants.TERRITORIESVISIBLE, visibleTerritoriesForEachPlayer.get(p));
             player_list.add(player_doc);
         }

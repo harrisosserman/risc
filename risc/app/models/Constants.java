@@ -47,7 +47,7 @@ public final class Constants{
     public static final String PERCENTAGE = "percentage";
     public static final String PREVIOUSTYPE = "previousType";
     public static final String TERRITORIESVISIBLE = "territoriesVisible";
-    public static final String HIGHESTTECHNOLOGY = "territoriesVisible";
+    public static final String HIGHESTTECHNOLOGY = "highestTechnology";
 
 
 
