@@ -42,6 +42,7 @@
     "playerInfo": [
         {
             "owner": "kat",
+            "playerNumber":0,
             "level": 6,
             "food": 5,
             "technology": 10,
@@ -50,10 +51,12 @@
         },
         {
             "owner": "kat",
+            "playerNumber":1,
             "level": 4
         },
         {
             "owner": "julian",
+            "playerNumber":2,
             "level": 8
         }
     ]

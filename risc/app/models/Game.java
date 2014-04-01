@@ -210,14 +210,13 @@ public class Game {
         return true;
     }
 
-    public String getCurrentGameStateJson(String username){        
+    public String getCurrentGameStateJson(String username, ArrayList<String> usernames){        
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
-        DBObject filteredCurrentTurn = filterStateForUsername(currentTurn, username);
-
+        DBObject filteredCurrentTurn = filterStateForUsername(currentTurn, username, usernames);
         return filteredCurrentTurn.toString();
     }
 
-    private DBObject filterStateForUsername(DBObject currentTurn, String username){
+    private DBObject filterStateForUsername(DBObject currentTurn, String username, ArrayList<String> usernames){
         //Filter territories
         ArrayList<DBObject> playerInfo = (ArrayList<DBObject>)currentTurn.get(DBHelper.PLAYER_INFO_KEY);
         DBObject targetPlayerInfo = null;
@@ -252,19 +251,23 @@ public class Game {
                 }
             }
 
-        currentTurn.put(DBHelper.SPIES_KEY, filteredSpies);
+            currentTurn.put(DBHelper.SPIES_KEY, filteredSpies);
         }
 
         //Filter playerInfo
         ArrayList<DBObject> filteredPlayerInfo = new ArrayList<DBObject>();
+        int requestingPlayerNumber = usernames.indexOf(username);
+        ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
         filteredPlayerInfo.add(targetPlayerInfo);
         ArrayList<DBObject> highestTech = (ArrayList<DBObject>)targetPlayerInfo.get(DBHelper.HIGHEST_TECHNOLOGY_KEY);
         for (DBObject tech : highestTech) {
             String owner = (String)tech.get(DBHelper.OWNER_KEY);
+            int playerNumber = usernames.indexOf(owner);
             int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
 
             BasicDBObject formattedTech = new BasicDBObject();
             formattedTech.append(DBHelper.OWNER_KEY, owner);
+            formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
             formattedTech.append(DBHelper.LEVEL_KEY, level);
             filteredPlayerInfo.add(formattedTech);
         }
