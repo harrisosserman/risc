@@ -135,12 +135,25 @@
             $("#map td button").hide();
         };
         board.getPlayerNumberByUsername = function(username) {
-            for(var k=0; k<board.playerList().length; k++) {
-                if(username === board.playerList()[k].name) {
-                    return k + 1;
-                }
+            if(username === "kat") {
+                return 1;
             }
-            return 0;
+            return 2;
+            // var output = -1;
+
+            // $.ajax('/game/' + globalFunctions.getGameID(), {
+            //     method: 'GET',
+            //         }).done(function(result) {
+            //             var data  = $.parseJSON(result);
+            //             console.log(data);
+            //             for(var k=0; k<data.players.length; k++) {
+            //                 if(username === data.players[k].name) {
+            //                     output =  k + 1;
+            //                     break;
+            //                 }
+            //             }
+            //         });
+
         };
         board.getMap = function() {
             $("#dialog").dialog();
@@ -150,14 +163,17 @@
             $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
                     }).done(function(result) {
+
                         if(globalFunctions.getPlayerNumber() === -1) {
                             $('.submitTurnButton').remove();
                         }
                         board.territoryInfo = $.parseJSON(result);
                         for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
-                            board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo);
-                            board.additionalInfantry[m] = board.territoryInfo.playerInfo[m].additionalInfantry;
-                            if(globalFunctions.getPlayerNumber() - 1 === m) {
+                            var playerNum = board.getPlayerNumberByUsername(board.territoryInfo.playerInfo[m].owner) - 1;
+                            console.log("for player " + board.territoryInfo.playerInfo[m].owner + " player number is " + playerNum);
+                            board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo, false, playerNum);
+                            board.additionalInfantry[playerNum] = board.territoryInfo.playerInfo[m].additionalInfantry;
+                            if(globalFunctions.getPlayerNumber() - 1 === playerNum) {
                                 board.playerInfo.food = board.territoryInfo.playerInfo[m].food;
                                 board.playerInfo.technology = board.territoryInfo.playerInfo[m].technology;
                                 board.playerInfo.maxTechLevel = board.territoryInfo.playerInfo[m].level;
@@ -239,10 +255,15 @@
                 }
             }
         };
-        board.updatePlayerInfoTable = function(index, playerInfo, updateTechnology) {
-            var playerObject = board.playerList()[index];
+        board.updatePlayerInfoTable = function(index, playerInfo, updateTechnology, playerNumber) {
+            var playerObject;
+            if(typeof playerNumber !== 'undefined' && playerNumber !== -1) {
+                playerObject = board.playerList()[playerNumber];
+            } else {
+                playerObject = board.playerList()[index];
+            }
             var newPlayerObject = {};
-            if(typeof updateTechnology !== 'undefined') {
+            if(typeof updateTechnology !== 'undefined' && updateTechnology !== false) {
                 newPlayerObject = {
                     name: playerObject.name,
                     color: playerObject.color,
@@ -277,7 +298,12 @@
                 };
             }
             board.playerList.remove(playerObject);
-            board.playerList.splice(index, 0, newPlayerObject);
+            if(typeof playerNumber !== 'undefined') {
+                console.log("player number is: " + playerNumber);
+                board.playerList.splice(playerNumber, 0, newPlayerObject);
+            } else {
+                board.playerList.splice(index, 0, newPlayerObject);
+            }
         };
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
