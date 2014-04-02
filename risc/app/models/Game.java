@@ -256,21 +256,40 @@ public class Game {
 
         //Filter playerInfo
         ArrayList<DBObject> filteredPlayerInfo = new ArrayList<DBObject>();
-        int requestingPlayerNumber = usernames.indexOf(username);
-        ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
-        filteredPlayerInfo.add(targetPlayerInfo);
+        // int requestingPlayerNumber = usernames.indexOf(username);
+        // ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
+        // filteredPlayerInfo.add(targetPlayerInfo);
         ArrayList<DBObject> highestTech = (ArrayList<DBObject>)targetPlayerInfo.get(DBHelper.HIGHEST_TECHNOLOGY_KEY);
-        for (DBObject tech : highestTech) {
-            String owner = (String)tech.get(DBHelper.OWNER_KEY);
-            int playerNumber = usernames.indexOf(owner);
-            int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
+        for (String user : usernames) {
+            for (DBObject tech : highestTech) {
+                String owner = (String)tech.get(DBHelper.OWNER_KEY);
+                if (owner.equals(user)) {
+                    int playerNumber = usernames.indexOf(owner);
+                    int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
 
-            BasicDBObject formattedTech = new BasicDBObject();
-            formattedTech.append(DBHelper.OWNER_KEY, owner);
-            formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
-            formattedTech.append(DBHelper.LEVEL_KEY, level);
-            filteredPlayerInfo.add(formattedTech);
+                    BasicDBObject formattedTech = new BasicDBObject();
+                    formattedTech.append(DBHelper.OWNER_KEY, owner);
+                    formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
+                    formattedTech.append(DBHelper.LEVEL_KEY, level);
+                    filteredPlayerInfo.add(formattedTech);
+                }else if (user.equals(username)){
+                    int requestingPlayerNumber = usernames.indexOf(username);
+                    ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
+                    filteredPlayerInfo.add(targetPlayerInfo);
+                }
+            }
         }
+        // for (DBObject tech : highestTech) {
+        //     String owner = (String)tech.get(DBHelper.OWNER_KEY);
+        //     int playerNumber = usernames.indexOf(owner);
+        //     int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
+
+        //     BasicDBObject formattedTech = new BasicDBObject();
+        //     formattedTech.append(DBHelper.OWNER_KEY, owner);
+        //     formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
+        //     formattedTech.append(DBHelper.LEVEL_KEY, level);
+        //     filteredPlayerInfo.add(formattedTech);
+        // }
 
         currentTurn.put(DBHelper.PLAYER_INFO_KEY, filteredPlayerInfo);
 
