@@ -5,14 +5,11 @@ import java.util.*;
 public class AdjacencyMap{
 
 	private HashMap<Integer, ArrayList<Integer>> myAdjacencies; 
-
 	public AdjacencyMap(){
 		myAdjacencies = createMap();
 	}
-
 	public HashMap<Integer, ArrayList<Integer>> createMap(){
                 HashMap<Integer, ArrayList<Integer>> map = new HashMap<Integer, ArrayList<Integer>>();
-
                 ArrayList<Integer> terr_0 = new ArrayList<Integer>();
                 terr_0.add(1);
                 terr_0.add(5);

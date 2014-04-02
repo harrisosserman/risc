@@ -61,11 +61,16 @@ public class Spy{
         return myCatchPercentage;
     }
     
+    public int getPosition(){
+        return myLocation.getPosition();
+    }
+
     public void setCatchPercentage(Integer percentage){
         myCatchPercentage = percentage;
     }
 
     public boolean spyCaughtOrNot(){
+        myCatchPercentage = myCatchPercentage + 7;
         double value =  (Math.random() * 100);
         if(myCatchPercentage>=value){
             return true;
