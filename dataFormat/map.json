@@ -3,6 +3,7 @@
     "timeStamp" : NumberLong("1393816130955"),
     "numPlayers": 3,
     "turn": 0,
+    "notifyNukesAvailable": true,
     "territories": [
                 {
                     "owner": "kat",

@@ -38,7 +38,16 @@
 
         }
     ],
-
+    "notifyNukesAvailable":[
+        {
+            "owner":"kat",
+            "notify": true
+        },
+        {
+            "owner":"harris",
+            "notify": true
+        }
+    ]
     "playerInfo": [ 
         {
             "owner": "kat",
