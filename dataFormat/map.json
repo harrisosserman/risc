@@ -48,14 +48,21 @@
             "technology": 10,
             "additionalInfantry": 48,
             "territoriesVisible": [5,4,6,7,8]
+            "allies": [
+                "harris",
+            ]
         },
         {
-            "owner": "kat",
+            "owner": "harris",
             "playerNumber":1,
             "level": 4
+            "food": 5,
+            "technology": 10,
+            "additionalInfantry": 48,
+            "territoriesVisible": [3,4,5,8]
         },
         {
-            "owner": "julian",
+            "owner": "julian",          //reduced info for non-allies
             "playerNumber":2,
             "level": 8
         }

@@ -57,6 +57,10 @@
                 }
             ],
             "territoriesVisible": [5,4,6,7,8]
+            "allies": [
+                "username1",
+                "username2",
+            ]
         },
         {
             "owner": "harris",
