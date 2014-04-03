@@ -61,7 +61,12 @@
             "troopType": "NUKE",
             "start": -1,
             "end": 4
-        }
+        },
+        {
+            "moveType": 3,  //placing an interceptor
+            "troopType": "INTERCEPTOR",
+            "position": 4
+        },
 
     ]
 
