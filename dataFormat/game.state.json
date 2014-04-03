@@ -47,6 +47,16 @@
             "owner":"harris",
             "notify": true
         }
+    ],
+    "canUseNukes":[
+        {
+            "owner":"kat",
+            "nukesAvailable": true
+        },
+        {
+            "owner":"harris",
+            "nukesAvailable": true
+        }
     ]
     "playerInfo": [ 
         {

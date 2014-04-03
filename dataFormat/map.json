@@ -4,6 +4,7 @@
     "numPlayers": 3,
     "turn": 0,
     "notifyNukesAvailable": true,
+    "canUseNukes": true,
     "territories": [
                 {
                     "owner": "kat",
