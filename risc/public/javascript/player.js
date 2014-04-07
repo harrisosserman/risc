@@ -41,7 +41,7 @@
 
         };
         player.usernameChanged = function() {
-            $.ajax('/player/' + player.username(), {
+            $.ajax('/test/player/' + player.username(), {
                 method: 'GET'
             }).fail(function() {
                 //there is no username in the db with the username the user tried to use
@@ -53,7 +53,7 @@
         };
 
         player.login = function() {
-            $.ajax('/player/' + player.username() + '/login', {
+            $.ajax('/test/player/' + player.username() + '/login', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': player.username(),
@@ -77,7 +77,7 @@
             }
             player.passwordError(false);
 
-            $.ajax('/player', {
+            $.ajax('/test/player', {
                 method: 'POST',
                 data: JSON.stringify({
                     'name': player.username(),
