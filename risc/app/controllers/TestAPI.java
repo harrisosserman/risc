@@ -153,7 +153,7 @@ public class TestAPI extends Controller {
     //     return ok(result.toString());
     // }
 
-    public static Result getTestMap(String id) {
+    public static Result getTestMap(String id, String username) {
         JSONObject result = new JSONObject();
         result.put("gameID", "3938383");
         result.put("numPlayers", 3);
@@ -189,15 +189,15 @@ public class TestAPI extends Controller {
         spies.put(new JSONObject().put("owner", "harriso").put("position", 1).put("percentage", 15).put("previousType", "INFANTRY"));
         result.put("spies", spies);
         JSONArray additionalInfo = new JSONArray();
-        additionalInfo.put(new JSONObject().put("owner", "rickybobby").put("level", 2));
-        additionalInfo.put(new JSONObject().put("owner", "magicman").put("level", 3));
-        additionalInfo.put(new JSONObject().put("owner", "harriso").put("level", 0).put("food", 35).put("technology", 100).put("additionalInfantry", 50));
+        additionalInfo.put(new JSONObject().put("owner", "rickybobby").put("level", 2).put("playerNumber", 0));
+        additionalInfo.put(new JSONObject().put("owner", "magicman").put("level", 3).put("playerNumber", 1));
+        additionalInfo.put(new JSONObject().put("owner", "harriso").put("level", 0).put("food", 35).put("technology", 100).put("additionalInfantry", 50).put("playerNumber", 2));
         result.put("playerInfo", additionalInfo);
         return ok(result.toString());
     }
 
     public static Result getTestMapReady(String id) {
-        return getTestMap(id);
+        return getTestMap(id, "");
     }
 
     public static Result commitTestTurn(String id) {
@@ -246,7 +246,7 @@ public class TestAPI extends Controller {
             return playerWinsMap();
         }
         if(testCounterInGetTestMap == 10) {
-            return getTestMap(id);
+            return getTestMap(id, "");
         }
         return status(400, "map not ready");
     }
