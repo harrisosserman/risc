@@ -191,7 +191,10 @@ public class TestAPI extends Controller {
         JSONArray additionalInfo = new JSONArray();
         additionalInfo.put(new JSONObject().put("owner", "rickybobby").put("level", 2).put("playerNumber", 0));
         additionalInfo.put(new JSONObject().put("owner", "magicman").put("level", 3).put("playerNumber", 1));
-        additionalInfo.put(new JSONObject().put("owner", "harriso").put("level", 0).put("food", 35).put("technology", 100).put("additionalInfantry", 50).put("playerNumber", 2));
+        ArrayList<String> alliesList = new ArrayList<String>();
+        alliesList.add("rickybobby");
+        JSONArray allies = new JSONArray(alliesList);
+        additionalInfo.put(new JSONObject().put("owner", "harriso").put("allies", allies).put("level", 0).put("food", 35).put("technology", 100).put("additionalInfantry", 50).put("playerNumber", 2));
         result.put("playerInfo", additionalInfo);
         return ok(result.toString());
     }

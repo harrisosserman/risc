@@ -283,6 +283,34 @@
                             </table>
                         </div>
                     </div>
+
+
+                    <div class="row-fluid">
+                        <div class = "well well-sm">
+                            <h5 class="centerAlign">Allies</h5>
+                            <table class="playerInfoTable">
+                                <thead>
+                                    <tr>
+                                        <th>Player</th>
+                                        <th>End Alliance</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: alliesList">
+                                    <tr>
+                                        <td data-bind="text: name"></td>
+                                        <td>
+                                            <button data-bind="click: $parent.removeAlly, enable: isAlliedNextTurn">End Alliance</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h5 class="centerAlign">Add Ally</h5>
+                            <select data-bind="options: playerList, optionsText: function(item) {
+                                return item.name
+                            }, value: selectedAddAlly"></select>
+                            <button data-bind="click: addAlly">Add Ally</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
