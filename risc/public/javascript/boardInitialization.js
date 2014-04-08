@@ -422,12 +422,13 @@
                 }
             }
             board.alliesList.push(newAlly);
-            board.editing.addAlly(globalFunctions.getUsername(), newAlly.name);
+            board.editing.editAlliance(globalFunctions.getUsername(), newAlly.name, true);
         };
         board.removeAlly = function(ally) {
             board.alliesList.remove(ally);
             ally.isAlliedNextTurn = false;
             board.alliesList.push(ally);
+            board.editing.editAlliance(globalFunctions.getUsername(), ally.name, false);
         };
         board.convertReadableText = function(input) {
             var result = {};
