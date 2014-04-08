@@ -294,6 +294,14 @@
                 board.playerList.splice(index, 0, newPlayerObject);
             }
         };
+        board.hasAllyOnTerritory = function(index) {
+            for(var k=0; k<board.alliesList().length; k++) {
+                if(board.alliesList()[k].name === board.territoryOwner[index] && board.alliesList()[k].isAlliedNextTurn === true) {
+                    return true;
+                }
+            }
+            return false;
+        };
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
             // var map = board.territoryDOMElements;
@@ -313,7 +321,7 @@
                 // }
 
 
-                if(board.territoryOwner[adjacentTerritories[k]] != globalFunctions.getUsername()) {
+                if(board.territoryOwner[adjacentTerritories[k]] != globalFunctions.getUsername() &&  !board.hasAllyOnTerritory(adjacentTerritories[k])) {
                     $(map[adjacentTerritories[k]]).addClass('territoryAttack');
                 } else {
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
@@ -383,6 +391,7 @@
                 }
             }
         };
+
         board.userMapAction = function(index, map) {
             if($(map[index]).hasClass('territoryClick')) {
                 board.editing.removeAllPreviousAdjacencies();
