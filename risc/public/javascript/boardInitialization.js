@@ -40,6 +40,7 @@
         board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
         board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35];
         board.editing = new BoardEditing(globalFunctions);
+        board.hasLoadedChat = false;
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.createAndLoadMap = function() {
             board.createMap();
@@ -146,6 +147,15 @@
             $("#dialog").dialog();
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
+            if(board.hasLoadedChat === false) {
+                  var chatRef = new Firebase('https://torid-fire-6946.firebaseio.com/chat');
+                  // var auth = new FirebaseSimpleLogin(chatRef, function(error, user) {});
+                  var chat = new FirechatUI(chatRef, document.getElementById("firechat-wrapper"));
+                  chat.setUser(globalFunctions.getUsername(), globalFunctions.getUsername());
+                  // auth.login('anonymous');
+                  board.hasLoadedChat = true;
+            }
+
 
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',

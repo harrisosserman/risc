@@ -116,7 +116,6 @@
         };
         lobby.loadMyGamesInnerFunc = function(data) {
             data = $.parseJSON(data);
-            console.log(data);
             lobby.loadGamesHelper(lobby.myGamesList, data);
         };
         lobby.loadAllGames = function() {
