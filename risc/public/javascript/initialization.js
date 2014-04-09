@@ -11,7 +11,9 @@
         initialization.openInstructions = function() {
             globalFunctions.setDisplayInstructions(true);
         };
-
+        initialization.openChat = function() {
+            globalFunctions.setDisplayChat(true);
+        };
         initialization.submitTurnClick = function() {
             globalFunctions.getAdditionalInfantry()[globalFunctions.getPlayerNumber() - 1] = 0;
             console.log(globalFunctions.getAdditionalInfantry());

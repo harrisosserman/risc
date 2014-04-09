@@ -40,7 +40,6 @@
         board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
         board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35];
         board.editing = new BoardEditing(globalFunctions);
-        board.hasLoadedChat = false;
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.createAndLoadMap = function() {
             board.createMap();
@@ -147,48 +146,6 @@
             $("#dialog").dialog();
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
-            if(board.hasLoadedChat === false) {
-                var chatRef = new Firebase('https://torid-fire-6946.firebaseio.com');
-                var chat = new FirechatUI(chatRef, document.getElementById("firechat-wrapper"));
-                // chat._chat.createRoom("RISC12345", "public", function(roomId) {
-                //      chat._chat.getRoom(roomId, function(room) {
-                //             console.log(room);
-                //         });
-
-
-                // });
-
-                // createRoom(roomName, roomType, callback(roomId))
-
-                var simpleLogin = new FirebaseSimpleLogin(chatRef, function(err, user) {
-                  if (user) {
-                    chat.setUser(user.id, 'Anonymous' + user.id.substr(0, 8));
-                    setTimeout(function() {
-                      chat._chat.enterRoom('-JJzwl7SG5J01akn17WU');
-                    }, 500);
-                  } else {
-                    simpleLogin.login('anonymous');
-                  }
-                });
-
-
-
-                // var firechatRef = new Firebase('https://torid-fire-6946.firebaseio.com');
-                // var auth = new FirebaseSimpleLogin(firechatRef, function(error, user) {
-                //     if(error) {
-                //         console.log("there was an error.  " + error);
-                //     } else {
-                //         console.log("user is: " + user);
-                //     }
-                // });
-                // auth.login('facebook');
-                // var chat = new FirechatUI(auth, document.getElementById("firechat-wrapper"));
-                // chat.setUser(globalFunctions.getUsername(), globalFunctions.getUsername());
-
-                board.hasLoadedChat = true;
-            }
-
-
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
                     }).done(function(result) {

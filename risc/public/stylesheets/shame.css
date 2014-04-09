@@ -75,3 +75,10 @@ table > tbody > td{
   -moz-box-shadow: 0 5px 25px #666;
   box-shadow: 0 5px 25px #666;
 }
+#chat-modal {
+  max-height:600px;
+  height:600px;
+}
+.alertNewMessage {
+  background-color: #CD9B9B;
+}
