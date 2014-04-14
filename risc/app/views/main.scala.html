@@ -63,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal" data-bind="visible: displayChat">
+                <div class="modal chatOnTop" data-bind="visible: displayChat">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -211,13 +211,34 @@
                         </table>
                     </div>
                     <div id="dialog">
-                        <h5>Enter the number of troops that you would like to use</h5>
-                        <input type="text" data-bind="value: inputNumberAttackOrMove" placeholder="Number of Troops"></input>
-                        <h5>Enter the type of troop</h5>
-                        <select data-bind="options: typesOfTroops, value: typeOfTroopSelected"></select>
-                        <div data-bind="visible: displayUpgradeTroopsModal">
-                            <h5>Upgrade to</h5>
-                            <select data-bind="options: typesOfTroops, value: typeOfTroopUpgradeSelected"></select>
+                        <div data-bind="visible: displayTradeModal">
+                            <div data-bind="foreach: tradeElementsList">
+                                <h5>Giver</h5>
+                                <select data-bind="options: playerList, optionsText: function(item) {
+                                    return item.name
+                                }, value: giver1"></select>
+                                <h5>Receiver</h5>
+                                <select data-bind="options: playerList, optionsText: function(item) {
+                                    return item.name
+                                }, value: receiver1"></select>
+                                <h5>Type</h5>
+                                <select data-bind="options: typeList, value: type"></select>
+                                <h5>Number</h5>
+                                <input type="text" data-bind="value: inputTradeNumber"></input>
+                            </div>
+
+
+
+                        </div>
+                        <div data-bind="visible: !displayTradeModal">
+                            <h5>Enter the number of troops that you would like to use</h5>
+                            <input type="text" data-bind="value: inputNumberAttackOrMove" placeholder="Number of Troops"></input>
+                            <h5>Enter the type of troop</h5>
+                            <select data-bind="options: typesOfTroops, value: typeOfTroopSelected"></select>
+                            <div data-bind="visible: displayUpgradeTroopsModal">
+                                <h5>Upgrade to</h5>
+                                <select data-bind="options: typesOfTroops, value: typeOfTroopUpgradeSelected"></select>
+                            </div>
                         </div>
                         <button data-bind="click: submitMove">Submit</button>
                     </div>
@@ -336,28 +357,30 @@
                     </div>
                     <div class="row-fluid">
                         <div class = "well well-sm">
-                            <h5 class="centerAlign">Allies</h5>
+                            <h5 class="centerAlign">Trades</h5>
                             <table class="playerInfoTable">
                                 <thead>
                                     <tr>
-                                        <th>Player</th>
-                                        <th>End Alliance</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Type</th>
+                                        <th>Number</th>
                                     </tr>
                                 </thead>
-                                <tbody data-bind="foreach: alliesList">
+                                <tbody data-bind="foreach: tradesList">
                                     <tr>
-                                        <td data-bind="text: name"></td>
-                                        <td>
-                                            <button data-bind="click: $parent.removeAlly, enable: isAlliedNextTurn">End Alliance</button>
-                                        </td>
+                                        <td>Offer:</td>
+                                        <td><button>Cancel Trade</button></td>
+                                        <tr data-bind="foreach: offer">
+                                            <td data-bind="text: giver"></td>
+                                            <td data-bind="text: receiver"></td>
+                                            <td data-bind="text: number"></td>
+                                            <td data-bind="text: type"></td>
+                                        </tr>
                                     </tr>
                                 </tbody>
+                                <button>Add Trade</button>
                             </table>
-                            <h5 class="centerAlign">Add Ally</h5>
-                            <select data-bind="options: playerList, optionsText: function(item) {
-                                return item.name
-                            }, value: selectedAddAlly"></select>
-                            <button data-bind="click: addAlly">Add Ally</button>
                         </div>
                     </div>
                 </div>

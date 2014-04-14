@@ -82,3 +82,6 @@ table > tbody > td{
 .alertNewMessage {
   background-color: #CD9B9B;
 }
+.chatOnTop {
+  z-index: 10;
+}

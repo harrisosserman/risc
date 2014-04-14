@@ -29,6 +29,7 @@
         board.displayMap = ko.observable(false);
         board.hasNotUpgradedThisTurn = ko.observable(true);
         board.displayUpgradeTroopsModal = ko.observable(false);
+        board.displayTradeModal = ko.observable(false);
         board.typeOfTroopUpgradeSelected = ko.observable();
         board.playerList = ko.observableArray();
         board.alliesList = ko.observableArray();
@@ -36,6 +37,7 @@
         board.territoryClickTerritoryNumber = ko.observable("-");
         board.territoryClickInfo = ko.observableArray();
         board.territoryClickAttackInfo = ko.observableArray();
+        board.tradesList = ko.observableArray();
         board.selectedAddAlly = ko.observable();
         board.moveTroops = false;
         board.attackTroops = false;
