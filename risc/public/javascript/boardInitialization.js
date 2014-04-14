@@ -31,10 +31,12 @@
         board.displayUpgradeTroopsModal = ko.observable(false);
         board.typeOfTroopUpgradeSelected = ko.observable();
         board.playerList = ko.observableArray();
+        board.alliesList = ko.observableArray();
         board.typeOfTroopSelected = ko.observable();
         board.territoryClickTerritoryNumber = ko.observable("-");
         board.territoryClickInfo = ko.observableArray();
         board.territoryClickAttackInfo = ko.observableArray();
+        board.selectedAddAlly = ko.observable();
         board.moveTroops = false;
         board.attackTroops = false;
         board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
@@ -76,6 +78,7 @@
             board.editing.clearSpiesCannotMove();
             board.editing.constructSpiesCannotMove();
             board.clearBoardInfo();
+            board.alliesList.removeAll();
         };
         globalFunctions.getPlayerInfo = function() {
             return board.playerInfo;
@@ -162,6 +165,7 @@
                                 board.playerInfo.food = board.territoryInfo.playerInfo[m].food;
                                 board.playerInfo.technology = board.territoryInfo.playerInfo[m].technology;
                                 board.playerInfo.maxTechLevel = board.territoryInfo.playerInfo[m].level;
+                                board.updateAlliesTable(m, board.territoryInfo.playerInfo);
                             }
                         }
                         var map = $("#map td");
@@ -289,6 +293,14 @@
                 board.playerList.splice(index, 0, newPlayerObject);
             }
         };
+        board.hasAllyOnTerritory = function(index) {
+            for(var k=0; k<board.alliesList().length; k++) {
+                if(board.alliesList()[k].name === board.territoryOwner[index] && board.alliesList()[k].isAlliedNextTurn === true) {
+                    return true;
+                }
+            }
+            return false;
+        };
         board.highlightMap = function(territoryNumber) {
             var index = territoryNumber - 1;
             // var map = board.territoryDOMElements;
@@ -301,14 +313,7 @@
             board.editing.removeAllPreviousAdjacencies();
             var adjacentTerritories = board.editing.findValidAdjacencies(index);
             for(var k=0; k<adjacentTerritories.length; k++) {
-                // if(board.territoryOwner[adjacentTerritories[k]] === globalFunctions.getUsername()) {
-                //     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
-                // } else if($(map[adjacentTerritories[k]]).hasClass('territoryMoveSpy')) {
-                //     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
-                // }
-
-
-                if(board.territoryOwner[adjacentTerritories[k]] != globalFunctions.getUsername()) {
+                if(board.territoryOwner[adjacentTerritories[k]] != globalFunctions.getUsername() &&  !board.hasAllyOnTerritory(adjacentTerritories[k])) {
                     $(map[adjacentTerritories[k]]).addClass('territoryAttack');
                 } else {
                     $(map[adjacentTerritories[k]]).addClass('territoryMoveTroops');
@@ -334,6 +339,17 @@
                     }
                 });
             }
+        };
+        board.updateAlliesTable = function(m, playerInfo) {
+            if(typeof playerInfo[m].allies !== 'undefined') {
+                for(var k=0; k<playerInfo[m].allies.length; k++) {
+                    board.alliesList.push({
+                        'name': playerInfo[m].allies[k],
+                        'isAlliedNextTurn': true
+                    });
+                }
+            }
+
         };
         board.updateTerritoryClickTable = function(index) {
             board.territoryClickTerritoryNumber(index + 1);
@@ -367,6 +383,7 @@
                 }
             }
         };
+
         board.userMapAction = function(index, map) {
             if($(map[index]).hasClass('territoryClick')) {
                 board.editing.removeAllPreviousAdjacencies();
@@ -384,6 +401,35 @@
                 board.displayUpgradeTroopsModal(false);
                 board.destinationTerritory = index;
             }
+        };
+        board.addAlly = function() {
+            var newAlly = {
+                'name': board.selectedAddAlly().name,
+                'isAlliedNextTurn': true
+            };
+            if(board.selectedAddAlly().name === globalFunctions.getUsername()) {
+                alert("You can't ally with yourself");
+                return;
+            }
+            for(var k=0; k<board.alliesList().length; k++) {
+                if(board.alliesList()[k].name === board.selectedAddAlly().name) {
+                    if(board.alliesList()[k].isAlliedNextTurn === true) {
+                        alert("You already are allies with that player");
+                        return;
+                    } else {
+                        board.alliesList.remove(board.alliesList()[k]);
+                        break;
+                    }
+                }
+            }
+            board.alliesList.push(newAlly);
+            board.editing.editAlliance(globalFunctions.getUsername(), newAlly.name, true);
+        };
+        board.removeAlly = function(ally) {
+            board.alliesList.remove(ally);
+            ally.isAlliedNextTurn = false;
+            board.alliesList.push(ally);
+            board.editing.editAlliance(globalFunctions.getUsername(), ally.name, false);
         };
         board.convertReadableText = function(input) {
             var result = {};

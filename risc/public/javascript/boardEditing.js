@@ -79,7 +79,7 @@ function BoardEditing(globals) {
         }
         return 6;
     };
-    editing.addMove = function(moveType, start, end, troopType, upgradeType) {
+    editing.addMove = function(moveType, start, end, troopType, upgradeType, formAlliance) {
         troopType = editing.convertTextForTroopCommit(troopType);
         upgradeType = editing.convertTextForTroopCommit(upgradeType);
         var result = {};
@@ -104,6 +104,16 @@ function BoardEditing(globals) {
                 moveType: moveType,
                 position: start,
                 troopType: troopType
+            };
+            editing.moveOrder.push(result);
+        } else if(moveType === 4) {
+
+        } else if(moveType === 5) {
+            result = {
+                moveType: 5,
+                formAlliance: formAlliance,
+                owner: start,
+                ally: end
             };
             editing.moveOrder.push(result);
         }
@@ -162,6 +172,9 @@ function BoardEditing(globals) {
             }
         }
         return -1;
+    };
+    editing.editAlliance = function(owner, ally, addAlly) {
+        editing.addMove(5, owner, ally, "", "", addAlly);
     };
     editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType, territoryOwner) {
         var origin = editing.findOrigin(destination, territoryDOMElements);
