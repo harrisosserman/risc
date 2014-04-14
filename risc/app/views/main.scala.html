@@ -8,6 +8,7 @@
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/shame.css")' />
         <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/bootstrap.css")' />
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href='@routes.Assets.at("stylesheets/libraries/firechat-default.css")' />
     </head>
     <body>
         <div class="navbar" id="initializationKnockout1">
@@ -17,6 +18,9 @@
                         <h3 style="text-align: center; color: white"><a href="#" id="gameName">Risc</a></h3>
                     </div>
                     <ul class="nav pull-right">
+                        <li>
+                            <button data-bind="click: openChat" id="openChatButton">Chat</button>
+                        </li>
                         <li>
                             <button data-bind="click: openInstructions">Instructions</button>
                         </li>
@@ -30,34 +34,54 @@
             </div>
         </div>
         <div class="container">
-            <div class="modal" data-bind="visible: displaySignupSigninModal" id="playerKnockout">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Play Risc!</h4>
-                        </div>
-                        <div class="modal-body loginSignupForm">
-                            <div data-bind="visible: displayGameStart">
-                                <div data-bind="visible: displayLogin" class="control-group">
-                                    <input type="text" data-bind="value: username" placeholder="Username"></input>
-                                    <input type="password" data-bind="value: password" placeholder="Password"></input>
-                                    <label data-bind="visible: loginError" class="alert-error">Your username and password don't match our records.  Please try again</label>
-                                    <button data-bind="click: login">Login</button>
-                                    <button data-bind="click: showSignup">Sign up</button>
+            <div id="playerKnockout">
+                <div class="modal" data-bind="visible: displaySignupSigninModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Play Risc!</h4>
+                            </div>
+                            <div class="modal-body loginSignupForm">
+                                <div data-bind="visible: displayGameStart">
+                                    <div data-bind="visible: displayLogin" class="control-group">
+                                        <input type="text" data-bind="value: username" placeholder="Username"></input>
+                                        <input type="password" data-bind="value: password" placeholder="Password"></input>
+                                        <label data-bind="visible: loginError" class="alert-error">Your username and password don't match our records.  Please try again</label>
+                                        <button data-bind="click: login">Login</button>
+                                        <button data-bind="click: showSignup">Sign up</button>
+                                    </div>
+                                    <div data-bind="visible: displaySignup" class="control-group">
+                                        <label data-bind="visible: usernameError" class="alert-error">Another user has that username.  Choose another username</label>
+                                        <input type="text" data-bind="event: {change: usernameChanged}, value: username, valueUpdate: 'afterkeydown', css: {inputError: usernameError}" placeholder="Username"></input>
+                                        <label data-bind="visible: passwordError" class="alert-error">Your passwords don't match</label>
+                                        <input type="password" data-bind="value: password" placeholder="Password"></input>
+                                        <input type="password" data-bind="value: passwordCheck" placeholder="Re-enter Password"></input>
+                                        <button data-bind="click: createUser">Sign Up</button>
+                                    </div>
                                 </div>
-                                <div data-bind="visible: displaySignup" class="control-group">
-                                    <label data-bind="visible: usernameError" class="alert-error">Another user has that username.  Choose another username</label>
-                                    <input type="text" data-bind="event: {change: usernameChanged}, value: username, valueUpdate: 'afterkeydown', css: {inputError: usernameError}" placeholder="Username"></input>
-                                    <label data-bind="visible: passwordError" class="alert-error">Your passwords don't match</label>
-                                    <input type="password" data-bind="value: password" placeholder="Password"></input>
-                                    <input type="password" data-bind="value: passwordCheck" placeholder="Re-enter Password"></input>
-                                    <button data-bind="click: createUser">Sign Up</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal" data-bind="visible: displayChat">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Chat</h4>
+                                <button class="pull-right" data-bind="click: closeChat">Close</button>
+                            </div>
+                        </div>
+                        <div class="modal-body" id="chat-modal">
+                            <div class="row-fluid">
+                                <div class="span6 offset3">
+                                    <div id="firechat-wrapper"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="modal" data-bind="visible: displayGameLobby" id="lobbyKnockout">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -176,6 +200,7 @@
                     </div>
                 </div>
             </div>
+
             <div id="boardKnockout">
                 <div data-bind="visible: displayMap">
                     <div class="row-fluid">
@@ -338,11 +363,18 @@
                 </div>
             </div>
         </div>
+
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="https://cdn.firebase.com/v0/firebase.js"></script>
+        <!-- // <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script> -->
         <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/knockout.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/bootstrap.js")'></script>
+        <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascript/libraries/firechat-default.js")'></script>
+        <script type="text/javascript" src="https://cdn.firebase.com/v0/firebase-simple-login.js"></script>
+
         <script type='text/javascript' src='@routes.Assets.at("javascript/turn.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/boardEditing.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascript/boardInitialization.js")'></script>

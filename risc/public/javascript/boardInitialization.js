@@ -149,7 +149,6 @@
             $("#dialog").dialog();
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
-
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
                     }).done(function(result) {
