@@ -33,6 +33,12 @@
         board.typeOfTroopUpgradeSelected = ko.observable();
         board.playerList = ko.observableArray();
         board.alliesList = ko.observableArray();
+        board.constructProposedTrade = [];
+        board.tradeGiver = ko.observable();
+        board.tradeReceiver = ko.observable();
+        board.tradeType = ko.observable();
+        board.tradeTypeList = ko.observableArray(['Territory', 'Food', 'Technology', 'Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies']);
+        board.tradeNumber = ko.observable();
         board.typeOfTroopSelected = ko.observable();
         board.territoryClickTerritoryNumber = ko.observable("-");
         board.territoryClickInfo = ko.observableArray();
@@ -353,6 +359,27 @@
             }
 
         };
+        board.clearTradeInputs = function() {
+            board.tradeGiver("");
+            board.tradeReceiver("");
+            board.tradeType("");
+            board.tradeNumber("");
+        };
+        board.addToTrade = function() {
+            board.constructProposedTrade.push(
+            {
+                giver: board.tradeGiver().name,
+                receiver: board.tradeReceiver().name,
+                number: board.tradeNumber(),
+                type: board.tradeType()
+            });
+            board.clearTradeInputs();
+        };
+        board.createTrade = function() {
+            board.displayTradeModal(true);
+            board.constructProposedTrade = [];
+            $("#dialog").dialog();
+        };
         board.updateTerritoryClickTable = function(index) {
             board.territoryClickTerritoryNumber(index + 1);
             board.territoryClickInfo.removeAll();
@@ -502,23 +529,31 @@
         };
         board.submitMove = function() {
             $("#dialog").dialog('close');
-            //regex found here: http://stackoverflow.com/questions/1019515/javascript-test-for-an-integer
-            var intRegex = /^\d+$/;
-            if(!(intRegex.test(board.inputNumberAttackOrMove()))) {
-               alert('You must enter a nonnegative integer');
-               return;
+            if(board.displayTradeModal() === true) {
+                board.displayTradeModal(false);
+                board.tradesList.push({
+                    offer: board.constructProposedTrade
+                });
+                console.log(board.tradesList());
+            } else {
+                //regex found here: http://stackoverflow.com/questions/1019515/javascript-test-for-an-integer
+                var intRegex = /^\d+$/;
+                if(!(intRegex.test(board.inputNumberAttackOrMove()))) {
+                   alert('You must enter a nonnegative integer');
+                   return;
+                }
+                var troopType = board.convertReadableText(board.typeOfTroopSelected());
+                if(board.displayUpgradeTroopsModal() === true) {
+                    var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());
+                    board.editing.upgradeTroops(board.territoryClickTerritoryNumber() - 1, board.boardInfo[troopType.text], board.boardInfo[troopTypeUpgradeTo.text], board.playerInfo, board.inputNumberAttackOrMove(), troopType, troopTypeUpgradeTo);
+                } else if(board.moveTroops === true) {
+                    board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove(), troopType.index, board.territoryOwner);
+                } else if(board.attackTroops === true) {
+                    board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType, board.territoryOwner);
+                }
+                board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
+                board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
             }
-            var troopType = board.convertReadableText(board.typeOfTroopSelected());
-            if(board.displayUpgradeTroopsModal() === true) {
-                var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());
-                board.editing.upgradeTroops(board.territoryClickTerritoryNumber() - 1, board.boardInfo[troopType.text], board.boardInfo[troopTypeUpgradeTo.text], board.playerInfo, board.inputNumberAttackOrMove(), troopType, troopTypeUpgradeTo);
-            } else if(board.moveTroops === true) {
-                board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove(), troopType.index, board.territoryOwner);
-            } else if(board.attackTroops === true) {
-                board.editing.attack(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.attackInfo, board.inputNumberAttackOrMove(), troopType, board.territoryOwner);
-            }
-            board.updateTerritoryClickTable(board.territoryClickTerritoryNumber() - 1);
-            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
         };
         board.playerWatching = function() {
             //reloads the map every 10 seconds for any players watching game
