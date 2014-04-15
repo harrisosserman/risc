@@ -60,8 +60,14 @@ function BoardEditing(globals) {
             return 'IMPROVEDTANKS';
         } else if(input === 5) {
             return 'PLANES';
+        } else if(input === 6) {
+            return 'SPIES';
+        } else if(input === 7) {
+            return 'TERRITORY';
+        } else if(input === 8) {
+            return 'FOOD';
         }
-        return 'SPIES';
+        return 'TECHNOLOGY';
     };
     editing.convertTextFromCapitalsToIndex = function(input) {
         if(input === 'INFANTRY') {
@@ -107,7 +113,11 @@ function BoardEditing(globals) {
             };
             editing.moveOrder.push(result);
         } else if(moveType === 4) {
-
+            result = {
+                moveType: moveType,
+                offer: start
+            };
+            editing.moveOrder.push(result);
         } else if(moveType === 5) {
             result = {
                 moveType: 5,
@@ -189,6 +199,14 @@ function BoardEditing(globals) {
     };
     editing.editAlliance = function(owner, ally, addAlly) {
         editing.addMove(5, owner, ally, "", "", addAlly);
+    };
+    editing.addTrade = function(trade) {
+        for(var k=0; k<trade.length; k++) {
+            var tradeType = trade[k].type;
+            tradeType = editing.convertTextForTroopCommit(globalFunctions.convertReadableText(tradeType).index);
+            trade[k].type = tradeType;
+        }
+        editing.addMove(4, trade);
     };
     editing.moveTroops = function(destination, map, territoryDOMElements, troopArray, numberOfTroopsMoved, troopType, territoryOwner) {
         var origin = editing.findOrigin(destination, territoryDOMElements);

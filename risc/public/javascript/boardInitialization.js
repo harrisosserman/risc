@@ -244,7 +244,7 @@
         board.updateBoardInfoValues = function(index, position) {
             for(var k=0; k<7; k++) {
                 var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
-                var troopTypeInBoardInfo = board.convertReadableText(board.convertTechLevelToText(k)).text;
+                var troopTypeInBoardInfo = globalFunctions.convertReadableText(board.convertTechLevelToText(k)).text;
                 if(typeof board.territoryInfo.territories == 'undefined' || typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
                     board.boardInfo[troopTypeInBoardInfo][position] = 0;
                 } else {
@@ -464,7 +464,7 @@
             board.alliesList.push(ally);
             board.editing.editAlliance(globalFunctions.getUsername(), ally.name, false);
         };
-        board.convertReadableText = function(input) {
+        globalFunctions.convertReadableText = function(input) {
             var result = {};
             if(input === "Infantry") {
                 result = {
@@ -496,10 +496,25 @@
                     text: 'plane',
                     index: 5
                 };
-            } else {
+            } else if(input === "Spies"){
                 result = {
                     text: 'spy',
                     index: 6
+                };
+            } else if(input === "Territory") {
+                result = {
+                    text: 'territory',
+                    index: 7
+                };
+            } else if(input === "Food") {
+                result = {
+                    text: 'food',
+                    index: 8
+                };
+            } else {
+                result = {
+                    text: 'tech',
+                    index: 9
                 };
             }
             return result;
@@ -539,7 +554,7 @@
                 board.tradesList.push({
                     offer: board.constructProposedTrade
                 });
-                console.log(board.tradesList());
+                board.editing.addTrade(board.constructProposedTrade);
             } else {
                 //regex found here: http://stackoverflow.com/questions/1019515/javascript-test-for-an-integer
                 var intRegex = /^\d+$/;
@@ -547,9 +562,9 @@
                    alert('You must enter a nonnegative integer');
                    return;
                 }
-                var troopType = board.convertReadableText(board.typeOfTroopSelected());
+                var troopType = globalFunctions.convertReadableText(board.typeOfTroopSelected());
                 if(board.displayUpgradeTroopsModal() === true) {
-                    var troopTypeUpgradeTo = board.convertReadableText(board.typeOfTroopUpgradeSelected());
+                    var troopTypeUpgradeTo = globalFunctions.convertReadableText(board.typeOfTroopUpgradeSelected());
                     board.editing.upgradeTroops(board.territoryClickTerritoryNumber() - 1, board.boardInfo[troopType.text], board.boardInfo[troopTypeUpgradeTo.text], board.playerInfo, board.inputNumberAttackOrMove(), troopType, troopTypeUpgradeTo);
                 } else if(board.moveTroops === true) {
                     board.editing.moveTroops(board.destinationTerritory, $("#map td"), board.territoryDOMElements, board.boardInfo[troopType.text], board.inputNumberAttackOrMove(), troopType.index, board.territoryOwner);
