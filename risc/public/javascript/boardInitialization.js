@@ -375,6 +375,10 @@
             });
             board.clearTradeInputs();
         };
+        board.cancelTrade = function(index) {
+            board.tradesList.splice(index, 1);
+            board.editing.removeTradeFromMovesList(index);
+        };
         board.createTrade = function() {
             board.displayTradeModal(true);
             board.constructProposedTrade = [];
@@ -530,6 +534,7 @@
         board.submitMove = function() {
             $("#dialog").dialog('close');
             if(board.displayTradeModal() === true) {
+                board.addToTrade();
                 board.displayTradeModal(false);
                 board.tradesList.push({
                     offer: board.constructProposedTrade

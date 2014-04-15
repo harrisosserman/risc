@@ -130,6 +130,20 @@ function BoardEditing(globals) {
         }
         globalFunctions.commitTurn(midTurn=true);
     };
+    editing.removeTradeFromMovesList = function(index) {
+        var foundTrades=0;
+        for(var k=0; k<editing.moveOrder.length; k++) {
+            if(editing.moveOrder[k].moveType === 4) {
+                if(foundTrades === index) {
+                    editing.moveOrder.splice(k, 1);
+                    break;
+                } else {
+                    foundTrades++;
+                }
+            }
+        }
+        globalFunctions.commitTurn(midTurn=true);
+    };
     editing.removeAttack = function(moveType, start, end, troopType, numberOfMoves) {
         troopType = editing.convertTextForTroopCommit(troopType);
         var indicesToRemove = [];

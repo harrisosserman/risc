@@ -366,7 +366,7 @@
                                 <tbody data-bind="foreach: tradesList">
                                     <tr>
                                         <td>Offer:</td>
-                                        <td><button>Cancel Trade</button></td>
+                                        <td><button data-bind="click: $parent.cancelTrade.bind($data, $index())">Cancel Trade</button></td>
                                     </tr>
                                     <tr data-bind="foreach: $data.offer">
                                             <td data-bind="text: $data.giver"></td>
