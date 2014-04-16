@@ -29,6 +29,7 @@
         globalFunctions.setDisplayChat = function(input) {
             player.displayChat(input);
             clearInterval(player.chatIntervalId);
+            player.chatIntervalId = 0;
             $("#openChatButton").removeClass('alertNewMessage');
         };
         globalFunctions.showGameLobby = function() {
@@ -63,9 +64,13 @@
             player.displayChat(false);
         };
         player.newChatUpdate = function() {
-            player.chatIntervalId = setInterval(function() {
-                $("#openChatButton").toggleClass('alertNewMessage');
-            }, 500);
+            // console.log("new chat update");
+            if(player.chatIntervalId === 0) {
+                player.chatIntervalId = setInterval(function() {
+                    $("#openChatButton").toggleClass('alertNewMessage');
+                }, 500);
+            }
+
         };
         player.loadChat = function() {
            if(player.hasLoadedChat === false) {
