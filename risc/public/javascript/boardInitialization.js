@@ -25,7 +25,7 @@
         };
         board.attackInfo = [];
         board.inputNumberAttackOrMove = ko.observable();
-        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies', 'Nukes']);
+        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies']);
         board.displayMap = ko.observable(false);
         board.hasNotUpgradedThisTurn = ko.observable(true);
         board.displayUpgradeTroopsModal = ko.observable(false);
