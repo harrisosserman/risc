@@ -25,12 +25,13 @@
         };
         board.attackInfo = [];
         board.inputNumberAttackOrMove = ko.observable();
-        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies']);
+        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies', 'Nukes']);
         board.displayMap = ko.observable(false);
         board.hasNotUpgradedThisTurn = ko.observable(true);
         board.displayUpgradeTroopsModal = ko.observable(false);
         board.displayTradeModal = ko.observable(false);
         board.typeOfTroopUpgradeSelected = ko.observable();
+        board.canUseNukes = false;
         board.playerList = ko.observableArray();
         board.alliesList = ko.observableArray();
         board.constructProposedTrade = [];
@@ -47,8 +48,8 @@
         board.selectedAddAlly = ko.observable();
         board.moveTroops = false;
         board.attackTroops = false;
-        board.technologyLevelCost = [0, 20, 50, 80, 120, 150];
-        board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35];
+        board.technologyLevelCost = [0, 20, 50, 80, 120, 150, 180];
+        board.unitUpgradeCost = [0, 3, 11, 30, 55, 90, 35, 50];
         board.editing = new BoardEditing(globalFunctions);
         /*          GLOBAL FUNCTIONS                        */
         globalFunctions.createAndLoadMap = function() {
@@ -135,15 +136,19 @@
             for(var k=0; k<5; k++) {
                 map.append("<tr>");
                 for(var m=0; m<5; m++) {
-                    map.append("<td>" + count + "<button class='upgradeTroopsButton'>Upgrade</button></td>");
+                    map.append("<td>" + count + "<button class='upgradeTroopsButton'>Upgrade</button><button class='nukeButton'>Nuke</button></td>");
                     count++;
                 }
                 map.append("</tr>");
             }
-            $("#map td button").click(function() {
+            $(".upgradeTroopsButton").click(function() {
                 board.upgradeTroops();
             });
-            $("#map td button").hide();
+            $(".upgradeTroopsButton").hide();
+            $(".nukeButton").click(function() {
+
+            });
+            $(".nukeButton").hide();
         };
         board.getPlayerNumberByUsername = function(username) {
             for(var k=0; k<board.territoryInfo.playerInfo.length; k++) {
@@ -166,6 +171,9 @@
                         board.territoryInfo = $.parseJSON(result);
                         if(board.territoryInfo.notifyNukesAvailable === true) {
                             alert("Be careful!  One of the players now has nukes");
+                        }
+                        if(board.territoryInfo.canUseNukes === true) {
+                            board.canUseNukes = true;
                         }
                         for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
                             var playerNum = board.getPlayerNumberByUsername(board.territoryInfo.playerInfo[m].owner) - 1;
@@ -204,7 +212,10 @@
                                         board.listenForAdditionalInfantry(pos);
                                         if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
                                             board.updateTerritoryClickTable(pos);
-                                            $($("#map td button")[pos]).toggle();
+                                            $($(".upgradeTroopsButton")[pos]).toggle();
+                                            if(board.canUseNukes === true) {
+                                                $($(".nukeButton")[pos]).toggle();
+                                            }
                                         }
                                     });
                                 })();
