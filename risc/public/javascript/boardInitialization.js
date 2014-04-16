@@ -160,11 +160,13 @@
             $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
                     }).done(function(result) {
-
                         if(globalFunctions.getPlayerNumber() === -1) {
                             $('.submitTurnButton').remove();
                         }
                         board.territoryInfo = $.parseJSON(result);
+                        if(board.territoryInfo.notifyNukesAvailable === true) {
+                            alert("Be careful!  One of the players now has nukes");
+                        }
                         for(var m = 0; m<board.territoryInfo.playerInfo.length; m++) {
                             var playerNum = board.getPlayerNumberByUsername(board.territoryInfo.playerInfo[m].owner) - 1;
                             board.updatePlayerInfoTable(m, board.territoryInfo.playerInfo, false, playerNum);
