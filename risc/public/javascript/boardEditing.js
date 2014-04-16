@@ -63,11 +63,13 @@ function BoardEditing(globals) {
         } else if(input === 6) {
             return 'SPIES';
         } else if(input === 7) {
-            return 'TERRITORY';
+            return 'NUKES';
         } else if(input === 8) {
             return 'FOOD';
+        } else if(input === 9) {
+            return 'TECHNOLOGY';
         }
-        return 'TECHNOLOGY';
+        return 'TERRITORY';
     };
     editing.convertTextFromCapitalsToIndex = function(input) {
         if(input === 'INFANTRY') {
@@ -252,6 +254,17 @@ function BoardEditing(globals) {
             alert("You only have " + originTroops + " and are trying to move " + numberOfTroopsMoved);
         }
 
+    };
+    editing.nukeTerritory = function(index, playerInfo) {
+        console.log(playerInfo);
+        if(playerInfo.technology < 50) {
+            alert("You need at least 50 technology to nuke a territory");
+            return;
+        }
+        playerInfo.technology = playerInfo.technology - 50;
+        editing.addMove(2, -1, index, 7);
+        $($("#map td")[index]).addClass('territoryNuke');
+        $($(".nukeButton")[index]).prop('disabled', true);
     };
     editing.upgradeTechLevel = function(playerInfo) {
         if(playerInfo.maxTechLevel === 5) {

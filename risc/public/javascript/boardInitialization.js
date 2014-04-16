@@ -146,7 +146,7 @@
             });
             $(".upgradeTroopsButton").hide();
             $(".nukeButton").click(function() {
-
+                board.nukeTerritory();
             });
             $(".nukeButton").hide();
         };
@@ -213,9 +213,6 @@
                                         if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
                                             board.updateTerritoryClickTable(pos);
                                             $($(".upgradeTroopsButton")[pos]).toggle();
-                                            if(board.canUseNukes === true) {
-                                                $($(".nukeButton")[pos]).toggle();
-                                            }
                                         }
                                     });
                                 })();
@@ -229,6 +226,10 @@
                                         $(map[pos]).toggleClass("territoryClick");
                                         if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
                                             board.updateTerritoryClickTable(pos);
+                                        }
+                                        if(board.canUseNukes === true) {
+                                            $($(".nukeButton")[pos]).toggle();
+                                            // board.updateTerritoryClickTable(pos);
                                         }
                                     });
                                 })();
@@ -244,6 +245,10 @@
                                     $(map[index]).toggleClass("territoryClick");
                                     if(!($(this).hasClass("territoryMoveTroops") || $(this).hasClass("territoryAttack"))) {
                                         board.updateTerritoryClickTable(index);
+                                    }
+                                    if(board.canUseNukes === true) {
+                                        $($(".nukeButton")[index]).toggle();
+                                        // board.updateTerritoryClickTable(index);
                                     }
                                 });
                             }
@@ -514,20 +519,27 @@
                     text: 'spy',
                     index: 6
                 };
-            } else if(input === "Territory") {
+            } else if(input === "Nukes") {
                 result = {
-                    text: 'territory',
+                    text: 'nuke',
                     index: 7
                 };
-            } else if(input === "Food") {
+            }
+            else if(input === "Food") {
                 result = {
                     text: 'food',
                     index: 8
                 };
-            } else {
+            } else if(input === "Technology"){
                 result = {
                     text: 'tech',
                     index: 9
+                };
+            }
+            else {
+                result = {
+                    text: 'territory',
+                    index: 10
                 };
             }
             return result;
@@ -545,8 +557,10 @@
                 return 'Improved Tanks';
             } else if(input === 5) {
                 return 'Fighter Planes';
-            } else {
+            } else if(input === 6){
                 return 'Spies';
+            } else {
+                return 'Nukes';
             }
         };
         board.upgradeTroops = function() {
@@ -559,6 +573,10 @@
                 board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
             }
         };
+        board.nukeTerritory = function() {
+            board.editing.nukeTerritory(board.territoryClickTerritoryNumber() - 1, board.playerInfo);
+        };
+
         board.submitMove = function() {
             $("#dialog").dialog('close');
             if(board.displayTradeModal() === true) {
