@@ -229,7 +229,6 @@
                                         }
                                         if(board.canUseNukes === true) {
                                             $($(".nukeButton")[pos]).toggle();
-                                            // board.updateTerritoryClickTable(pos);
                                         }
                                     });
                                 })();
@@ -248,7 +247,6 @@
                                     }
                                     if(board.canUseNukes === true) {
                                         $($(".nukeButton")[index]).toggle();
-                                        // board.updateTerritoryClickTable(index);
                                     }
                                 });
                             }
@@ -575,6 +573,7 @@
         };
         board.nukeTerritory = function() {
             board.editing.nukeTerritory(board.territoryClickTerritoryNumber() - 1, board.playerInfo);
+            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
         };
 
         board.submitMove = function() {
