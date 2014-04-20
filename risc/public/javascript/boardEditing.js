@@ -65,11 +65,13 @@ function BoardEditing(globals) {
         } else if(input === 7) {
             return 'NUKES';
         } else if(input === 8) {
-            return 'FOOD';
+            return "INTERCEPTOR";
         } else if(input === 9) {
             return 'TECHNOLOGY';
+        } else if(input === 10) {
+            return 'TERRITORY';
         }
-        return 'TERRITORY';
+        return 'FOOD';
     };
     editing.convertTextFromCapitalsToIndex = function(input) {
         if(input === 'INFANTRY') {
@@ -267,7 +269,7 @@ function BoardEditing(globals) {
         $($(".nukeButton")[index]).prop('disabled', true);
     };
     editing.upgradeTechLevel = function(playerInfo) {
-        if(playerInfo.maxTechLevel === 5) {
+        if(playerInfo.maxTechLevel === 6) {
             alert("You are already on the maximum technology level");
             return false;
         } else if(playerInfo.technology >= globalFunctions.getTechnologyLevelCost()[playerInfo.maxTechLevel + 1]) {

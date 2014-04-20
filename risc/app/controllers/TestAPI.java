@@ -194,7 +194,7 @@ public class TestAPI extends Controller {
         ArrayList<String> alliesList = new ArrayList<String>();
         alliesList.add("rickybobby");
         JSONArray allies = new JSONArray(alliesList);
-        additionalInfo.put(new JSONObject().put("owner", "harriso").put("allies", allies).put("level", 7).put("food", 35).put("technology", 100).put("additionalInfantry", 50).put("playerNumber", 2));
+        additionalInfo.put(new JSONObject().put("owner", "harriso").put("allies", allies).put("level", 6).put("food", 35).put("technology", 500).put("additionalInfantry", 50).put("playerNumber", 2));
         result.put("playerInfo", additionalInfo);
         result.put("notifyNukesAvailable", true);
         result.put("canUseNukes", true);

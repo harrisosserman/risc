@@ -16,7 +16,8 @@
             tank: [],
             improvedTank: [],
             plane: [],
-            spy: []
+            spy: [],
+            interceptor: []
         };
         board.playerInfo = {
             food: -1,
@@ -25,7 +26,7 @@
         };
         board.attackInfo = [];
         board.inputNumberAttackOrMove = ko.observable();
-        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies']);
+        board.typesOfTroops = ko.observableArray(['Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies', 'Interceptors']);
         board.displayMap = ko.observable(false);
         board.hasNotUpgradedThisTurn = ko.observable(true);
         board.displayUpgradeTroopsModal = ko.observable(false);
@@ -38,7 +39,7 @@
         board.tradeGiver = ko.observable();
         board.tradeReceiver = ko.observable();
         board.tradeType = ko.observable();
-        board.tradeTypeList = ko.observableArray(['Territory', 'Food', 'Technology', 'Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies']);
+        board.tradeTypeList = ko.observableArray(['Territory', 'Food', 'Technology', 'Infantry', 'Automatic Weapons', 'Rocket Launchers', 'Tanks', 'Improved Tanks', 'Fighter Planes', 'Spies', 'Interceptors']);
         board.tradeNumber = ko.observable();
         board.typeOfTroopSelected = ko.observable();
         board.territoryClickTerritoryNumber = ko.observable("-");
@@ -116,7 +117,8 @@
                 tank: [],
                 improvedTank: [],
                 plane: [],
-                spy: []
+                spy: [],
+                interceptor: []
             };
             for(var k=0; k<25; k++) {
                 board.updateBoardInfoValues(k, k);
@@ -136,7 +138,7 @@
             for(var k=0; k<5; k++) {
                 map.append("<tr>");
                 for(var m=0; m<5; m++) {
-                    map.append("<td>" + count + "<button class='upgradeTroopsButton'>Upgrade</button><button class='nukeButton'>Nuke</button></td>");
+                    map.append("<td>" + count + "<button class='upgradeTroopsButton'>Upgrade</button><button class='nukeButton'>Nuke</button><button class='interceptorButton'>Interceptor</button></td>");
                     count++;
                 }
                 map.append("</tr>");
@@ -149,6 +151,10 @@
                 board.nukeTerritory();
             });
             $(".nukeButton").hide();
+            $(".interceptorButton").click(function() {
+                board.buyInterceptor();
+            });
+            $(".interceptorButton").hide();
         };
         board.getPlayerNumberByUsername = function(username) {
             for(var k=0; k<board.territoryInfo.playerInfo.length; k++) {
@@ -213,6 +219,7 @@
                                         if(!($(map[pos]).hasClass("territoryMoveTroops") || $(map[pos]).hasClass("territoryAttack"))) {
                                             board.updateTerritoryClickTable(pos);
                                             $($(".upgradeTroopsButton")[pos]).toggle();
+                                            $($(".interceptorButton")[pos]).toggle();
                                         }
                                     });
                                 })();
@@ -258,9 +265,9 @@
                 });
         };
         board.updateBoardInfoValues = function(index, position) {
-            for(var k=0; k<7; k++) {
+            for(var k=0; k<9; k++) {
                 var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
-                var troopTypeInBoardInfo = globalFunctions.convertReadableText(board.convertTechLevelToText(k)).text;
+                var troopTypeInBoardInfo = globalFunctions.convertReadableText(board.convertTroopToText(k), false).text;
                 if(typeof board.territoryInfo.territories == 'undefined' || typeof board.territoryInfo.territories[index][troopTypeInTerritoryInfo] == 'undefined') {
                     board.boardInfo[troopTypeInBoardInfo][position] = 0;
                 } else {
@@ -283,7 +290,7 @@
                     additionalInfantry: board.additionalInfantry[index],
                     food: board.playerInfo.food,
                     tech: board.playerInfo.technology,
-                    techLevel: board.convertTechLevelToText(board.playerInfo.maxTechLevel)
+                    techLevel: board.convertTroopToText(board.playerInfo.maxTechLevel, true)
                 };
             }
             else if(typeof playerInfo !== 'undefined') {
@@ -293,7 +300,7 @@
                     additionalInfantry: playerInfo[index].additionalInfantry,
                     food: playerInfo[index].food,
                     tech: playerInfo[index].technology,
-                    techLevel: board.convertTechLevelToText(playerInfo[index].level)
+                    techLevel: board.convertTroopToText(playerInfo[index].level, true)
                 };
                 if(typeof playerInfo[index].technology == 'undefined') {
                     newPlayerObject.food = 0;
@@ -400,6 +407,10 @@
             board.constructProposedTrade = [];
             $("#dialog").dialog();
         };
+        board.buyInterceptor = function() {
+            board.editing.buyInterceptor(board.territoryClickTerritoryNumber() - 1, board.playerInfo);
+            board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
+        };
         board.updateTerritoryClickTable = function(index) {
             board.territoryClickTerritoryNumber(index + 1);
             board.territoryClickInfo.removeAll();
@@ -412,9 +423,11 @@
                 tank: board.boardInfo.tank[index],
                 improvedTank: board.boardInfo.improvedTank[index],
                 plane: board.boardInfo.plane[index],
-                spy: board.boardInfo.spy[index]
+                spy: board.boardInfo.spy[index],
+                interceptor: board.boardInfo.interceptor[index]
             };
             board.territoryClickInfo.push(data);
+            console.log(data);
             board.territoryClickAttackInfo.removeAll();
             if(typeof board.attackInfo[index] != 'undefined') {
                 for(var k=0; k<board.attackInfo[index].length; k++) {
@@ -426,7 +439,8 @@
                         tank: board.attackInfo[index][k].tank,
                         improvedTank: board.attackInfo[index][k].improvedTank,
                         plane: board.attackInfo[index][k].plane,
-                        spy: board.attackInfo[index][k].spy
+                        spy: board.attackInfo[index][k].spy,
+                        interceptor: board.attackInfo[index][k].interceptor
                     };
                     board.territoryClickAttackInfo.push(data);
                 }
@@ -523,9 +537,9 @@
                     index: 7
                 };
             }
-            else if(input === "Food") {
+            else if(input === "Interceptors"){
                 result = {
-                    text: 'food',
+                    text: 'interceptor',
                     index: 8
                 };
             } else if(input === "Technology"){
@@ -534,15 +548,21 @@
                     index: 9
                 };
             }
-            else {
+            else if(input === "Territory"){
                 result = {
                     text: 'territory',
                     index: 10
                 };
             }
+            else {
+                result = {
+                    text: 'food',
+                    index: 11
+                };
+            }
             return result;
         };
-        board.convertTechLevelToText = function(input) {
+        board.convertTroopToText = function(input, techLevel) {
             if(input === 0) {
                 return 'Infantry';
             } else if(input === 1) {
@@ -555,10 +575,12 @@
                 return 'Improved Tanks';
             } else if(input === 5) {
                 return 'Fighter Planes';
-            } else if(input === 6){
-                return 'Spies';
-            } else {
+            } else if((techLevel === true && input === 6) || (techLevel === false && input === 7)){
                 return 'Nukes';
+            } else if(input === 8) {
+                return 'Interceptors';
+            } else {
+                return 'Spies';
             }
         };
         board.upgradeTroops = function() {

@@ -247,6 +247,7 @@
                                         <th>Food</th>
                                         <th>Technology</th>
                                         <th>Spies</th>
+                                        <th>Interceptors</th>
                                         <th>Infantry</th>
                                         <th>Automatic Weapons</th>
                                         <th>Rocket Launchers</th>
@@ -260,6 +261,7 @@
                                         <td data-bind="text: food"></td>
                                         <td data-bind="text: tech"></td>
                                         <td data-bind="text: spy"></td>
+                                        <td data-bind="text: interceptor"></td>
                                         <td data-bind="text: infantry"></td>
                                         <td data-bind="text: automatic"></td>
                                         <td data-bind="text: rocket"></td>
@@ -369,13 +371,13 @@
                                         <td><button data-bind="click: $parent.cancelTrade.bind($data, $index())">Cancel Trade</button></td>
                                     </tr>
                                     <tr data-bind="foreach: $data.offer">
-                                            <td data-bind="text: $data.giver"></td>
-                                            <td data-bind="text: $data.receiver"></td>
-                                            <td data-bind="text: $data.number"></td>
-                                            <td data-bind="text: $data.type"></td>
+                                        <td data-bind="text: $data.giver"></td>
+                                        <td data-bind="text: $data.receiver"></td>
+                                        <td data-bind="text: $data.number"></td>
+                                        <td data-bind="text: $data.type"></td>
                                     </tr>
                                 </tbody>
-                                <button data-bind="click: createTrade">Add Trade</button>
+                                <button data-bind ="click: createTrade">Add Trade</button>
                             </table>
                         </div>
                     </div>
