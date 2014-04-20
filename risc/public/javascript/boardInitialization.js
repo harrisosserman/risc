@@ -408,7 +408,7 @@
             $("#dialog").dialog();
         };
         board.buyInterceptor = function() {
-            board.editing.buyInterceptor(board.territoryClickTerritoryNumber() - 1, board.playerInfo);
+            board.editing.buyInterceptor(board.territoryClickTerritoryNumber() - 1, board.playerInfo, board.boardInfo.interceptor);
             board.updatePlayerInfoTable(globalFunctions.getPlayerNumber() - 1, null, true);
         };
         board.updateTerritoryClickTable = function(index) {

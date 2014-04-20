@@ -144,6 +144,15 @@ function BoardEditing(globals) {
         }
         globalFunctions.commitTurn(midTurn=true);
     };
+    editing.buyInterceptor = function(index, playerInfo, boardInfo) {
+        if(playerInfo.technology < 10) {
+            alert("You do not have enough technology to buy an interceptor.  It costs 10 technology");
+            return;
+        }
+        playerInfo.technology = playerInfo.technology - 10;
+        boardInfo[index] = boardInfo[index] + 1;
+        editing.addMove(3, index, -1, 8);
+    };
     editing.removeTradeFromMovesList = function(index) {
         var foundTrades=0;
         for(var k=0; k<editing.moveOrder.length; k++) {
