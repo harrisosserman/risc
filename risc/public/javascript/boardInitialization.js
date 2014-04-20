@@ -427,7 +427,6 @@
                 interceptor: board.boardInfo.interceptor[index]
             };
             board.territoryClickInfo.push(data);
-            console.log(data);
             board.territoryClickAttackInfo.removeAll();
             if(typeof board.attackInfo[index] != 'undefined') {
                 for(var k=0; k<board.attackInfo[index].length; k++) {
