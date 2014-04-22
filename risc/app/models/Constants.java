@@ -48,6 +48,13 @@ public final class Constants{
     public static final String PREVIOUSTYPE = "previousType";
     public static final String TERRITORIESVISIBLE = "territoriesVisible";
     public static final String HIGHESTTECHNOLOGY = "highestTechnology";
+    public static final String FORMALLIANCE = "formAlliance";
+    public static final String ALLY = "ally";
+    public static final String GIVER = "giver";
+    public static final String RECIEVER = "receiver";
+    public static final String ALLIES = "allies";
+
+
 
 
 

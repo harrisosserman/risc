@@ -12,6 +12,7 @@ public class Territory{
 	private int myTechnology;
 	private HashMap<Integer, Attacker> attackers;
 	private Army myArmy;
+	private HashMap<Player, Army> alliedTroops;
 	
 
 	public Territory(int position, Player owner, int food, int technology){
@@ -21,8 +22,10 @@ public class Territory{
 		myFood = food;
 		myArmy = new Army(myOwner);
 		attackers = new HashMap<Integer, Attacker>();
+		alliedTroops = new HashMap<Player, Army>();
 
 	}
+
 	public int getFood(){
 		return myFood;
 	}

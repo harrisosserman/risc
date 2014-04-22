@@ -92,6 +92,17 @@ public int loadPreviousState(){
         player1.setAdditionalTroops(addTroops);
         myActivePlayers.put(username, player1);
     }
+    for(BasicDBObject player : playerArray){
+        String username = player.get(Constants.OWNER).toString();
+        Player p_ = myActivePlayers.get(username);
+        BasicDBList playerAllies = (BasicDBList) player.get(Constants.ALLIES);
+        BasicDBObject[] myallies = player.toArray(new BasicDBObject[0]);
+        for(BasicDBObject ally : myallies){
+            String allyUsername = ally.toString();
+            Player p = myActivePlayers.get(allyUsername);
+            p_.addAlly(p);
+        }
+    }
     //players loaded
     BasicDBList territoryInfo = (BasicDBList) lastStateObject.get(Constants.TERRITORIES);
     BasicDBObject[] territoryArray = territoryInfo.toArray(new BasicDBObject[0]);
@@ -139,6 +150,9 @@ public int loadPreviousState(){
             Troop t = new Troop(p, TroopType.PLANES);
             terr.addTroop(t);
         }}
+        //add allied troops
+
+
         territories.put(terr.getPosition(), terr);
     }
     System.out.println("territories loaded");
@@ -167,7 +181,7 @@ public int loadPreviousState(){
         spies.put(position, spys);
 
     }
-System.out.println("spies loaded");
+    System.out.println("spies loaded");
 
     updateStateWithMoves();
     System.out.println("between methods");

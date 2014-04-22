@@ -81,28 +81,38 @@ public class Turn {
         while(movesData.hasNext()){
                 JsonNode moveData = movesData.next();
                 int moveType = Integer.parseInt(moveData.get(Constants.MOVETYPE).toString());
-                String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                 if(moveType == 0){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     String upgradeType = API.removeQuotes(moveData.get(Constants.UPGRADETYPE).toString());
                     int position = Integer.parseInt(moveData.get(Constants.POSITION).toString());
                     Upgrade newMove = new Upgrade(moveType, troopType, upgradeType, position);
                     moves.add(newMove);
                 }
                 else if(moveType == 1){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     int start = Integer.parseInt(moveData.get(Constants.START).toString());
                     int end = Integer.parseInt(moveData.get(Constants.END).toString());
                     Move newMove = new Move(moveType, troopType, start, end);
                     moves.add(newMove);
                 }
                 else if(moveType == 2){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     int start = Integer.parseInt(moveData.get(Constants.START).toString());
                     int end = Integer.parseInt(moveData.get(Constants.END).toString());
                     Attack newMove = new Attack(moveType, troopType, start, end);
                     moves.add(newMove);
                 }
                 else if(moveType == 3){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     int position = Integer.parseInt(moveData.get(Constants.POSITION).toString());
                     Place newMove = new Place(moveType, troopType, position);
+                    moves.add(newMove);
+                }
+                else if(moveType == 5){
+                    boolean form = moveData.get(Constants.FORMALLIANCE).toBoolean();
+                    String owner = API.removeQuotes(moveData.get(Constants.OWNER).toString());
+                    String ally = API.removeQuotes(moveData.get(Constants.ALLY).toString());
+                    Allign newMove = new Allign(moveType, form, owner, ally);
                     moves.add(newMove);
                 }
         }
