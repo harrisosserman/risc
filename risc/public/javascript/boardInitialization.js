@@ -438,7 +438,7 @@
             board.territoryClickTerritoryNumber(index + 1);
             board.territoryClickInfo.removeAll();
             var data = {
-                owner: board.territoryOwner[position],
+                owner: board.territoryOwner[index],
                 food: board.boardInfo.food[index],
                 tech: board.boardInfo.technology[index],
                 infantry: board.boardInfo.infantry[index],
@@ -451,16 +451,19 @@
                 interceptor: board.boardInfo.interceptor[index]
             };
             board.territoryClickInfo.push(data);
-            if(board.boardInfoAllies[index].length > 0) {
-                board.territoryClickInfo.push({owner: "ALLIES:"});
+            if(typeof board.boardInfoAllies[index] !== 'undefined' && board.boardInfoAllies[index].length > 0) {
+                board.territoryClickInfo.push({owner: "ALLIES:", food: "", tech: "", infantry: "", automatic: "", rocket: "", tank: "", improvedTank: "", plane: "", spy: "", interceptor: ""});
                 for(var m=0; m<board.boardInfoAllies[index].length; m++) {
                     var resultObj = {};
-                   for(var k=0; k<9; k++) {
+                    resultObj.owner = board.boardInfoAllies[index][m].owner;
+                    resultObj.food = "-";
+                    resultObj.tech = "-";
+                    for(var k=0; k<9; k++) {
                         var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
                         var troopTypeInBoardInfo = globalFunctions.convertReadableText(board.convertTroopToText(k), false).text;
-                        resultObj[troopTypeInBoardInfo] = board.boardInfoAllies[m][troopTypeInBoardInfo];
+                        resultObj[troopTypeInBoardInfo] = board.boardInfoAllies[index][m][troopTypeInBoardInfo];
                     }
-                    board.boardInfoAllies[index].push(resultObj);
+                    board.territoryClickInfo.push(resultObj);
                 }
             }
             board.territoryClickAttackInfo.removeAll();
