@@ -295,7 +295,7 @@
                         inputObject[troopTypeInBoardInfo] = board.territoryInfo.territories[index].alliedTroops[m][troopTypeInTerritoryInfo];
                     }
                 }
-                board.boardInfoAllies[index].push(inputObject);
+                board.boardInfoAllies[position].push(inputObject);
             }
         };
         board.updatePlayerInfoTable = function(index, playerInfo, updateTechnology, playerNumber) {

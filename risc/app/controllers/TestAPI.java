@@ -159,7 +159,11 @@ public class TestAPI extends Controller {
         result.put("numPlayers", 3);
         JSONArray map = new JSONArray();
         map.put(new JSONObject().put("position", 7).put("owner", "harriso").put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30));
-        map.put(new JSONObject().put("position", 5).put("owner", "rickybobby").put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30));
+        JSONObject harrisAlliedTroops = new JSONObject();
+        harrisAlliedTroops.put("owner", "harriso").put("INFANTRY", 5).put("AUTOMATIC", 5).put("ROCKETS", 5).put("TANKS", 5).put("IMPROVEDTANKS", 5).put("PLANES", 5).put("food", 5).put("technology", 5);
+        JSONArray harrisAlliedTroopsArray = new JSONArray();
+        harrisAlliedTroopsArray.put(harrisAlliedTroops);
+        map.put(new JSONObject().put("position", 5).put("owner", "rickybobby").put("alliedTroops", harrisAlliedTroopsArray).put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30));
         map.put(new JSONObject().put("position", 1).put("owner", "harriso").put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30));
         JSONObject rickybobbyTroops = new JSONObject();
         rickybobbyTroops.put("owner", "rickybobby").put("position", 3).put("INFANTRY", 5).put("AUTOMATIC", 10).put("ROCKETS", 15).put("TANKS", 20).put("IMPROVEDTANKS", 25).put("PLANES", 30).put("food", 10).put("technology", 30);
