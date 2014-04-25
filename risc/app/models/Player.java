@@ -22,6 +22,16 @@ public class Player {
 		return myName;
 	}
 
+	public boolean containsAlly(Player p){
+		for(Player k : allies){
+			if(k.equals(p)){ 
+				return true;
+			}
+			
+		}
+        return false;
+	}
+
 	public void addAlly(Player p){
 		for(Player k : allies){
 			if(k.equals(p)){ 

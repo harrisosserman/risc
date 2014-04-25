@@ -30,9 +30,13 @@ public class Territory{
 		alliedTroops.put(p, a);
 	}
 
-	public void getAllyArmy(Player p){
+	public Army getAllyArmy(Player p){
 		return alliedTroops.get(p);
 	}
+    
+    public HashMap<Player, Army> getAllies(){
+        return alliedTroops;
+    }
 
 	public int getFood(){
 		return myFood;

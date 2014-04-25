@@ -98,7 +98,7 @@ public int loadPreviousState(){
         String username = player.get(Constants.OWNER).toString();
         Player p_ = myActivePlayers.get(username);
         BasicDBList playerAllies = (BasicDBList) player.get(Constants.ALLIES);
-        BasicDBObject[] myallies = player.toArray(new BasicDBObject[0]);
+        BasicDBObject[] myallies = playerAllies.toArray(new BasicDBObject[0]);
         for(BasicDBObject ally : myallies){
             String allyUsername = ally.toString();
             Player p = myActivePlayers.get(allyUsername);
@@ -155,8 +155,8 @@ public int loadPreviousState(){
         BasicDBList alliedTroops = (BasicDBList) territory.get(Constants.ALLIES);
         BasicDBObject[] alliedArmies = alliedTroops.toArray(new BasicDBObject[0]);
         for(BasicDBObject ally : alliedArmies){
-            Player p = myActivePlayers.get(ally.get(Constants.OWNER).toString());
-            Army alliedArmy = new Army(p);
+            Player p1 = myActivePlayers.get(ally.get(Constants.OWNER).toString());
+            Army alliedArmy = new Army(p1);
             if(ally.get(Constants.INFANTRY_)!= null){
                 int infantry = Integer.parseInt(ally.get(Constants.INFANTRY_).toString());
                 for(int i=0; i<infantry; i++){
@@ -194,7 +194,7 @@ public int loadPreviousState(){
                     alliedArmy.addTroop(t);
             }}
 
-            terr.addAlly(p, alliedArmy);
+            terr.addAlly(p1, alliedArmy);
         }
 
         territories.put(terr.getPosition(), terr);
@@ -315,7 +315,7 @@ public void moveTypeMove(BasicDBObject move, Player p){
             if(start.getAllyArmy(p)!=null){
             Army a = start.getAllyArmy(p);
             if(a.containsTroop(type)){
-                a.removeTroopFromArmy(type);
+                a.deleteTroop(type);
                 start.addAlly(p, a);
             }
             }
@@ -569,9 +569,9 @@ public int computeCostOfTroopUpgrade(TroopType old, TroopType new_){
 public void approveAlliances(){
     for(PotentialAlly p : potentialAllies){
         Player p1 = p.getProposer();
-        Player p2 = p.getAlly();
+        Player p2 = p.getAccepter();
         for(PotentialAlly k : potentialAllies){
-            if(k.getAlly().equals(p1)){
+            if(k.getAccepter().equals(p1)){
                 if(k.getProposer().equals(p2)){
                     p1.addAlly(p2);
                     p2.addAlly(p1);
@@ -610,7 +610,7 @@ public void updateStateWithMoves(){
             approveAlliances();
         }
         //trades
-        
+
         for(BasicDBObject move : movesArray){
             int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
             if(moveType == 0){
@@ -639,6 +639,15 @@ public ArrayList<Attacker> attackersForBattle(HashMap<Player, Attacker> map){
         attackers.add(map.get(p));
     }
     return attackers;
+}
+
+public ArrayList<Army> alliesForBattle(HashMap<Player, Army> map){
+    ArrayList<Army> allies = new ArrayList<Army>();
+    for(Player p : map.keySet()){
+        allies.add(map.get(p));
+
+    }
+    return allies;
 }
 
 public void doAttacksAndMoves(){
@@ -673,8 +682,12 @@ public void doAttacksAndMoves(){
             }
         }
 
-        Army winner = battle(attackersForBattle(attacks), territories.get(position).getDefendingArmy());
-        territories.get(position).setDefendingArmy(winner);
+
+
+        HashMap<Player, Army> allies = territories.get(position).getAllies();
+
+        Army winner = battle(attackersForBattle(attacks), territories.get(position).getDefendingArmy(), alliesForBattle(allies));
+       // territories.get(position).setDefendingArmy(winner);
         Territory t = territories.get(position);
         t.addTroop(TroopType.INFANTRY);
         t.setOwner(winner.getOwner());
@@ -765,16 +778,31 @@ public int battleCrossing(Army attacker, int attackerHome, Army defender, int de
  */
 
 //add in troops size
-public Army battle(ArrayList<Attacker> attackers, Army defender){
+public Army battle(ArrayList<Attacker> attackers, Army defender, ArrayList<Army> allies){
     
     Collections.shuffle(attackers);
+
+
+
 
     while(attackers.size()>0){
         System.out.println("battle has begun");
         for(int i=attackers.size()-1; i>=0; i--){
 
             Army attacker = attackers.get(i).getArmy();
+            Army currentDefender = defender;
             Troop battler_1 = defender.getStrongest();
+            for(Army a : allies){
+                Troop k = a.getStrongest();
+                if(k.findStrength()>battler_1.findStrength()){
+                    if(!k.getOwner().containsAlly(attacker.getOwner())){
+                        battler_1 = k; 
+                        currentDefender = a;
+                    }
+                 
+
+                }
+            }
             if(battler_1==null){
                     System.out.println("the defender lost the battle because he had no army");
                     defender = attacker;
@@ -790,6 +818,7 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             Troop battler_2 = attacker.getWeakest();
             double batt_1 = battler_1.battle();
             double batt_2 = battler_2.battle();
+
             if(batt_1 == batt_2){
                 if(battler_1.getStrength() >= battler_2.getStrength()){
                     batt_1++;
@@ -825,8 +854,21 @@ public Army battle(ArrayList<Attacker> attackers, Army defender){
             Army attacker = attackers.get(j).getArmy();
             System.out.println("first attacker is " + attackers.get(j).getName());
             Troop battler_1 = defender.getWeakest();
+            Army currentDefender = defender;
             System.out.println("first weakest defender is " + battler_1.getType());
             Troop battler_2 = attacker.getStrongest();
+            for(Army a : allies){
+                Troop k = a.getWeakest();
+                if(k.findStrength()<battler_1.findStrength()){
+                    if(!k.getOwner().containsAlly(attacker.getOwner())){
+                        battler_1 = k; 
+                        System.out.println("first weakest defender is " + battler_1.getType());
+                        currentDefender = a;
+                    }
+                 
+
+                }
+            }
             System.out.println("first strongest attacker is " + battler_2.getType());
             double batt_1 = battler_1.battle();
             double batt_2 = battler_2.battle();

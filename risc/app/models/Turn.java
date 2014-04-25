@@ -109,7 +109,8 @@ public class Turn {
                     moves.add(newMove);
                 }
                 else if(moveType == 5){
-                    boolean form = moveData.get(Constants.FORMALLIANCE).toBoolean();
+                    String formString = moveData.get(Constants.FORMALLIANCE).toString();
+                    boolean form = Boolean.parseBoolean(formString);
                     String owner = API.removeQuotes(moveData.get(Constants.OWNER).toString());
                     String ally = API.removeQuotes(moveData.get(Constants.ALLY).toString());
                     Allign newMove = new Allign(moveType, form, owner, ally);
@@ -242,7 +243,7 @@ public class Turn {
             }
             else if(moves.get(i).getMoveType() == 5){
                 Allign ally = (Allign) moves.get(i);
-                move_doc.append(Constants.FORMALLIANCE, ally.forming().toString());
+                move_doc.append(Constants.FORMALLIANCE, ally.forming());
                 move_doc.append(Constants.OWNER, ally.getOwner());
                 move_doc.append(Constants.ALLY, ally.getAlly());
                 move_list.add(move_doc);
