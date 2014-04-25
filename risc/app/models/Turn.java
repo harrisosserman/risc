@@ -213,31 +213,41 @@ public class Turn {
          //   System.out.println("in loop of move size " + i);
             BasicDBObject move_doc = new BasicDBObject();
             move_doc.append(Constants.MOVETYPE, moves.get(i).getMoveType());
-            move_doc.append(Constants.TROOPTYPE, moves.get(i).getTroopType());
             if(moves.get(i).getMoveType() == 0){
                 Upgrade upgrade = (Upgrade) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, upgrade.getTroopType());
                 move_doc.append(Constants.UPGRADETYPE, upgrade.getUpgradeType());
                 move_doc.append(Constants.POSITION, upgrade.getPosition());
                 move_list.add(move_doc);
             }
             else if(moves.get(i).getMoveType() == 1){
                 Move move = (Move) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, move.getTroopType());
                 move_doc.append(Constants.START, move.getStart());
                 move_doc.append(Constants.END, move.getEnd());
                 move_list.add(move_doc);
             }
             else if(moves.get(i).getMoveType() == 2){
                 Attack attack = (Attack) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, attack.getTroopType());                
                 move_doc.append(Constants.START, attack.getStart());
                 move_doc.append(Constants.END, attack.getEnd());
                 move_list.add(move_doc);
             }
             else if(moves.get(i).getMoveType() == 3){
                 Place place = (Place) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, place.getTroopType());                
                 move_doc.append(Constants.POSITION, place.getPosition());
                 move_list.add(move_doc);
             }
-            
+            else if(moves.get(i).getMoveType() == 5){
+                Allign ally = (Allign) moves.get(i);
+                move_doc.append(Constants.FORMALLIANCE, ally.forming().toString());
+                move_doc.append(Constants.OWNER, ally.getOwner());
+                move_doc.append(Constants.ALLY, ally.getAlly());
+                move_list.add(move_doc);
+            }
+
         }
 
         turn_doc.append(Constants.MOVES, move_list);

@@ -35,6 +35,7 @@ public class State{
     private HashMap<String, Player> myActivePlayers;
     private HashMap<Player, TreeSet<Integer>> visibleTerritoriesForEachPlayer;
     private HashMap<Integer, ArrayList<Spy>> spies;
+    private ArrayList<PotentialAlly> potentialAllies;
     //private ArrayList<Attacker> attackers;
 
 
@@ -44,6 +45,7 @@ public State(String gameID){
     myActivePlayers = new HashMap<String, Player>();
     visibleTerritoriesForEachPlayer = new HashMap<Player, TreeSet<Integer>>();
     spies = new HashMap<Integer, ArrayList<Spy>>();
+    potentialAllies = new ArrayList<PotentialAlly>();
 }
 
 /*
@@ -115,43 +117,85 @@ public int loadPreviousState(){
         int technology = Integer.parseInt(territory.get(Constants.TECHNOLOGY).toString());
         Territory terr = new Territory(position, p, food, technology);
         if(territory.get(Constants.INFANTRY_)!= null){
-        int infantry = Integer.parseInt(territory.get(Constants.INFANTRY_).toString());
-        for(int i=0; i<infantry; i++){
-            Troop t = new Troop(p, TroopType.INFANTRY);
-            terr.addTroop(t);
+            int infantry = Integer.parseInt(territory.get(Constants.INFANTRY_).toString());
+            for(int i=0; i<infantry; i++){
+                Troop t = new Troop(p, TroopType.INFANTRY);
+                terr.addTroop(t);
         }}
         if(territory.get(Constants.AUTOMATIC_)!= null){
-        int automatic = Integer.parseInt(territory.get(Constants.AUTOMATIC_).toString());
-        for(int i=0; i<automatic; i++){
-            Troop t = new Troop(p, TroopType.AUTOMATIC);
-            terr.addTroop(t);
+            int automatic = Integer.parseInt(territory.get(Constants.AUTOMATIC_).toString());
+            for(int i=0; i<automatic; i++){
+                Troop t = new Troop(p, TroopType.AUTOMATIC);
+                terr.addTroop(t);
         }}
         if(territory.get(Constants.ROCKETS_)!= null){
-        int rockets = Integer.parseInt(territory.get(Constants.ROCKETS_).toString());
-        for(int i=0; i<rockets; i++){
-            Troop t = new Troop(p, TroopType.ROCKETS);
-            terr.addTroop(t);
+            int rockets = Integer.parseInt(territory.get(Constants.ROCKETS_).toString());
+            for(int i=0; i<rockets; i++){
+                Troop t = new Troop(p, TroopType.ROCKETS);
+                terr.addTroop(t);
         }}
         if(territory.get(Constants.TANKS_)!= null){
-        int tanks = Integer.parseInt(territory.get(Constants.TANKS_).toString());
-        for(int i=0; i<tanks; i++){
-            Troop t = new Troop(p, TroopType.TANKS);
-            terr.addTroop(t);
+            int tanks = Integer.parseInt(territory.get(Constants.TANKS_).toString());
+            for(int i=0; i<tanks; i++){
+                Troop t = new Troop(p, TroopType.TANKS);
+                terr.addTroop(t);
         }}
         if(territory.get(Constants.IMPROVEDTANKS_)!= null){
-        int impTanks = Integer.parseInt(territory.get(Constants.IMPROVEDTANKS_).toString());
-        for(int i=0; i<impTanks; i++){
-            Troop t = new Troop(p, TroopType.IMPROVEDTANKS);
-            terr.addTroop(t);
+            int impTanks = Integer.parseInt(territory.get(Constants.IMPROVEDTANKS_).toString());
+            for(int i=0; i<impTanks; i++){
+                Troop t = new Troop(p, TroopType.IMPROVEDTANKS);
+                terr.addTroop(t);
         }}
         if(territory.get(Constants.PLANES_)!= null){
-        int planes = Integer.parseInt(territory.get(Constants.PLANES_).toString());
-        for(int i=0; i<planes; i++){
-            Troop t = new Troop(p, TroopType.PLANES);
-            terr.addTroop(t);
+            int planes = Integer.parseInt(territory.get(Constants.PLANES_).toString());
+            for(int i=0; i<planes; i++){
+                Troop t = new Troop(p, TroopType.PLANES);
+                terr.addTroop(t);
         }}
-        //add allied troops
+        BasicDBList alliedTroops = (BasicDBList) territory.get(Constants.ALLIES);
+        BasicDBObject[] alliedArmies = alliedTroops.toArray(new BasicDBObject[0]);
+        for(BasicDBObject ally : alliedArmies){
+            Player p = myActivePlayers.get(ally.get(Constants.OWNER).toString());
+            Army alliedArmy = new Army(p);
+            if(ally.get(Constants.INFANTRY_)!= null){
+                int infantry = Integer.parseInt(ally.get(Constants.INFANTRY_).toString());
+                for(int i=0; i<infantry; i++){
+                    Troop t = new Troop(p, TroopType.INFANTRY);
+                    alliedArmy.addTroop(t);
+            }}
+            if(ally.get(Constants.AUTOMATIC_)!= null){
+                int automatic = Integer.parseInt(ally.get(Constants.AUTOMATIC_).toString());
+                for(int i=0; i<automatic; i++){
+                    Troop t = new Troop(p, TroopType.AUTOMATIC);
+                    alliedArmy.addTroop(t);
+            }}
+            if(ally.get(Constants.ROCKETS_)!= null){
+                int rockets = Integer.parseInt(ally.get(Constants.ROCKETS_).toString());
+                for(int i=0; i<rockets; i++){
+                    Troop t = new Troop(p, TroopType.ROCKETS);
+                    alliedArmy.addTroop(t);
+            }}
+            if(ally.get(Constants.TANKS_)!= null){
+                int tanks = Integer.parseInt(ally.get(Constants.TANKS_).toString());
+                for(int i=0; i<tanks; i++){
+                    Troop t = new Troop(p, TroopType.TANKS);
+                    alliedArmy.addTroop(t);
+            }}
+            if(ally.get(Constants.IMPROVEDTANKS_)!= null){
+                int impTanks = Integer.parseInt(ally.get(Constants.IMPROVEDTANKS_).toString());
+                for(int i=0; i<impTanks; i++){
+                    Troop t = new Troop(p, TroopType.IMPROVEDTANKS);
+                    alliedArmy.addTroop(t);
+            }}
+            if(ally.get(Constants.PLANES_)!= null){
+                int planes = Integer.parseInt(ally.get(Constants.PLANES_).toString());
+                for(int i=0; i<planes; i++){
+                    Troop t = new Troop(p, TroopType.PLANES);
+                    alliedArmy.addTroop(t);
+            }}
 
+            terr.addAlly(p, alliedArmy);
+        }
 
         territories.put(terr.getPosition(), terr);
     }
@@ -215,7 +259,7 @@ private TroopType getTroopType(String str){
     }
         return null;
 }
-
+//needs to be finished...
 public void moveTypeMove(BasicDBObject move, Player p){
     int startInt = Integer.parseInt(move.get(Constants.START).toString());
     Territory start = territories.get(startInt);
@@ -239,11 +283,9 @@ public void moveTypeMove(BasicDBObject move, Player p){
                     break;
                 }
                 k++;
-                System.out.println("after k loop");
-            
+                System.out.println("after k loop");            
             }
-
-            
+      
             if(spyToMove!=null){
                  System.out.println("spy to move !=nulll");
                 if(checkAdjacency(startInt, endInt)){
@@ -264,15 +306,40 @@ public void moveTypeMove(BasicDBObject move, Player p){
         }
     }
     else{
-        if(start.getDefendingArmy().containsTroop(type)){
-            start.removeTroopFromArmy(type);
-            Army entering = end.getDefendingArmy();
-            entering.addTroop(type);
-            end.setDefendingArmy(entering);
+        if(p.equals(start.getOwner())){
+            if(start.getDefendingArmy().containsTroop(type)){
+                start.removeTroopFromArmy(type);
+            }
+        }
+        else{
+            if(start.getAllyArmy(p)!=null){
+            Army a = start.getAllyArmy(p);
+            if(a.containsTroop(type)){
+                a.removeTroopFromArmy(type);
+                start.addAlly(p, a);
+            }
+            }
+        }
+        if(p.equals(end.getOwner())){
+            end.getDefendingArmy().addTroop(type);
+        }
+        else{
+            if(end.getAllyArmy(p)!=null){
+                Army a = end.getAllyArmy(p);
+                a.addTroop(type);
+                end.addAlly(p, a);
+            }
+            else{
+                Army a = new Army(p);
+                a.addTroop(type);
+                end.addAlly(p, a);
+            }
         }
     }
+        
+    }
     
-}
+
 
 public boolean checkAdjacency(int start, int end){
     AdjacencyMap mapOfAdjacencies = new AdjacencyMap();
@@ -361,6 +428,13 @@ public void moveTypePlace(BasicDBObject move, Player p){
         army.addTroop(trooptype);
         p.setAdditionalTroops(p.getAdditionalTroops()-1);
     }
+}
+
+public void moveTypeAllign(BasicDBObject move, Player p){
+    String username = move.get(Constants.ALLY).toString();
+    Player ally = myActivePlayers.get(username);
+    PotentialAlly k = new PotentialAlly(p, ally);
+    potentialAllies.add(k);
 }
 
 public int computeCostOfUpgrade(int oldlevel, int newlevel){
@@ -492,6 +566,21 @@ public int computeCostOfTroopUpgrade(TroopType old, TroopType new_){
     return 0;
 }
 
+public void approveAlliances(){
+    for(PotentialAlly p : potentialAllies){
+        Player p1 = p.getProposer();
+        Player p2 = p.getAlly();
+        for(PotentialAlly k : potentialAllies){
+            if(k.getAlly().equals(p1)){
+                if(k.getProposer().equals(p2)){
+                    p1.addAlly(p2);
+                    p2.addAlly(p1);
+                }
+            }
+        }
+    }
+}
+
 public void updateStateWithMoves(){
     System.out.println("within state with moves method");
     for(String username : myActivePlayers.keySet()){
@@ -513,22 +602,31 @@ public void updateStateWithMoves(){
         BasicDBObject[] movesArray = movesList.toArray(new BasicDBObject[0]);
         for(BasicDBObject move : movesArray){
             int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
+            if(moveType == 5){
+                moveTypeAllign(move, p);
+                System.out.println("move type = allign");
+
+            }
+            approveAlliances();
+        }
+        //trades
+        
+        for(BasicDBObject move : movesArray){
+            int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
             if(moveType == 0){
                 System.out.println("move type = 0");
                 moveTypeUpgrade(move, p);
             }
             else if(moveType == 1){
                 moveTypeMove(move, p);
-                System.out.println("move type = 1");
             }
             else if(moveType == 2){
                 moveTypeAttack(move, p);
-                System.out.println("move type = 2");
             }
             else if(moveType == 3){
                 moveTypePlace(move, p);
-                System.out.println("move type = 3");
             }
+            
 
         }
     }

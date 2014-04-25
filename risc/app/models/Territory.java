@@ -26,6 +26,14 @@ public class Territory{
 
 	}
 
+	public void addAlly(Player p, Army a){
+		alliedTroops.put(p, a);
+	}
+
+	public void getAllyArmy(Player p){
+		return alliedTroops.get(p);
+	}
+
 	public int getFood(){
 		return myFood;
 	}
