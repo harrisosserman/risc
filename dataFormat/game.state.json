@@ -13,8 +13,26 @@
                     "TANKS": 1,
                     "IMPROVEDTANKS": 3,
                     "PLANES": 0,
+                    "INTERCEPTORS": 0,
                     "food": 4,
-                    "technology": 5
+                    "technology": 5,
+                    "alliedTroops": [
+                        {                    
+                            "owner": "Harris",
+                            "position": 2,
+                            "INFANTRY": 5,
+                            "AUTOMATIC": 6,
+                            "ROCKETS": 0,
+                            "TANKS": 1,
+                            "IMPROVEDTANKS": 3,
+                            "PLANES": 0,
+                            "INTERCEPTORS": 0
+                        },
+                        {
+
+                        }
+
+                    ]
                 }
                 {
                     "owner": "harris",
@@ -26,7 +44,13 @@
                     "IMPROVEDTANKS": 3,
                     "PLANES": 0,
                     "food": 4,
-                    "technology": 5
+                    "technology": 5,
+                    alliedTroops:[
+                        {
+
+                        }
+                        
+                    ]
                 }
     ],
     "spies":[

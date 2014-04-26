@@ -11,13 +11,46 @@ public class Player {
 	private int turnCommitted;
     private int additionalTroops;
 	private Long myTimeStamp;
+	private ArrayList<Player> allies;
 
 	public Player(String name){
 		this.myName = name;
+		allies = new ArrayList<Player>();
 	}
 
 	public String getName(){
 		return myName;
+	}
+
+	public boolean containsAlly(Player p){
+		for(Player k : allies){
+			if(k.equals(p)){ 
+				return true;
+			}
+			
+		}
+        return false;
+	}
+
+	public void addAlly(Player p){
+		for(Player k : allies){
+			if(k.equals(p)){ 
+				return;}
+		}
+		allies.add(p);
+	}
+
+	public void removeAlly(Player p){
+		int j = 0;
+		for(Player k : allies){
+			if(k.equals(p)){ allies.remove(j);
+				return;}
+			j++;
+		}
+	}
+
+	public ArrayList<Player> getAllies(){
+		return allies;
 	}
 
     public void setAdditionalTroops(int numTroops){

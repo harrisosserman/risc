@@ -27,12 +27,6 @@ public class Army{
     public String getName(){
         return myOwner.getName();
     }
-    
-	/*public void addTroop(TroopType type, Troop t){
-		ArrayList<Troop> troops = myTroops.get(type);
-		troops.add(t);
-		myTroops.put(type, troops);
-	}*/
 
 	public ArrayList<Troop> getArrayOfTroops(){
 		ArrayList<Troop> troops = new ArrayList<Troop>();
@@ -126,8 +120,7 @@ public class Army{
 			return strongest;
 		}
 		return null;
-	}
-	
+	}	
 	public Troop getWeakest(){
 		if(myTroops.get(TroopType.INFANTRY).size()>0){
 			Troop weakest = myTroops.get(TroopType.INFANTRY).get(0);
