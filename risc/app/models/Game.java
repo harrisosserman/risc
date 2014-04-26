@@ -132,6 +132,9 @@ public class Game {
             ArrayList<DBObject> highestTech = initialHighestTech(username, usernames);
             info.append(DBHelper.HIGHEST_TECHNOLOGY_KEY, highestTech);
 
+            ArrayList<DBObject> allies = new ArrayList<DBObject>();
+            info.append(DBHelper.ALLIES_KEY, allies);
+
             playerInfo.add(info);
         }
         state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
