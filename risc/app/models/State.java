@@ -98,8 +98,7 @@ public int loadPreviousState(){
     for(BasicDBObject player : playerArray){
         String username = player.get(Constants.OWNER).toString();
         Player p_ = myActivePlayers.get(username);
-        BasicDBList playerAllies = (BasicDBList) player.get(Constants.ALLIES);
-        BasicDBObject[] myallies = playerAllies.toArray(new BasicDBObject[0]);
+        ArrayList<String> myallies = (ArrayList<String>)p_.get(Constants.ALLIES);
         for(BasicDBObject ally : myallies){
             String allyUsername = ally.toString();
             Player p = myActivePlayers.get(allyUsername);
