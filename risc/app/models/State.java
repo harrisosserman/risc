@@ -36,7 +36,7 @@ public class State{
     private HashMap<Player, TreeSet<Integer>> visibleTerritoriesForEachPlayer;
     private HashMap<Integer, ArrayList<Spy>> spies;
     private ArrayList<PotentialAlly> potentialAllies;
-    private ArrayList<Trade> tradeOrders;
+    private HashMap<Player, ArrayList<Trade>> tradeOrders;
     //private ArrayList<Attacker> attackers;
 
 
@@ -47,7 +47,7 @@ public State(String gameID){
     visibleTerritoriesForEachPlayer = new HashMap<Player, TreeSet<Integer>>();
     spies = new HashMap<Integer, ArrayList<Spy>>();
     potentialAllies = new ArrayList<PotentialAlly>();
-    tradeOrders = new ArrayList<Trade>();
+    tradeOrders = new  HashMap<Player, ArrayList<Trade>>();
 
 }
 
@@ -453,12 +453,20 @@ public void moveTypeAllign(BasicDBObject move, Player p){
 }
 
 public void moveTypeTrade(BasicDBObject move, Player p){
+    ArrayList<Trade> playerTrades;
+    if(!tradeOrders.contains(p)){
+        playerTrades = new ArrayList<Trade>();
+    }   
+    else{
+        playerTrades = tradeOrders.get(p);
+    }
     String giver_ = move.get(Constants.GIVER).toString();
     String receiver_ = move.get(Constants.RECEIVER).toString();
     int amount = Integer.parseInt(move.get(Constants.NUMBER).toString());
     String type = move.get(Constants.TYPE).toString();
     Trade newTrade = new Trade(4, giver_, receiver_, amount, type);
-    tradeOrders.add(newTrade);
+    playerTrades.add(newTrade);
+    tradeOrders.put(p, playerTrades);
 }
 
 public int computeCostOfUpgrade(int oldlevel, int newlevel){
@@ -606,6 +614,14 @@ public void approveAlliances(){
 }
 
 public void settleTrades(){
+    for(String username : myActivePlayers.keySey()){
+        Player p = myActivePlayers.get(username);
+        ArrayList<Trade> trades = tradeOrders.get(p);
+        for(Trade trade : trades){
+            String 
+        }
+    }
+
     ArrayList<Trade> tradeListSample = tradeOrders;
     for(int i=tradeOrders.size(); i>0; i--){
         for(int j=tradeListSample.size(); j>0; j--){
