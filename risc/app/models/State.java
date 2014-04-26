@@ -594,8 +594,8 @@ public void settleTrades(){
     ArrayList<Trade> tradeListSample = tradeOrders;
     for(int i=tradeOrders.size(); i>0; i--){
         for(int j=tradeListSample.size(); j>0; j--){
-            Trade t1 = tradeListSample.get(i);
-            Trade t2 = tradeOrders.get(j);
+            Trade t1 = tradeOrders.get(i);
+            Trade t2 = tradeListSample.get(j);
             if(t1.equivalentTo(t2)){
                 executeTrade(t1);
                 tradeListSample.remove(i);
@@ -612,26 +612,86 @@ public void executeTrade(Trade t){
     TradeType type = t.getTradeType();
     switch(type){
         case INFANTRY:
-        {
-
-            return;
+        {       
+            TroopType type = TroopType.INFANTRY;
+            break;
         }
-        case AUTOMATIC: return;
-        case ROCKETS: return;
-        case TANKS: return;
-        case IMPROVEDTANKS: return;
-        case PLANES: return;
+        case AUTOMATIC:         
+        {       
+            TroopType type = TroopType.AUTOMATIC;
+            break;
+        }
+        case ROCKETS: 
+        {       
+            TroopType type = TroopType.ROCKETS;
+            break;
+        }
+        case TANKS:
+        {       
+            TroopType type = TroopType.TANKS;
+            break;
+        }
+        case IMPROVEDTANKS:
+        {       
+            TroopType type = TroopType.IMPROVEDTANKS;
+            break;
+
+        }
+        case PLANES:
+        {       
+            TroopType type = TroopType.PLANES;
+            break;
+
+        }
+
+                
         case SPIES: return;
         case INTERCEPTOR: return;
         case NUKE: return;
         case TERRITORY: return;
         case FOOD: 
             {
-          //      int food = t.getAmount();
+                int food = t.getAmount();
+                p1.setFood(p1.getFood()-food);
+                p2.setFood(p2.getFood()+food);
+                return;
 
             }
-        case TECHNOLOGY: return;
+        case TECHNOLOGY:
+            {
+                int tech = t.getAmount();
+                p1.setTechnology(p1.getTechnology()-tech);
+                p2.setTechnology(p2.getTechnology()+tech);
+                return;
+            }
         default: return;
+
+        //army stuff
+        int troopsToDelete = t.getAmount()
+                for(Integer position : territories.keySet()){
+                    Territory terr = territories.get(position);
+                    if(t.getOwner().equals(p1)){
+                        while(terr.tryToDeleteTroop(type) && troopsToDelete >0){
+                            troopsToDelete --;
+                        }
+                        if(troopsToDelete==0){
+                            return;
+                        }
+                    }
+                }
+                int troopsToAdd = t.getAmount();
+                for(Integer position : territories.keySet()){
+                    Territory terr = territories.get(position);
+                    if(t.getOwner().equals(p2)){
+                        while(troopsToAdd >0){
+                            terr.addTroop(type);
+                            troopsToAdd --;
+                        }
+                        if(troopsToAdd==0){
+                            return;
+                        }
+                    }
+                }
     }
 
 }
@@ -1252,6 +1312,22 @@ public void saveState(){
         }
         territory_doc.append(Constants.FOOD, t.getFood());
         territory_doc.append(Constants.TECHNOLOGY, t.getTechnology());
+        List<BasicDBObject> ally_list = new ArrayList<BasicDBObject>();
+        HashMap<Player, Army> alliedTroopMap = t.getAllies();
+
+        for(Player p : alliedTroopMap.keySet()){
+            BasicDBObject ally_doc = new BasicDBObject();
+            ally_doc.append(Constants.OWNER, p.getName());
+            HashMap<TroopType, ArrayList<Troop>> troopsOfType = alliedTroopMap.get(p).getTroops();
+            for(TroopType type : troopsOfType.keySet()){
+                ArrayList<Troop> troops = troopsOfType.get(type);
+                int size = troops.size();
+                ally_doc.append(typeToString(type), size);
+            }
+            ally_list.add(ally_doc);
+
+        }        
+        territory_doc.append(Constants.ALLIEDTROOPS, ally_list);
         territory_list.add(territory_doc);
     }
     turn_doc.append(Constants.TERRITORIES, territory_list);
@@ -1306,7 +1382,7 @@ public void saveState(){
     
         }
     }
-   turn_doc.append(Constants.SPIES, spy_list);
+    turn_doc.append(Constants.SPIES, spy_list);
     state.insert(turn_doc);
 
     return;

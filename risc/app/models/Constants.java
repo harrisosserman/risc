@@ -56,6 +56,7 @@ public final class Constants{
     public static final String NUMBER = "number";
     public static final String TYPE = "type";
     public static final String OFFER = "offer";
+    public static final String ALLIEDTROOPS = "alliedTroops";
 
 
 }
