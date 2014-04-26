@@ -152,7 +152,7 @@ public int loadPreviousState(){
                 Troop t = new Troop(p, TroopType.PLANES);
                 terr.addTroop(t);
         }}
-        BasicDBList alliedTroops = (BasicDBList) territory.get(Constants.ALLIES);
+        BasicDBList alliedTroops = (BasicDBList) territory.get(Constants.ALLIEDTROOPS);
         BasicDBObject[] alliedArmies = alliedTroops.toArray(new BasicDBObject[0]);
         for(BasicDBObject ally : alliedArmies){
             Player p1 = myActivePlayers.get(ally.get(Constants.OWNER).toString());
