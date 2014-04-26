@@ -130,15 +130,6 @@ public class Game {
             ArrayList<DBObject> highestTech = initialHighestTech(username, usernames);
             info.append(DBHelper.HIGHEST_TECHNOLOGY_KEY, highestTech);
 
-            //TESTING---------------
-            if (username.equals("a")) {
-                ArrayList<String> allies = new ArrayList<String>();
-                allies.add("b");
-                info.append(DBHelper.ALLIES_KEY, allies);
-            }
-
-            //End TESTING---------------
-
             playerInfo.add(info);
         }
         state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
