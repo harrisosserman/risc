@@ -34,7 +34,7 @@
                     }
                     if(otherPlayersFound === false) {
                         alert("Player " + owner + " wins!!!");
-                        $.ajax('/test/game/' + globalFunctions.getGameID() + '/end', {
+                        $.ajax('/game/' + globalFunctions.getGameID() + '/end', {
                             method: 'POST'
                         });
                         location.reload(true);
@@ -49,7 +49,7 @@
         };
 
         turn.loadGameMap = function(deferred) {
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
             }).done(function(result) {
                 var gameMap = $.parseJSON(result);
@@ -61,7 +61,7 @@
 
         turn.commitTurn = function(midturn) {
             var result = turn.constructComittedTurn(midturn);
-            $.ajax('/test/game/' + globalFunctions.getGameID(), {
+            $.ajax('/game/' + globalFunctions.getGameID(), {
                 method: 'POST',
                 data: JSON.stringify(result),
                 contentType: "application/json"

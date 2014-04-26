@@ -19,6 +19,7 @@
             spy: [],
             interceptor: []
         };
+        board.boardInfoAllies = [];
         board.playerInfo = {
             food: -1,
             technology: -1,
@@ -120,6 +121,7 @@
                 spy: [],
                 interceptor: []
             };
+            board.boardInfoAllies = [];
             for(var k=0; k<25; k++) {
                 board.updateBoardInfoValues(k, k);
             }
@@ -168,7 +170,7 @@
             $("#dialog").dialog();
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -197,6 +199,7 @@
                             var position = board.territoryInfo.territories[index].position;
                             board.territoryOwner[position] = board.territoryInfo.territories[index].owner;
                             board.updateBoardInfoValues(index, position);
+                            board.updateBoardInfoAlliesValues(index, position);
                             board.boardInfo.food[position] = board.territoryInfo.territories[index].food;
                             board.boardInfo.technology[position] = board.territoryInfo.territories[index].technology;
                             var playerNumber = board.getPlayerNumberByUsername(board.territoryInfo.territories[index].owner);
@@ -273,6 +276,26 @@
                 } else {
                     board.boardInfo[troopTypeInBoardInfo][position] = board.territoryInfo.territories[index][troopTypeInTerritoryInfo];
                 }
+            }
+        };
+        board.updateBoardInfoAlliesValues = function(index, position) {
+            board.boardInfoAllies[position] = [];
+            if(typeof board.territoryInfo.territories == 'undefined' || typeof board.territoryInfo.territories[index].alliedTroops == 'undefined') {
+                return;
+            }
+            for(var m=0; m<board.territoryInfo.territories[index].alliedTroops.length; m++) {
+                var inputObject = {};
+                inputObject.owner = board.territoryInfo.territories[index].alliedTroops[m].owner;
+                for(var k=0; k<9; k++) {
+                    var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
+                    var troopTypeInBoardInfo = globalFunctions.convertReadableText(board.convertTroopToText(k), false).text;
+                    if(typeof board.territoryInfo.territories == 'undefined' || typeof board.territoryInfo.territories[index].alliedTroops[m][troopTypeInTerritoryInfo] == 'undefined') {
+                        inputObject[troopTypeInBoardInfo] = 0;
+                    } else {
+                        inputObject[troopTypeInBoardInfo] = board.territoryInfo.territories[index].alliedTroops[m][troopTypeInTerritoryInfo];
+                    }
+                }
+                board.boardInfoAllies[position].push(inputObject);
             }
         };
         board.updatePlayerInfoTable = function(index, playerInfo, updateTechnology, playerNumber) {
@@ -415,6 +438,7 @@
             board.territoryClickTerritoryNumber(index + 1);
             board.territoryClickInfo.removeAll();
             var data = {
+                owner: board.territoryOwner[index],
                 food: board.boardInfo.food[index],
                 tech: board.boardInfo.technology[index],
                 infantry: board.boardInfo.infantry[index],
@@ -427,6 +451,21 @@
                 interceptor: board.boardInfo.interceptor[index]
             };
             board.territoryClickInfo.push(data);
+            if(typeof board.boardInfoAllies[index] !== 'undefined' && board.boardInfoAllies[index].length > 0) {
+                board.territoryClickInfo.push({owner: "ALLIES:", food: "", tech: "", infantry: "", automatic: "", rocket: "", tank: "", improvedTank: "", plane: "", spy: "", interceptor: ""});
+                for(var m=0; m<board.boardInfoAllies[index].length; m++) {
+                    var resultObj = {};
+                    resultObj.owner = board.boardInfoAllies[index][m].owner;
+                    resultObj.food = "-";
+                    resultObj.tech = "-";
+                    for(var k=0; k<9; k++) {
+                        var troopTypeInTerritoryInfo = board.editing.convertTextForTroopCommit(k);
+                        var troopTypeInBoardInfo = globalFunctions.convertReadableText(board.convertTroopToText(k), false).text;
+                        resultObj[troopTypeInBoardInfo] = board.boardInfoAllies[index][m][troopTypeInBoardInfo];
+                    }
+                    board.territoryClickInfo.push(resultObj);
+                }
+            }
             board.territoryClickAttackInfo.removeAll();
             if(typeof board.attackInfo[index] != 'undefined') {
                 for(var k=0; k<board.attackInfo[index].length; k++) {
@@ -631,7 +670,7 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
             }).done(function() {
                 globalFunctions.destroyAndRebuildMap();

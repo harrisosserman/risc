@@ -244,6 +244,7 @@
                             <table class="table">
                                 <thead>
                                     <tr>
+                                        <th>Owner</th>
                                         <th>Food</th>
                                         <th>Technology</th>
                                         <th>Spies</th>
@@ -258,6 +259,7 @@
                                 </thead>
                                 <tbody data-bind="foreach: territoryClickInfo">
                                     <tr>
+                                        <td data-bind="text: owner"></td>
                                         <td data-bind="text: food"></td>
                                         <td data-bind="text: tech"></td>
                                         <td data-bind="text: spy"></td>
