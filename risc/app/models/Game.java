@@ -130,6 +130,15 @@ public class Game {
             ArrayList<DBObject> highestTech = initialHighestTech(username, usernames);
             info.append(DBHelper.HIGHEST_TECHNOLOGY_KEY, highestTech);
 
+            //TESTING---------------
+            if (username.equals("a")) {
+                ArrayList<String> allies = new ArrayList<String>();
+                allies.add("b");
+                info.append(DBHelper.ALLIES_KEY, allies);
+            }
+
+            //End TESTING---------------
+
             playerInfo.add(info);
         }
         state.append(DBHelper.PLAYER_INFO_KEY, playerInfo);
@@ -223,12 +232,12 @@ public class Game {
         //Find main user's info
         ArrayList<DBObject> playerInfo = (ArrayList<DBObject>)currentTurn.get(DBHelper.PLAYER_INFO_KEY);
         DBObject targetPlayerInfo = null;
-        ArrayList<Integer> territoriesVisible = null;
+        ArrayList<Integer> territoriesVisible = new ArrayList<Integer>();
         for (DBObject info : playerInfo) {
             String owner = (String)info.get(DBHelper.OWNER_KEY);
             if (owner.equals(username)) {
                 targetPlayerInfo = info;
-                territoriesVisible = (ArrayList<Integer>)targetPlayerInfo.get(DBHelper.VISIBLE_TERRITORIES_KEY);
+                // territoriesVisible = (ArrayList<Integer>)targetPlayerInfo.get(DBHelper.VISIBLE_TERRITORIES_KEY);
             }
         }
 
@@ -239,7 +248,22 @@ public class Game {
                 allies.add(ally);
             }
         }
-        System.out.println("Allies: " + allies);
+        System.out.println(username + "'s " + "Allies: " + allies);
+
+        for (DBObject info : playerInfo) {
+            String owner = (String)info.get(DBHelper.OWNER_KEY);
+            if (allies.contains(owner)) {
+                ArrayList<Integer> allysVisibleTerritories = (ArrayList<Integer>)info.get(DBHelper.VISIBLE_TERRITORIES_KEY);
+                System.out.println("Ally's Visible terr:" + allysVisibleTerritories);
+                for (Integer territoryNum : allysVisibleTerritories) {
+                    if (!territoriesVisible.contains(territoryNum)) {
+                        territoriesVisible.add(territoryNum);
+                    }
+                }
+            }
+        }
+        Collections.sort(territoriesVisible);
+        System.out.println("all visible: " + territoriesVisible);
 
         //Filter territories
         ArrayList<DBObject> filteredTerritories = new ArrayList<DBObject>();
@@ -259,7 +283,7 @@ public class Game {
         if(spies != null){
             for (DBObject spy : spies) {
                 String owner = (String)spy.get(DBHelper.OWNER_KEY);
-                if (owner.equals(username)) {
+                if (owner.equals(username)) {   //TODO allies
                     filteredSpies.add(spy);
                 }
             }
@@ -276,7 +300,7 @@ public class Game {
         for (String user : usernames) {
             for (DBObject tech : highestTech) {
                 String owner = (String)tech.get(DBHelper.OWNER_KEY);
-                if (owner.equals(user)) {
+                if (owner.equals(user)) {       //TODO allies
                     int playerNumber = usernames.indexOf(owner);
                     int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
 
@@ -285,13 +309,16 @@ public class Game {
                     formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
                     formattedTech.append(DBHelper.LEVEL_KEY, level);
                     filteredPlayerInfo.add(formattedTech);
-                }else if (user.equals(username)){
+                }else if (user.equals(username)){       //TODO allies
                     int requestingPlayerNumber = usernames.indexOf(username);
                     ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
                     filteredPlayerInfo.add(targetPlayerInfo);
                 }
             }
         }
+
+        //TODO allies?
+
         // for (DBObject tech : highestTech) {
         //     String owner = (String)tech.get(DBHelper.OWNER_KEY);
         //     int playerNumber = usernames.indexOf(owner);
