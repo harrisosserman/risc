@@ -702,12 +702,16 @@ public void updateStateWithMoves(){
     for(String username : myActivePlayers.keySet()){
         Player p = myActivePlayers.get(username);
         System.out.println(myGameID);
+        System.out.println("within state with moves method");
         DBObject lastCommittedTurn = DBHelper.getCommittedTurnForPlayerAndGame(myGameID, username);
         int technology = Integer.parseInt(lastCommittedTurn.get(Constants.TECHNOLOGY).toString());
         int technology_level = Integer.parseInt(lastCommittedTurn.get(Constants.TECHNOLOGY_LEVEL).toString());
+        System.out.println("within state with moves method");
         if(technology_level != p.getTechnologyLevel()){
+            System.out.println("techn level");
             int cost = computeCostOfUpgrade(p.getTechnologyLevel(), technology_level);
             if(technology >= cost){
+                System.out.println("techn level if");
                 p.setTechnology(technology-cost);
                 p.setTechnologyLevel(technology_level);
                 myActivePlayers.put(p.getName(), p);

@@ -258,12 +258,15 @@ public class Turn {
             }
 
         }
+
             BasicDBObject move_doc = new BasicDBObject();
             move_doc.append(Constants.MOVETYPE, 4);
             List<BasicDBObject> trade_list = new ArrayList<BasicDBObject>();
+            boolean isThereATrade = false;
         for(int i=0; i<moves.size(); i++){
             BasicDBObject trade_doc = new BasicDBObject();
             if(moves.get(i).getMoveType() == 4){
+                isThereATrade = true;
                 Trade trade = (Trade) moves.get(i);
                 trade_doc.append(Constants.GIVER, trade.getGiver());
                 trade_doc.append(Constants.RECEIVER, trade.getReceiver());
@@ -272,9 +275,12 @@ public class Turn {
                 trade_list.add(trade_doc);
             }
         }
-        move_doc.append(Constants.OFFER, trade_list);
+        if(isThereATrade){
+            move_doc.append(Constants.OFFER, trade_list);
 
-        move_list.add(move_doc);
+            move_list.add(move_doc);
+        }
+
         
         turn_doc.append(Constants.MOVES, move_list);
 
