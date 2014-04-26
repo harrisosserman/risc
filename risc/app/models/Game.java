@@ -244,6 +244,10 @@ public class Game {
             filteredCurrentTurn.put(DBHelper.WINNER_KEY, winner);
         }
 
+        // Since Nukes aren't working
+        filteredCurrentTurn.put(DBHelper.NOTIFY_NUKES_AVAILABLE_KEY, false);
+        filteredCurrentTurn.put(DBHelper.CAN_USE_NUKES_KEY, false);
+
         return filteredCurrentTurn.toString();
     }
 

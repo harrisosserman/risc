@@ -46,6 +46,8 @@ public class DBHelper{
     public static final String ALLIES_KEY = "allies";
     public static final String WINNER_KEY = "winnder";
     public static final String ALLIED_TROOPS = "alliedTroops";
+    public static final String NOTIFY_NUKES_AVAILABLE_KEY = "notifyNukesAvailable";
+    public static final String CAN_USE_NUKES_KEY = "canUseNukes";
     
     public static final String INFANTRY_KEY = "INFANTRY";
     public static final String AUTOMATIC_WEAPONS_KEY = "AUTOMATIC";
