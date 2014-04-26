@@ -108,6 +108,14 @@ public class Turn {
                     Place newMove = new Place(moveType, troopType, position);
                     moves.add(newMove);
                 }
+                else if(moveType == 4){
+                    String giver_ = API.removeQuotes(moveData.get(Constants.GIVER).toString());
+                    String receiver_ = API.removeQuotes(moveData.get(Constants.RECEIVER).toString());
+                    int amount = Integer.parseInt(moveData.get(Constants.NUMBER).toString());
+                    String type = API.removeQuotes(moveData.get(Constants.TYPE).toString());
+                    Trade newMove = new Trade(moveType, giver_, receiver_, amount, type);
+                    moves.add(newMove);
+                }
                 else if(moveType == 5){
                     String formString = moveData.get(Constants.FORMALLIANCE).toString();
                     boolean form = Boolean.parseBoolean(formString);
@@ -250,7 +258,24 @@ public class Turn {
             }
 
         }
+            BasicDBObject move_doc = new BasicDBObject();
+            move_doc.append(Constants.MOVETYPE, 4);
+            List<BasicDBObject> trade_list = new ArrayList<BasicDBObject>();
+        for(int i=0; i<moves.size(); i++){
+            BasicDBObject trade_doc = new BasicDBObject();
+            if(moves.get(i).getMoveType() == 4){
+                Trade trade = (Trade) moves.get(i);
+                trade_doc.append(Constants.GIVER, trade.getGiver());
+                trade_doc.append(Constants.RECEIVER, trade.getReceiver());
+                trade_doc.append(Constants.TYPE, trade.getTradeType());
+                trade_doc.append(Constants.NUMBER, trade.getAmount());
+                trade_list.add(trade_doc);
+            }
+        }
+        move_doc.append(Constants.OFFER, trade_list);
 
+        move_list.add(move_doc);
+        
         turn_doc.append(Constants.MOVES, move_list);
 
         committedTurns.insert(turn_doc);

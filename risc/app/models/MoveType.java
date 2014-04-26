@@ -12,6 +12,10 @@ public abstract class MoveType {
 		myTroopType = trooptype;
 	}
 
+	public MoveType(int movetype){
+		myMoveType = movetype;
+	}
+
 	public int getMoveType(){
 		return myMoveType;
 	}

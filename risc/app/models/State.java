@@ -36,6 +36,7 @@ public class State{
     private HashMap<Player, TreeSet<Integer>> visibleTerritoriesForEachPlayer;
     private HashMap<Integer, ArrayList<Spy>> spies;
     private ArrayList<PotentialAlly> potentialAllies;
+    private ArrayList<Trade> tradeOrders;
     //private ArrayList<Attacker> attackers;
 
 
@@ -46,6 +47,7 @@ public State(String gameID){
     visibleTerritoriesForEachPlayer = new HashMap<Player, TreeSet<Integer>>();
     spies = new HashMap<Integer, ArrayList<Spy>>();
     potentialAllies = new ArrayList<PotentialAlly>();
+
 }
 
 /*
@@ -74,8 +76,6 @@ public State(String gameID){
  * @throws UnknownHost Exception Thrown to indicate that the IP address of a host could not 
  * be determined.
  */
-
-
 public int loadPreviousState(){
     DBObject lastStateObject = DBHelper.getCurrentTurnForGame(myGameID);
     turn = Integer.parseInt(lastStateObject.get(Constants.TURN).toString());
@@ -235,6 +235,7 @@ public int loadPreviousState(){
 
 }
 
+
 private TroopType getTroopType(String str){
     if(str.equals("INFANTRY")){
         return TroopType.INFANTRY;
@@ -340,7 +341,6 @@ public void moveTypeMove(BasicDBObject move, Player p){
     }
     
 
-
 public boolean checkAdjacency(int start, int end){
     AdjacencyMap mapOfAdjacencies = new AdjacencyMap();
     ArrayList<Integer> adjacencies = mapOfAdjacencies.getAdjacencies(start);
@@ -435,6 +435,15 @@ public void moveTypeAllign(BasicDBObject move, Player p){
     Player ally = myActivePlayers.get(username);
     PotentialAlly k = new PotentialAlly(p, ally);
     potentialAllies.add(k);
+}
+
+public void moveTypeTrade(BasicDBObject move, Player p){
+    String giver_ = move.get(Constants.GIVER).toString();
+    String receiver_ = move.get(Constants.RECEIVER).toString();
+    int amount = Integer.parseInt(move.get(Constants.NUMBER).toString());
+    String type = move.get(Constants.TYPE).toString();
+    Trade newTrade = new Trade(4, giver_, receiver_, amount, type);
+    tradeOrders.add(newTrade);
 }
 
 public int computeCostOfUpgrade(int oldlevel, int newlevel){
@@ -581,6 +590,52 @@ public void approveAlliances(){
     }
 }
 
+public void settleTrades(){
+    ArrayList<Trade> tradeListSample = tradeOrders;
+    for(int i=tradeOrders.size(); i>0; i--){
+        for(int j=tradeListSample.size(); j>0; j--){
+            Trade t1 = tradeListSample.get(i);
+            Trade t2 = tradeOrders.get(j);
+            if(t1.equivalentTo(t2)){
+                executeTrade(t1);
+                tradeListSample.remove(i);
+                break;
+
+            }
+        }
+    }
+}
+
+public void executeTrade(Trade t){
+    Player p1 = myActivePlayers.get(t.getGiver());
+    Player p2 = myActivePlayers.get(t.getReceiver());
+    TradeType type = t.getTradeType();
+    switch(type){
+        case INFANTRY:
+        {
+
+            return;
+        }
+        case AUTOMATIC: return;
+        case ROCKETS: return;
+        case TANKS: return;
+        case IMPROVEDTANKS: return;
+        case PLANES: return;
+        case SPIES: return;
+        case INTERCEPTOR: return;
+        case NUKE: return;
+        case TERRITORY: return;
+        case FOOD: 
+            {
+          //      int food = t.getAmount();
+
+            }
+        case TECHNOLOGY: return;
+        default: return;
+    }
+
+}
+
 public void updateStateWithMoves(){
     System.out.println("within state with moves method");
     for(String username : myActivePlayers.keySet()){
@@ -609,7 +664,15 @@ public void updateStateWithMoves(){
             }
             approveAlliances();
         }
-        //trades
+        for(BasicDBObject move : movesArray){
+            int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
+            if(moveType == 4){
+                moveTypeTrade(move, p);
+                System.out.println("move type = trade");
+
+            }
+            approveAlliances();
+        }
 
         for(BasicDBObject move : movesArray){
             int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
@@ -688,6 +751,7 @@ public void doAttacksAndMoves(){
 
         Army winner = battle(attackersForBattle(attacks), territories.get(position).getDefendingArmy(), alliesForBattle(allies));
        // territories.get(position).setDefendingArmy(winner);
+        compareSittingTroops();
         Territory t = territories.get(position);
         t.addTroop(TroopType.INFANTRY);
         t.setOwner(winner.getOwner());
@@ -695,6 +759,93 @@ public void doAttacksAndMoves(){
 
     }
     finalizeState();
+}
+
+public void compareSittingTroops(){
+    for(Integer position : territories.keySet()){
+        Territory terr = territories.get(position);
+        HashMap<Player, Army> alliedArmies = terr.getAllies();
+        for(Player p : alliedArmies.keySet()){
+            for(Player q : alliedArmies.keySet()){
+                if(!p.containsAlly(q) && !p.equals(q)){
+                    Army p_army = alliedArmies.get(p);
+                    Army q_army = alliedArmies.get(q);
+                    Player winner = battleOnHomeGround(p_army, p, q_army, q);
+                    if(winner.equals(p)){
+                        alliedArmies.remove(q);
+                        terr.setAllies(alliedArmies);
+                    }
+                    else{
+                        alliedArmies.remove(p);
+                        terr.setAllies(alliedArmies);
+                    }
+                }
+            }
+        }
+    }
+}
+
+public Player battleOnHomeGround(Army attacker, Player attacker_player, Army defender, Player defender_player){
+    while(attacker.getNumberOfTroops()>0 & defender.getNumberOfTroops()>0){
+
+        Troop battler_1 = defender.getStrongest();
+  //      System.out.println("first strongest defender is a " + battler_1.getType());
+        Troop battler_2 = attacker.getWeakest();
+    //    System.out.println("first weakest attacker is a " + battler_2.getType());
+        double batt_1 = battler_1.battle();
+        double batt_2 = battler_2.battle();
+        if(batt_1 == batt_2){
+      //      System.out.println("it was a tie " + batt_1);
+            if(battler_1.getStrength() >= battler_2.getStrength()){
+                batt_1++;
+            }
+            else{
+                batt_2++;
+            }
+        }
+        if(batt_1 < batt_2){
+ //           System.out.println(batt_1 + " is less than  " +batt_2 + " the defender lost one troop");
+            defender.deleteTroop(battler_1.getType());
+            if(defender.getNumberOfTroops()==0){
+                return attacker_player;
+            }
+        }
+        else{
+   //         System.out.println(batt_2 + " is less than  " + batt_1 + " the attacker lost one troop");
+            attacker.deleteTroop(battler_2.getType());
+            if(attacker.getNumberOfTroops()==0){
+                return defender_player;
+            }
+        }       
+        battler_1 = defender.getWeakest();
+    //    System.out.println("first weakest defender is " + battler_1.getType());
+        battler_2 = attacker.getStrongest();
+      //  System.out.println("first strongest attacker is " + battler_2.getType());
+        batt_1 = battler_1.battle();
+        batt_2 = battler_2.battle();
+        if(batt_1 < batt_2){
+        //    System.out.println(batt_1 + " is less than  " + batt_2 + " the defender lost one troop");
+            defender.deleteTroop(battler_1.getType());
+            if(defender.getNumberOfTroops()==0){
+                return attacker_player;
+            }                
+        }
+        else{
+        //    System.out.println(batt_1 + " is less than  " + batt_2 + " the attacker lost one troop");
+            attacker.deleteTroop(battler_2.getType());
+            if(attacker.getNumberOfTroops()==0){
+                return defender_player;
+            } 
+        }
+    }
+
+    if(attacker.getNumberOfTroops()>0){
+        return attacker_player;
+    }
+    else{
+        return defender_player;
+    }
+      
 }
 
 public int battleCrossing(Army attacker, int attackerHome, Army defender, int defenderHome){
@@ -963,7 +1114,7 @@ public void finalizeState(){
         }
     }
     for(String username: myActivePlayers.keySet()){
-         System.out.println("players again");
+        System.out.println("players again");
         Player player = myActivePlayers.get(username);
         int troopsToDelete = 0;
         int food = player.getFood();
@@ -1034,6 +1185,20 @@ public void visibleTerritories(){
             ints.add(spyposition);
             visibleTerritoriesForEachPlayer.put(p, ints);
         }
+
+    }
+    //add all visible territories to the allies
+    for(String username : myActivePlayers.keySet()){
+        Player p = myActivePlayers.get(username);
+        ArrayList<Player> allies = p.getAllies();
+        TreeSet<Integer> visibleTerrs = visibleTerritoriesForEachPlayer.get(p);
+        for(Player q : allies){
+            TreeSet<Integer> visibleToAlly = visibleTerritoriesForEachPlayer.get(q);
+            for(Integer k : visibleToAlly){
+                visibleTerrs.add(k);
+            }   
+        }
+        visibleTerritoriesForEachPlayer.put(p,visibleTerrs);
     }
 } 
  

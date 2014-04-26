@@ -37,6 +37,10 @@ public class Territory{
     public HashMap<Player, Army> getAllies(){
         return alliedTroops;
     }
+    public void setAllies(HashMap<Player, Army> a){
+        alliedTroops = a;
+    }
+
 
 	public int getFood(){
 		return myFood;

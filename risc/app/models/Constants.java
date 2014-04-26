@@ -51,11 +51,11 @@ public final class Constants{
     public static final String FORMALLIANCE = "formAlliance";
     public static final String ALLY = "ally";
     public static final String GIVER = "giver";
-    public static final String RECIEVER = "receiver";
+    public static final String RECEIVER = "receiver";
     public static final String ALLIES = "allies";
-
-
-
+    public static final String NUMBER = "number";
+    public static final String TYPE = "type";
+    public static final String OFFER = "offer";
 
 
 }
