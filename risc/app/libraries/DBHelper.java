@@ -43,6 +43,7 @@ public class DBHelper{
     public static final String VISIBLE_TERRITORIES_KEY = "territoriesVisible";
     public static final String SPIES_KEY = "spies";
     public static final String HIGHEST_TECHNOLOGY_KEY = "highestTechnology";
+    public static final String ALLIES_KEY = "allies";
     
     public static final String INFANTRY_KEY = "INFANTRY";
     public static final String AUTOMATIC_WEAPONS_KEY = "AUTOMATIC";

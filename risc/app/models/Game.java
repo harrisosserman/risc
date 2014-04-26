@@ -217,7 +217,10 @@ public class Game {
     }
 
     private DBObject filterStateForUsername(DBObject currentTurn, String username, ArrayList<String> usernames){
-        //Filter territories
+        ArrayList<String> allies = new ArrayList<String>();
+        allies.add(username);
+
+        //Find main user's info
         ArrayList<DBObject> playerInfo = (ArrayList<DBObject>)currentTurn.get(DBHelper.PLAYER_INFO_KEY);
         DBObject targetPlayerInfo = null;
         ArrayList<Integer> territoriesVisible = null;
@@ -225,10 +228,20 @@ public class Game {
             String owner = (String)info.get(DBHelper.OWNER_KEY);
             if (owner.equals(username)) {
                 targetPlayerInfo = info;
-                territoriesVisible = (ArrayList<Integer>)info.get(DBHelper.VISIBLE_TERRITORIES_KEY);
+                territoriesVisible = (ArrayList<Integer>)targetPlayerInfo.get(DBHelper.VISIBLE_TERRITORIES_KEY);
             }
         }
 
+        //Populate allies
+        if (targetPlayerInfo.containsKey(DBHelper.ALLIES_KEY)) {
+            ArrayList<String> foreignAllies = (ArrayList<String>)targetPlayerInfo.get(DBHelper.ALLIES_KEY);
+            for (String ally : foreignAllies) {
+                allies.add(ally);
+            }
+        }
+        System.out.println("Allies: " + allies);
+
+        //Filter territories
         ArrayList<DBObject> filteredTerritories = new ArrayList<DBObject>();
         ArrayList<DBObject> territories = (ArrayList<DBObject>)currentTurn.get(DBHelper.TERRITORIES_KEY);
         for (DBObject territory : territories) {
