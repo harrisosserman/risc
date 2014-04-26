@@ -1367,6 +1367,7 @@ public void saveState(){
             player_doc.append(Constants.HIGHESTTECHNOLOGY, otherPlayer_list);
             System.out.println(visibleTerritoriesForEachPlayer.size() + "size");
             player_doc.append(Constants.TERRITORIESVISIBLE, visibleTerritoriesForEachPlayer.get(p));
+            player_doc.append(Constants.ALLIES, p.getAllyNames());
             player_list.add(player_doc);   
         }
 

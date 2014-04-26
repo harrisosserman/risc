@@ -40,6 +40,14 @@ public class Player {
 		allies.add(p);
 	}
 
+	public ArrayList<String> getAllyNames(){
+		ArrayList<String> names = new ArrayList<String>();
+		for(Player p: allies){
+			names.add(p.getName());
+		}
+		return names;
+	}
+
 	public void removeAlly(Player p){
 		int j = 0;
 		for(Player k : allies){
