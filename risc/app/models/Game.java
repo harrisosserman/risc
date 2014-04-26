@@ -237,7 +237,6 @@ public class Game {
             String owner = (String)info.get(DBHelper.OWNER_KEY);
             if (owner.equals(username)) {
                 targetPlayerInfo = info;
-                // territoriesVisible = (ArrayList<Integer>)targetPlayerInfo.get(DBHelper.VISIBLE_TERRITORIES_KEY);
             }
         }
 
@@ -248,13 +247,13 @@ public class Game {
                 allies.add(ally);
             }
         }
-        System.out.println(username + "'s " + "Allies: " + allies);
+        // System.out.println(username + "'s " + "Allies: " + allies);
 
         for (DBObject info : playerInfo) {
             String owner = (String)info.get(DBHelper.OWNER_KEY);
             if (allies.contains(owner)) {
                 ArrayList<Integer> allysVisibleTerritories = (ArrayList<Integer>)info.get(DBHelper.VISIBLE_TERRITORIES_KEY);
-                System.out.println("Ally's Visible terr:" + allysVisibleTerritories);
+                // System.out.println("Ally's Visible terr:" + allysVisibleTerritories);
                 for (Integer territoryNum : allysVisibleTerritories) {
                     if (!territoriesVisible.contains(territoryNum)) {
                         territoriesVisible.add(territoryNum);
@@ -263,7 +262,7 @@ public class Game {
             }
         }
         Collections.sort(territoriesVisible);
-        System.out.println("all visible: " + territoriesVisible);
+        // System.out.println("all visible: " + territoriesVisible);
 
         //Filter territories
         ArrayList<DBObject> filteredTerritories = new ArrayList<DBObject>();
@@ -283,7 +282,7 @@ public class Game {
         if(spies != null){
             for (DBObject spy : spies) {
                 String owner = (String)spy.get(DBHelper.OWNER_KEY);
-                if (owner.equals(username)) {   //TODO allies
+                if (allies.contains(username)) {
                     filteredSpies.add(spy);
                 }
             }
@@ -293,43 +292,35 @@ public class Game {
 
         //Filter playerInfo
         ArrayList<DBObject> filteredPlayerInfo = new ArrayList<DBObject>();
-        // int requestingPlayerNumber = usernames.indexOf(username);
-        // ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
-        // filteredPlayerInfo.add(targetPlayerInfo);
+
         ArrayList<DBObject> highestTech = (ArrayList<DBObject>)targetPlayerInfo.get(DBHelper.HIGHEST_TECHNOLOGY_KEY);
         for (String user : usernames) {
             for (DBObject tech : highestTech) {
                 String owner = (String)tech.get(DBHelper.OWNER_KEY);
-                if (owner.equals(user)) {       //TODO allies
-                    int playerNumber = usernames.indexOf(owner);
-                    int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
+                if (owner.equals(user)) {
+                    if (allies.contains(user) && !user.equals(username)) {
+                        int requestingPlayerNumber = usernames.indexOf(user);
+                        DBObject allyPlayerInfo = playerInfo.get(requestingPlayerNumber);
+                        ((BasicDBObject)allyPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
+                        filteredPlayerInfo.add(allyPlayerInfo);
+                    }else{
+                        int playerNumber = usernames.indexOf(owner);
+                        int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
 
-                    BasicDBObject formattedTech = new BasicDBObject();
-                    formattedTech.append(DBHelper.OWNER_KEY, owner);
-                    formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
-                    formattedTech.append(DBHelper.LEVEL_KEY, level);
-                    filteredPlayerInfo.add(formattedTech);
-                }else if (user.equals(username)){       //TODO allies
-                    int requestingPlayerNumber = usernames.indexOf(username);
-                    ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
-                    filteredPlayerInfo.add(targetPlayerInfo);
+                        BasicDBObject formattedTech = new BasicDBObject();
+                        formattedTech.append(DBHelper.OWNER_KEY, owner);
+                        formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
+                        formattedTech.append(DBHelper.LEVEL_KEY, level);
+                        filteredPlayerInfo.add(formattedTech);
+                    }
                 }
             }
+            if (user.equals(username)) {
+                int requestingPlayerNumber = usernames.indexOf(user);
+                ((BasicDBObject)targetPlayerInfo).append(DBHelper.PLAYER_NUMBER_KEY, requestingPlayerNumber);
+                filteredPlayerInfo.add(targetPlayerInfo);
+            }
         }
-
-        //TODO allies?
-
-        // for (DBObject tech : highestTech) {
-        //     String owner = (String)tech.get(DBHelper.OWNER_KEY);
-        //     int playerNumber = usernames.indexOf(owner);
-        //     int level = (Integer)tech.get(DBHelper.LEVEL_KEY);
-
-        //     BasicDBObject formattedTech = new BasicDBObject();
-        //     formattedTech.append(DBHelper.OWNER_KEY, owner);
-        //     formattedTech.append(DBHelper.PLAYER_NUMBER_KEY, playerNumber);
-        //     formattedTech.append(DBHelper.LEVEL_KEY, level);
-        //     filteredPlayerInfo.add(formattedTech);
-        // }
 
         currentTurn.put(DBHelper.PLAYER_INFO_KEY, filteredPlayerInfo);
 
