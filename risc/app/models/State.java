@@ -433,8 +433,23 @@ public void moveTypePlace(BasicDBObject move, Player p){
 public void moveTypeAllign(BasicDBObject move, Player p){
     String username = move.get(Constants.ALLY).toString();
     Player ally = myActivePlayers.get(username);
-    PotentialAlly k = new PotentialAlly(p, ally);
-    potentialAllies.add(k);
+    boolean forming = Boolean.parseBoolean(move.get(Constants.FORMALLIANCE).toString());
+    if(!forming){
+        if(p.containsAlly(ally)){
+            p.removeAlly(ally);
+            myActivePlayers.put(p.getName(), p);
+        }
+        if(ally.containsAlly(p)){
+            ally.removeAlly(p);
+            myActivePlayers.put(username, ally);
+
+        }
+    }
+    else{
+        PotentialAlly k = new PotentialAlly(p, ally);
+        potentialAllies.add(k); 
+    }
+
 }
 
 public void moveTypeTrade(BasicDBObject move, Player p){
@@ -736,7 +751,7 @@ public void updateStateWithMoves(){
                 System.out.println("move type = trade");
 
             }
-            approveAlliances();
+            settleTrades();
         }
 
         for(BasicDBObject move : movesArray){
