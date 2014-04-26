@@ -107,6 +107,9 @@ public class Game {
             territory.append(DBHelper.FOOD_KEY, foodProductions[i]);
             territory.append(DBHelper.TECHNOLOGY_KEY, techProductions[i]);
 
+            ArrayList<DBObject> alliedTroops = new ArrayList<DBObject>();
+            territory.append(DBHelper.ALLIED_TROOPS, alliedTroops);
+
             territories.add(territory);
         }
         state.append(DBHelper.TERRITORIES_KEY, territories);
@@ -122,9 +125,6 @@ public class Game {
             info.append(DBHelper.FOOD_KEY, foodPerPlayer);
             info.append(DBHelper.TECHNOLOGY_KEY, techPerPlayer);
             info.append(DBHelper.ADDITIONAL_INFANTRY_KEY, infantryPerPlayer);
-
-            ArrayList<DBObject> alliedTroops = new ArrayList<DBObject>();
-            info.append(DBHelper.ALLIED_TROOPS, alliedTroops);
 
             ArrayList<Integer> visibleTerritories = initialVisibleTerritories(countryOwners, usernames.indexOf(username));
             info.append(DBHelper.VISIBLE_TERRITORIES_KEY, visibleTerritories);
