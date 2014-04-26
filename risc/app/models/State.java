@@ -609,37 +609,38 @@ public void settleTrades(){
 public void executeTrade(Trade t){
     Player p1 = myActivePlayers.get(t.getGiver());
     Player p2 = myActivePlayers.get(t.getReceiver());
-    TradeType type = t.getTradeType();
-    switch(type){
+    TradeType type_= t.getTradeType();
+    TroopType type;
+    switch(type_){
         case INFANTRY:
         {       
-            TroopType type = TroopType.INFANTRY;
+            type = TroopType.INFANTRY;
             break;
         }
         case AUTOMATIC:         
         {       
-            TroopType type = TroopType.AUTOMATIC;
+            type = TroopType.AUTOMATIC;
             break;
         }
         case ROCKETS: 
         {       
-            TroopType type = TroopType.ROCKETS;
+            type = TroopType.ROCKETS;
             break;
         }
         case TANKS:
         {       
-            TroopType type = TroopType.TANKS;
+             type = TroopType.TANKS;
             break;
         }
         case IMPROVEDTANKS:
         {       
-            TroopType type = TroopType.IMPROVEDTANKS;
+             type = TroopType.IMPROVEDTANKS;
             break;
 
         }
         case PLANES:
         {       
-            TroopType type = TroopType.PLANES;
+             type = TroopType.PLANES;
             break;
 
         }
@@ -665,12 +666,12 @@ public void executeTrade(Trade t){
                 return;
             }
         default: return;
-
+    }
         //army stuff
-        int troopsToDelete = t.getAmount()
+        int troopsToDelete = t.getAmount();
                 for(Integer position : territories.keySet()){
                     Territory terr = territories.get(position);
-                    if(t.getOwner().equals(p1)){
+                    if(terr.getOwner().equals(p1)){
                         while(terr.tryToDeleteTroop(type) && troopsToDelete >0){
                             troopsToDelete --;
                         }
@@ -682,7 +683,7 @@ public void executeTrade(Trade t){
                 int troopsToAdd = t.getAmount();
                 for(Integer position : territories.keySet()){
                     Territory terr = territories.get(position);
-                    if(t.getOwner().equals(p2)){
+                    if(terr.getOwner().equals(p2)){
                         while(troopsToAdd >0){
                             terr.addTroop(type);
                             troopsToAdd --;
@@ -692,7 +693,7 @@ public void executeTrade(Trade t){
                         }
                     }
                 }
-    }
+    
 
 }
 
