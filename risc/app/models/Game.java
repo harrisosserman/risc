@@ -123,6 +123,8 @@ public class Game {
             info.append(DBHelper.TECHNOLOGY_KEY, techPerPlayer);
             info.append(DBHelper.ADDITIONAL_INFANTRY_KEY, infantryPerPlayer);
 
+            ArrayList<DBObject> alliedTroops = new ArrayList<DBObject>();
+            info.append(DBHelper.ALLIED_TROOPS, alliedTroops);
 
             ArrayList<Integer> visibleTerritories = initialVisibleTerritories(countryOwners, usernames.indexOf(username));
             info.append(DBHelper.VISIBLE_TERRITORIES_KEY, visibleTerritories);
