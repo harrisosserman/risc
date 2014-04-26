@@ -5,6 +5,7 @@
     "turn": 0,
     "notifyNukesAvailable": true,
     "canUseNukes": true,
+    "winner":"harris",  //only there if someone has won
     "territories": [
                 {
                     "owner": "kat",
