@@ -210,9 +210,35 @@ public class Game {
         return true;
     }
 
+    private String getGameWinner(DBObject currentTurn){
+        String winner = null;
+        HashMap<String, Integer> playerTerritoryCounts = new HashMap<String, Integer>();
+        ArrayList<DBObject> territories = (ArrayList<DBObject>)currentTurn.get(DBHelper.TERRITORIES_KEY);
+        for (DBObject territory : territories) {
+            String owner = (String)territory.get(DBHelper.OWNER_KEY);
+            if (!playerTerritoryCounts.containsKey(owner)) {
+                playerTerritoryCounts.put(owner, new Integer(0));
+            }
+            Integer incrementedCount = new Integer(playerTerritoryCounts.get(owner).intValue());
+            playerTerritoryCounts.put(owner, incrementedCount);
+        }
+
+        if (playerTerritoryCounts.size() > 1) {
+            return null;
+        }else{
+            return (String)playerTerritoryCounts.keySet().toArray()[0];
+        }
+    }
+
     public String getCurrentGameStateJson(String username, ArrayList<String> usernames){        
         DBObject currentTurn = DBHelper.getCurrentTurnForGame(myGameID);
         DBObject filteredCurrentTurn = filterStateForUsername(currentTurn, username, usernames);
+        
+        String winner = getGameWinner(currentTurn);
+        if (winner != null) {
+            filteredCurrentTurn.put(DBHelper.WINNER_KEY, winner);
+        }
+
         return filteredCurrentTurn.toString();
     }
 
