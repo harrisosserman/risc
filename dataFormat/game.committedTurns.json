@@ -38,13 +38,13 @@
             "offer": [
                 {
                     "giver": "USERNAME",
-                    "reciever": "USERNAME",
+                    "receiver": "USERNAME",
                     "number": 5,             //number refers to the number of things or the territory number
                     "type": "TERRITORY"                //types are: "NONE, TERRITORY, FOOD, TECHNOLOGY, INFANTRY, AUTOMATIC, etc"
                 },
                 {
                     "giver": "USERNAME",
-                    "reciever": "USERNAME",
+                    "receiver": "USERNAME",
                     "number": 5,             //number refers to the number of things or the territory number
                     "type": "TERRITORY"               //types are: "NONE, TERRITORY, FOOD, TECHNOLOGY, INFANTRY, AUTOMATIC, etc"
                 }

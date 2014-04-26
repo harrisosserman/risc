@@ -170,7 +170,7 @@
             $("#dialog").dialog();
             $("#dialog").dialog('close');
             board.hasNotUpgradedThisTurn(true);
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
                     }).done(function(result) {
                         if(globalFunctions.getPlayerNumber() === -1) {
@@ -670,7 +670,7 @@
             if(globalFunctions.getPlayerNumber() !== -1) {
                 return;
             }
-            $.ajax('/test/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
+            $.ajax('/game/' + globalFunctions.getGameID() + '/map/' + globalFunctions.getUsername(), {
                 method: 'GET',
             }).done(function() {
                 globalFunctions.destroyAndRebuildMap();

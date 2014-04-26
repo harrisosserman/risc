@@ -81,28 +81,47 @@ public class Turn {
         while(movesData.hasNext()){
                 JsonNode moveData = movesData.next();
                 int moveType = Integer.parseInt(moveData.get(Constants.MOVETYPE).toString());
-                String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                 if(moveType == 0){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     String upgradeType = API.removeQuotes(moveData.get(Constants.UPGRADETYPE).toString());
                     int position = Integer.parseInt(moveData.get(Constants.POSITION).toString());
                     Upgrade newMove = new Upgrade(moveType, troopType, upgradeType, position);
                     moves.add(newMove);
                 }
                 else if(moveType == 1){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     int start = Integer.parseInt(moveData.get(Constants.START).toString());
                     int end = Integer.parseInt(moveData.get(Constants.END).toString());
                     Move newMove = new Move(moveType, troopType, start, end);
                     moves.add(newMove);
                 }
                 else if(moveType == 2){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     int start = Integer.parseInt(moveData.get(Constants.START).toString());
                     int end = Integer.parseInt(moveData.get(Constants.END).toString());
                     Attack newMove = new Attack(moveType, troopType, start, end);
                     moves.add(newMove);
                 }
                 else if(moveType == 3){
+                    String troopType = API.removeQuotes(moveData.get(Constants.TROOPTYPE).toString());
                     int position = Integer.parseInt(moveData.get(Constants.POSITION).toString());
                     Place newMove = new Place(moveType, troopType, position);
+                    moves.add(newMove);
+                }
+                else if(moveType == 4){
+                    String giver_ = API.removeQuotes(moveData.get(Constants.GIVER).toString());
+                    String receiver_ = API.removeQuotes(moveData.get(Constants.RECEIVER).toString());
+                    int amount = Integer.parseInt(moveData.get(Constants.NUMBER).toString());
+                    String type = API.removeQuotes(moveData.get(Constants.TYPE).toString());
+                    Trade newMove = new Trade(moveType, giver_, receiver_, amount, type);
+                    moves.add(newMove);
+                }
+                else if(moveType == 5){
+                    String formString = moveData.get(Constants.FORMALLIANCE).toString();
+                    boolean form = Boolean.parseBoolean(formString);
+                    String owner = API.removeQuotes(moveData.get(Constants.OWNER).toString());
+                    String ally = API.removeQuotes(moveData.get(Constants.ALLY).toString());
+                    Allign newMove = new Allign(moveType, form, owner, ally);
                     moves.add(newMove);
                 }
         }
@@ -203,33 +222,60 @@ public class Turn {
          //   System.out.println("in loop of move size " + i);
             BasicDBObject move_doc = new BasicDBObject();
             move_doc.append(Constants.MOVETYPE, moves.get(i).getMoveType());
-            move_doc.append(Constants.TROOPTYPE, moves.get(i).getTroopType());
             if(moves.get(i).getMoveType() == 0){
                 Upgrade upgrade = (Upgrade) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, upgrade.getTroopType());
                 move_doc.append(Constants.UPGRADETYPE, upgrade.getUpgradeType());
                 move_doc.append(Constants.POSITION, upgrade.getPosition());
                 move_list.add(move_doc);
             }
             else if(moves.get(i).getMoveType() == 1){
                 Move move = (Move) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, move.getTroopType());
                 move_doc.append(Constants.START, move.getStart());
                 move_doc.append(Constants.END, move.getEnd());
                 move_list.add(move_doc);
             }
             else if(moves.get(i).getMoveType() == 2){
                 Attack attack = (Attack) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, attack.getTroopType());                
                 move_doc.append(Constants.START, attack.getStart());
                 move_doc.append(Constants.END, attack.getEnd());
                 move_list.add(move_doc);
             }
             else if(moves.get(i).getMoveType() == 3){
                 Place place = (Place) moves.get(i);
+                move_doc.append(Constants.TROOPTYPE, place.getTroopType());                
                 move_doc.append(Constants.POSITION, place.getPosition());
                 move_list.add(move_doc);
             }
-            
-        }
+            else if(moves.get(i).getMoveType() == 5){
+                Allign ally = (Allign) moves.get(i);
+                move_doc.append(Constants.FORMALLIANCE, ally.forming());
+                move_doc.append(Constants.OWNER, ally.getOwner());
+                move_doc.append(Constants.ALLY, ally.getAlly());
+                move_list.add(move_doc);
+            }
 
+        }
+            BasicDBObject move_doc = new BasicDBObject();
+            move_doc.append(Constants.MOVETYPE, 4);
+            List<BasicDBObject> trade_list = new ArrayList<BasicDBObject>();
+        for(int i=0; i<moves.size(); i++){
+            BasicDBObject trade_doc = new BasicDBObject();
+            if(moves.get(i).getMoveType() == 4){
+                Trade trade = (Trade) moves.get(i);
+                trade_doc.append(Constants.GIVER, trade.getGiver());
+                trade_doc.append(Constants.RECEIVER, trade.getReceiver());
+                trade_doc.append(Constants.TYPE, trade.getTradeType());
+                trade_doc.append(Constants.NUMBER, trade.getAmount());
+                trade_list.add(trade_doc);
+            }
+        }
+        move_doc.append(Constants.OFFER, trade_list);
+
+        move_list.add(move_doc);
+        
         turn_doc.append(Constants.MOVES, move_list);
 
         committedTurns.insert(turn_doc);
