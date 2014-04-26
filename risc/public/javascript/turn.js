@@ -32,8 +32,8 @@
                     if(playerNumberFound === false) {
                         globalFunctions.setPlayerNumber(-1);
                     }
-                    if(otherPlayersFound === false) {
-                        alert("Player " + owner + " wins!!!");
+                    if(typeof data.winner !== 'undefined') {
+                        alert("Player " + data.winner + " wins!!!!!");
                         $.ajax('/game/' + globalFunctions.getGameID() + '/end', {
                             method: 'POST'
                         });
