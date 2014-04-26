@@ -167,14 +167,14 @@ public class API extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result logUserIn(String username){
 
-        if (!TimeoutManager.isStarted()) {
-            Akka.system().scheduler().schedule(
-            Duration.create(0, TimeUnit.MILLISECONDS),
-            Duration.create(5, TimeUnit.SECONDS),
-            new TimeoutManager(),
-            Akka.system().dispatcher()
-            ); 
-        }
+        // if (!TimeoutManager.isStarted()) {
+        //     Akka.system().scheduler().schedule(
+        //     Duration.create(0, TimeUnit.MILLISECONDS),
+        //     Duration.create(5, TimeUnit.SECONDS),
+        //     new TimeoutManager(),
+        //     Akka.system().dispatcher()
+        //     ); 
+        // }
 
         RequestBody body = request().body();
         String jsonUsername = body.asJson().get(UserManager.NAME_KEY).toString();
