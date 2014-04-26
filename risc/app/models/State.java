@@ -47,6 +47,7 @@ public State(String gameID){
     visibleTerritoriesForEachPlayer = new HashMap<Player, TreeSet<Integer>>();
     spies = new HashMap<Integer, ArrayList<Spy>>();
     potentialAllies = new ArrayList<PotentialAlly>();
+    tradeOrders = new ArrayList<Trade>();
 
 }
 
