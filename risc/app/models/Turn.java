@@ -109,12 +109,22 @@ public class Turn {
                     moves.add(newMove);
                 }
                 else if(moveType == 4){
-                    String giver_ = API.removeQuotes(moveData.get(Constants.GIVER).toString());
-                    String receiver_ = API.removeQuotes(moveData.get(Constants.RECEIVER).toString());
-                    int amount = Integer.parseInt(moveData.get(Constants.NUMBER).toString());
-                    String type = API.removeQuotes(moveData.get(Constants.TYPE).toString());
+                    Iterator<JsonNode> tradeData_ = moveData.get(Constants.OFFER).elements();
+                    JsonNode tradeData = tradeData_.next();
+                    System.out.println("trade");
+                    String giver_ = API.removeQuotes(tradeData.get(Constants.GIVER).toString());
+                    System.out.println("trade");
+                    String receiver_ = API.removeQuotes(tradeData.get(Constants.RECEIVER).toString());
+                    System.out.println("trade");
+                    int amount = Integer.parseInt(API.removeQuotes(tradeData.get(Constants.NUMBER).toString()));
+                    System.out.println(amount);
+                    System.out.println("trade");
+                    String type = API.removeQuotes(tradeData.get(Constants.TYPE).toString());
+                    System.out.println("trade");
                     Trade newMove = new Trade(moveType, giver_, receiver_, amount, type);
+                    System.out.println("trade");
                     moves.add(newMove);
+                    System.out.println("trade");
                 }
                 else if(moveType == 5){
                     String formString = moveData.get(Constants.FORMALLIANCE).toString();
@@ -125,6 +135,7 @@ public class Turn {
                     moves.add(newMove);
                 }
         }
+        System.out.println("trade");
         int result = commitTurn(moves, player_);
 
         return result;
@@ -264,27 +275,38 @@ public class Turn {
             List<BasicDBObject> trade_list = new ArrayList<BasicDBObject>();
             boolean isThereATrade = false;
         for(int i=0; i<moves.size(); i++){
+            System.out.println("bottom");
             BasicDBObject trade_doc = new BasicDBObject();
             if(moves.get(i).getMoveType() == 4){
                 isThereATrade = true;
+                            System.out.println("bottom");
                 Trade trade = (Trade) moves.get(i);
                 trade_doc.append(Constants.GIVER, trade.getGiver());
+                            System.out.println("bottom");
                 trade_doc.append(Constants.RECEIVER, trade.getReceiver());
-                trade_doc.append(Constants.TYPE, trade.getTradeType());
+                trade_doc.append(Constants.TYPE, trade.getTradeType().toString());
+                            System.out.println("bottom");
                 trade_doc.append(Constants.NUMBER, trade.getAmount());
                 trade_list.add(trade_doc);
+                        System.out.println("bottom");
             }
         }
         if(isThereATrade){
+                                     System.out.println("bottom");
+
             move_doc.append(Constants.OFFER, trade_list);
+                            System.out.println("bottom");
 
             move_list.add(move_doc);
         }
+                            System.out.println("bottom");
 
         
         turn_doc.append(Constants.MOVES, move_list);
+                            System.out.println("bottom");
 
         committedTurns.insert(turn_doc);
+                            System.out.println("bottom");
 
         return turn;
     }

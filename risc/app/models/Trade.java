@@ -14,10 +14,16 @@ public class Trade extends MoveType{
 
 	public Trade(int movetype, String give, String recieve, int number, String type){
 		super(movetype);
+		System.out.println("trade");
+
 		giver = give;
+		System.out.println("trade");
 		reciever = recieve;
+		System.out.println("trade");
 		myAmount = number;
-	//	myType = fromString(type);
+		System.out.println("trade");
+		myType = fromString(type);
+		System.out.println("trade");
 
 	}
 
@@ -38,15 +44,33 @@ public class Trade extends MoveType{
 	}
 
 	public boolean equivalentTo(Trade t){
-		if(t.getGiver().equals(reciever)){
-			if(t.getReceiver().equals(giver)){
-			//	if(t.getAmount() == myAmount)){
+		if(t.getGiver().equals(giver)){
+			if(t.getReceiver().equals(reciever)){
+				if(t.getAmount() == myAmount){
 					if(t.getTradeType().equals(myType)){
 						return true;
-				//	}
+					}
 				}
 			}
 		}
         return false;
 	}   
+
+	public TradeType fromString(String s){
+		switch(s){
+			case "INFANTRY": return TradeType.INFANTRY;
+			case "AUTOMATIC" : return TradeType.AUTOMATIC;
+			case "ROCKETS" : return TradeType.ROCKETS;
+			case "TANKS": return TradeType.TANKS;
+			case "IMPROVEDTANKS": return TradeType.IMPROVEDTANKS;
+			case "PLANES": return TradeType.PLANES;
+			case "SPIES": return TradeType.SPIES;
+			case "INTERCEPTOR": return TradeType.INTERCEPTOR;
+			case "NUKE": return TradeType.NUKE;
+			case "TERRITORY": return TradeType.TERRITORY;
+			case "FOOD": return TradeType.FOOD;
+			case "TECHNOLOGY": return TradeType.TECHNOLOGY;
+			default: return TradeType.INFANTRY;
+		}
+	}
 }

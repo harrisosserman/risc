@@ -453,20 +453,33 @@ public void moveTypeAllign(BasicDBObject move, Player p){
 }
 
 public void moveTypeTrade(BasicDBObject move, Player p){
-    ArrayList<Trade> playerTrades;
-    if(!tradeOrders.contains(p)){
-        playerTrades = new ArrayList<Trade>();
-    }   
-    else{
-        playerTrades = tradeOrders.get(p);
+    BasicDBList moves = (BasicDBList) move.get(Constants.OFFER);  
+    BasicDBObject[] tradeList = moves.toArray(new BasicDBObject[0]);
+    for(BasicDBObject trade: tradeList){
+        ArrayList<Trade> playerTrades;
+            System.out.println("creating move");
+        if(!tradeOrders.containsKey(p)){
+            System.out.println("creating moveif");
+            playerTrades = new ArrayList<Trade>();
+            System.out.println("creating move if");
+        }   
+        else{
+            System.out.println("creating move else");
+            playerTrades = tradeOrders.get(p);
+        }
+        String giver_ = trade.get(Constants.GIVER).toString();
+        System.out.println("creating move");
+        String receiver_ = trade.get(Constants.RECEIVER).toString();
+        int amount = Integer.parseInt(trade.get(Constants.NUMBER).toString());
+        String type = trade.get(Constants.TYPE).toString();
+        System.out.println("creating move");
+        Trade newTrade = new Trade(4, giver_, receiver_, amount, type);
+        System.out.println("creating move");
+        playerTrades.add(newTrade);
+        System.out.println("creating move");
+        tradeOrders.put(p, playerTrades);
+        System.out.println("creating move end");
     }
-    String giver_ = move.get(Constants.GIVER).toString();
-    String receiver_ = move.get(Constants.RECEIVER).toString();
-    int amount = Integer.parseInt(move.get(Constants.NUMBER).toString());
-    String type = move.get(Constants.TYPE).toString();
-    Trade newTrade = new Trade(4, giver_, receiver_, amount, type);
-    playerTrades.add(newTrade);
-    tradeOrders.put(p, playerTrades);
 }
 
 public int computeCostOfUpgrade(int oldlevel, int newlevel){
@@ -599,7 +612,11 @@ public int computeCostOfTroopUpgrade(TroopType old, TroopType new_){
 }
 
 public void approveAlliances(){
+    System.out.println("approve the allign");
+
     for(PotentialAlly p : potentialAllies){
+        System.out.println("approve allign2");
+
         Player p1 = p.getProposer();
         Player p2 = p.getAccepter();
         for(PotentialAlly k : potentialAllies){
@@ -614,34 +631,62 @@ public void approveAlliances(){
 }
 
 public void settleTrades(){
-    for(String username : myActivePlayers.keySey()){
+    System.out.println("settling");
+    for(String username : myActivePlayers.keySet()){
         Player p = myActivePlayers.get(username);
+            System.out.println("settling");
         ArrayList<Trade> trades = tradeOrders.get(p);
         for(Trade trade : trades){
-            String 
-        }
-    }
+            String giver = trade.getGiver();
+                System.out.println("settling");
+            String receiver = trade.getReceiver();
+            Player giverP = myActivePlayers.get(giver);
+            Player receiverP = myActivePlayers.get(receiver);
+            if(giverP.equals(p)){
+                ArrayList<Trade> tradesToExamine = tradeOrders.get(receiverP);
+                for(Trade t : tradesToExamine){
+                        System.out.println("settling p");
+                    if(t.equivalentTo(trade)){
+                        tradesToExamine.remove(t);
+                        executeTrade(t);
+                            System.out.println("settling");
+                        tradeOrders.put(receiverP, tradesToExamine);
+                        break;
+                    }
+                }
+            }
+            else if(receiverP.equals(p)){
+                    System.out.println("settling q");
+                ArrayList<Trade> tradesToExamine = tradeOrders.get(giverP);
+                                    System.out.println("settling q");
 
-    ArrayList<Trade> tradeListSample = tradeOrders;
-    for(int i=tradeOrders.size(); i>0; i--){
-        for(int j=tradeListSample.size(); j>0; j--){
-            Trade t1 = tradeOrders.get(i);
-            Trade t2 = tradeListSample.get(j);
-            if(t1.equivalentTo(t2)){
-                executeTrade(t1);
-                tradeListSample.remove(i);
-                break;
+                for(Trade t : tradesToExamine){
+                                        System.out.println("settling q");
 
+                    if(t.equivalentTo(trade)){
+
+                            System.out.println("settling");
+                        tradesToExamine.remove(t);
+                        executeTrade(t);
+                        tradeOrders.put(giverP, tradesToExamine);
+                                            System.out.println("settling q");
+
+                        break;
+                    }
+                }
             }
         }
     }
 }
 
 public void executeTrade(Trade t){
+            System.out.println("executing" );
+
     Player p1 = myActivePlayers.get(t.getGiver());
     Player p2 = myActivePlayers.get(t.getReceiver());
     TradeType type_= t.getTradeType();
     TroopType type;
+          System.out.println("executing" );
     switch(type_){
         case INFANTRY:
         {       
@@ -761,12 +806,16 @@ public void updateStateWithMoves(){
             approveAlliances();
         }
         for(BasicDBObject move : movesArray){
+            System.out.println("move type = trade");
             int moveType = Integer.parseInt(move.get(Constants.MOVETYPE).toString());
+            System.out.println("move type = trade");
             if(moveType == 4){
+                System.out.println("move type = trade");
                 moveTypeTrade(move, p);
                 System.out.println("move type = trade");
 
             }
+            System.out.println("move type = before settle");
             settleTrades();
         }
 
@@ -813,10 +862,13 @@ public void doAttacksAndMoves(){
     /*
     for each territory:
     */
+    System.out.println("attacks&moves");
     for(Integer position : territories.keySet()){
         HashMap<Integer, Attacker> attackers = territories.get(position).getAttackers();
         HashMap<Player, Attacker> attacks = new HashMap<Player, Attacker>();
+            System.out.println("attacks&moves territories");
         for(Integer attackerint : attackers.keySet()){
+                System.out.println("attackerslist");
             Attacker a = attackers.get(attackerint);
             int attackingFrom = a.getTerritory();
             HashMap<Integer, Attacker> attackers_crossing = territories.get(attackingFrom).getAttackers();
@@ -842,26 +894,40 @@ public void doAttacksAndMoves(){
         }
 
 
-
+        System.out.println("attacks&moves");
         HashMap<Player, Army> allies = territories.get(position).getAllies();
 
         Army winner = battle(attackersForBattle(attacks), territories.get(position).getDefendingArmy(), alliesForBattle(allies));
        // territories.get(position).setDefendingArmy(winner);
         compareSittingTroops();
         Territory t = territories.get(position);
+
+
+        System.out.println("attacks + moves" );
         t.addTroop(TroopType.INFANTRY);
+
+        System.out.println("attacks + moves" );
         t.setOwner(winner.getOwner());
+
+        System.out.println("attacks + moves" );
         territories.put(position, t);
 
+        System.out.println("attacks + moves" );
     }
     finalizeState();
 }
 
 public void compareSittingTroops(){
+        System.out.println("compare troops");
     for(Integer position : territories.keySet()){
         Territory terr = territories.get(position);
+
+        System.out.println("compare troops position" );
         HashMap<Player, Army> alliedArmies = terr.getAllies();
         for(Player p : alliedArmies.keySet()){
+
+
+        System.out.println("compare troops  allied armies" );
             for(Player q : alliedArmies.keySet()){
                 if(!p.containsAlly(q) && !p.equals(q)){
                     Army p_army = alliedArmies.get(p);
@@ -869,6 +935,9 @@ public void compareSittingTroops(){
                     Player winner = battleOnHomeGround(p_army, p, q_army, q);
                     if(winner.equals(p)){
                         alliedArmies.remove(q);
+
+
+        System.out.println("compare troops winner" );
                         terr.setAllies(alliedArmies);
                     }
                     else{
@@ -1169,6 +1238,8 @@ public Army battle(ArrayList<Attacker> attackers, Army defender, ArrayList<Army>
  */
 
 public void finalizeState(){
+
+        System.out.println("finalize" );
     for(Integer k : spies.keySet()){
         ArrayList<Spy> spys_ = spies.get(k);
         if(spys_.size()>0){
